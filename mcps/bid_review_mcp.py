@@ -206,6 +206,57 @@ def score_item(doc_id: str, profile_id: str = "profile-a") -> dict[str, Any]:
     return {"doc_id": doc.doc_id, "file_name": doc.file_name, **result}
 
 
+@mcp.tool()
+def list_documents(limit: int = 5) -> dict[str, Any]:
+    """列出最近解析过的文档（含 doc_id / 文件名 / 页数 / 解析状态）。
+
+    用户没有给出 doc_id 时**先调用本工具**，不要凭文件名或 S3 路径猜 doc_id。
+    """
+    items = store.list_docs(limit=max(1, min(int(limit or 5), 20)))
+    return {
+        "count": len(items),
+        "items": items,
+        "hint": "把 items[0].doc_id 传给 parse_tender 继续评审",
+    }
+
+
+@mcp.tool()
+def parse_attachment(s3_path: str) -> dict[str, Any]:
+    """解析聊天里上传的附件（Nexent 对象存储路径，形如 s3://nexent/attachments/...）。
+
+    取回文件后走与页面上传完全相同的解析流程，返回 doc_id 与字段；后续工具都用这个 doc_id。
+    若附件读取失败（凭据未配置等），返回 error 并提示改用页面上传 + list_documents。
+    """
+    from api import ingest, s3fetch
+
+    if not s3fetch.configured():
+        return _error(
+            "附件存储未配置（缺少 S3_ACCESS_KEY / S3_SECRET_KEY）",
+            hint="请在页面 http://<host>:8080 上传文件，再用 list_documents 取 doc_id",
+        )
+    try:
+        name, blob = s3fetch.fetch(s3_path)
+        doc = ingest.ingest(blob, name, source="attachment")
+    except Exception as exc:  # noqa: BLE001 - 工具不抛异常，如实返回
+        return _error(f"读取或解析附件失败：{exc}", s3_path=s3_path)
+    return ingest.summary(doc)
+
+
+@mcp.tool()
+def export_report(review_id: str, format: str = "docx") -> dict[str, Any]:
+    """生成审核报告并返回文件信息（docx / pdf）。
+
+    报告内容只读该次评审的结果，不重新算分；同一评审重复调用返回同一文件（幂等）。
+    返回 `path / download_url / numbers`，numbers 与页面上展示的数值一致。
+    """
+    from api.report import service as report_service
+
+    try:
+        return report_service.summary(review_id, format)
+    except Exception as exc:  # noqa: BLE001 - 工具不抛异常
+        return _error(f"报告生成失败：{exc}", review_id=review_id, format=format)
+
+
 def _relax_transport_security() -> None:
     """容器内以服务名互访时 Host 头是 mcp:8765；新版 MCP 的 DNS rebinding 防护会返回 421。
 

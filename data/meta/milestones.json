@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-15",
-  "current": "D6",
+  "current": "D7",
   "note": "页面与文档同源：改这里不用改前端。status 取 done / doing / planned。",
   "items": [
     {
@@ -35,8 +35,8 @@
       "id": "M4",
       "name": "报告与摘要",
       "day": "D7",
-      "status": "planned",
-      "target": "docx/pdf 一键下载；报告数值 = 页面数值"
+      "status": "done",
+      "target": "docx/pdf 报告九章导出，报告数值 = 评审 JSON；页脚免责 + 页码；check_report 逐项一致"
     },
     {
       "id": "M5",
@@ -54,41 +54,41 @@
     }
   ],
   "stage": {
-    "label": "D6 交付物",
+    "label": "D7 交付物",
     "items": [
       {
-        "item": "合规定式 + 否定上下文过滤",
-        "path": "api/rules.py",
+        "item": "知识库切 40 分片（一文件一规则）",
+        "path": "knowledge/rules/",
         "status": "done"
       },
       {
-        "item": "计算型规则（限价/低于成本/有效期/贴标/大小写）",
-        "path": "api/checks.py",
+        "item": "提示词 v3（7 工具 + 能力边界）",
+        "path": "prompt.md",
         "status": "done"
       },
       {
-        "item": "15 份植入风险样本 + 标注",
-        "path": "data/samples/risk/",
+        "item": "聊天附件解析（S3）",
+        "path": "api/s3fetch.py",
         "status": "done"
       },
       {
-        "item": "5 份干净对照（误报组）",
-        "path": "data/samples/bid-00*.docx",
+        "item": "MCP 8 工具",
+        "path": "mcps/bid_review_mcp.py",
         "status": "done"
       },
       {
-        "item": "检出率/误报率评测脚本",
-        "path": "tools/eval_risks.py",
+        "item": "报告九章装配",
+        "path": "api/report/builder.py",
         "status": "done"
       },
       {
-        "item": "dev/holdout 分档成绩",
-        "path": "tools/eval_risks.py",
+        "item": "docx / pdf 导出",
+        "path": "api/report/",
         "status": "done"
       },
       {
-        "item": "误报治理留痕（66.7% → 0%）",
-        "path": "docs/D6-交接文档.md",
+        "item": "报告数值一致性校验",
+        "path": "tools/check_report.py",
         "status": "done"
       }
     ]

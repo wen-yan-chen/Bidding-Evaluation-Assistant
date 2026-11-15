@@ -51,7 +51,7 @@ def health_detail() -> dict[str, Any]:
             "qualification": True,   # D5 资格性核验（R01–R10 三态）
             "scoring": True,       # D5 分项评分（两套细则可切换）
             "risk_scan": True,     # D6 风险扫描（关键词 + 计算型）
-            "report_export": False,  # D7 docx/pdf 导出
+            "report_export": True,   # D7 docx/pdf 报告导出（九章 + 双指纹）
             "mcp": True,           # D4 MCP 工具服务（compose 内 mcp 服务，8765）
             "knowledge_base": True,   # D4 知识库（平台已导入，检索命中 R12）
             "skills": False,       # D5 Skill 挂载

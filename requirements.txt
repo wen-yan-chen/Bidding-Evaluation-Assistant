@@ -11,3 +11,7 @@ pypdfium2>=5.0
 # D4 规则库 + MCP 工具服务
 pyyaml>=6.0
 mcp>=1.2,<2
+# D7 起：读取 Nexent 聊天附件（MinIO/S3）
+minio>=7.2
+# D7 起：PDF 报告（内置 CID 中文字体，不依赖 LibreOffice）
+reportlab>=4.0

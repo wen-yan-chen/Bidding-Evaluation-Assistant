@@ -1,73 +1,32 @@
-"""文档接口：上传解析、查询结果、取原文（D2 上线）。
+"""文档接口：上传解析、查询结果、取原文（D2 上线，D7 起复用 ingest 统一入库）。
 
 设计要点：
 - 解析失败不报 500，返回 `parse_status=failed` + 原因，前端可直接展示；
 - 文档 ID 是 `YYYYMMDD-8位hex`，服务端做正则校验，挡路径穿越；
-- 结果落盘，重启后仍可查询（演示与复算都依赖这一点）。
+- 结果落盘，重启后仍可查询（演示与复算都依赖这一点）；
+- 页面传的文件与聊天附件（MCP `parse_attachment`）走同一个 `api.ingest`，口径一致。
 """
 
 from __future__ import annotations
 
-import hashlib
 import mimetypes
-from datetime import datetime
 from typing import Any
-from uuid import uuid4
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
-from api import config, store
-from api.extract import extract_fields
-from api.parsers.dispatch import SUPPORTED_EXTS, parse_file
+from api import config, ingest, store
+from api.parsers import ParseError, ext_of
+from api.parsers.dispatch import SUPPORTED_EXTS
 
 router = APIRouter(prefix="/api", tags=["docs"])
 MAX_BYTES = config.settings.max_upload_mb * 1024 * 1024
 
 
-def _new_doc_id() -> str:
-    return f"{datetime.now(config.CST):%Y%m%d}-{uuid4().hex[:8]}"
-
-
-def _summary(doc) -> dict[str, Any]:  # noqa: ANN001 - Doc，避免循环导入
-    return {
-        "doc_id": doc.doc_id,
-        "file_name": doc.file_name,
-        "ext": doc.ext,
-        "sha256": doc.sha256,
-        "page_count": len(doc.pages),
-        "char_count": len(doc.full_text),
-        "page_source": doc.page_source,
-        "parse_status": doc.parse_status,
-        "degraded": doc.degraded,
-        "text_pages": doc.meta.get("text_pages") or [],
-        "ocr_pages": doc.meta.get("ocr_pages") or [],
-        "empty_pages": doc.meta.get("empty_pages") or [],
-        "clause_count": len(doc.clauses),
-        "fields": [
-            {
-                "name": f.name,
-                "value": f.value,
-                "page": f.page,
-                "char_start": f.char_start,
-                "char_end": f.char_end,
-                "quote": f.quote,
-            }
-            for f in doc.fields
-        ],
-        "missing_fields": [
-            name
-            for name in ("项目名称", "项目编号", "采购人", "投标人", "报价", "工期")
-            if all(f.name != name for f in doc.fields)
-        ],
-        "created_at": doc.meta.get("created_at"),
-    }
-
-
 @router.post("/upload", summary="上传招标/投标文件并解析")
 async def upload(file: UploadFile = File(..., description="docx / pdf / txt / md")) -> dict[str, Any]:
     name = (file.filename or "unnamed").strip()
-    ext = ("." + name.rsplit(".", 1)[-1].lower()) if "." in name else ""
+    ext = ext_of(name)
     if ext not in SUPPORTED_EXTS:
         raise HTTPException(415, f"不支持的文件类型：{ext or '无扩展名'}（支持 {' / '.join(SUPPORTED_EXTS)}）")
 
@@ -77,27 +36,16 @@ async def upload(file: UploadFile = File(..., description="docx / pdf / txt / md
     if len(blob) > MAX_BYTES:
         raise HTTPException(413, f"文件超过 {config.settings.max_upload_mb} MB 限制")
 
-    doc_id = _new_doc_id()
-    sha256 = hashlib.sha256(blob).hexdigest()
-    store.save_upload(doc_id, ext, blob)
-
-    doc = parse_file(blob, name, doc_id, sha256)
-    doc.fields = extract_fields(doc)
-    doc.meta.update(
-        {
-            "created_at": config.iso(config.now()),
-            "size_bytes": len(blob),
-            "content_type": file.content_type or mimetypes.guess_type(name)[0] or "application/octet-stream",
-        }
-    )
-    store.save_doc(doc)
-
-    return _summary(doc)
+    try:
+        doc = ingest.ingest(blob, name, source="upload")
+    except ParseError as exc:
+        raise HTTPException(415, str(exc)) from exc
+    return ingest.summary(doc)
 
 
 @router.get("/documents", summary="已解析文档列表")
-def list_documents() -> dict[str, Any]:
-    items = store.list_docs()
+def list_documents(limit: int = 200) -> dict[str, Any]:
+    items = store.list_docs(limit=limit)
     return {"count": len(items), "items": items}
 
 

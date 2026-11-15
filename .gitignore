@@ -15,6 +15,7 @@ data/uploads/*
 !data/uploads/.gitkeep
 data/parsed/
 data/reviews/
+data/reports/
 data/predictions/
 *.log
 

@@ -2,7 +2,7 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与语义化版本。
 
-## [未发布] — D7 进行中（知识库治理 + 提示词 v2）
+## [0.7.0] — 2026-11-15（D7 知识库治理 + 提示词 v3 + 报告导出）
 
 ### Changed
 
@@ -12,6 +12,31 @@
   D6 的能力边界（10 条 manual / 7 条未实现 / 限价缺失时 R12-R13-R31 不判 / 资质类只在资格核验），
   并删除 D1 遗留的「工具尚未上线」与「待办」章节；`agent.json.prompt` 由脚本同步。
 - 新增 `docs/D7-交接文档.md`（含 .docx）与 `docs/D7-自测记录.md`，记录本次改动、验证与平台侧待办。
+
+### Added
+
+- MCP 新增 `list_documents`（列出最近解析文档，解决"助手拿不到 doc_id"）与 `parse_attachment`（直接解析
+  Nexent 聊天附件，S3/MinIO 取回后走统一入库），工具总数达到 **8 个**。
+- `api/ingest.py`：页面与聊天附件共用的入库入口（解析 + 字段 + 落盘），保证两条路径口径一致。
+- `api/s3fetch.py`：从 Nexent 附件存储按 `s3://bucket/key` 取文件（凭据走环境变量，不写进代码）。
+- 报告导出：`api/report/builder.py`（九章装配 + 双指纹 + 合同六要素）、`docx_export.py`、`pdf_export.py`
+  （reportlab + 内置 CID 中文字体，**不依赖 LibreOffice**）、`api/routes/report.py`
+  （`POST /api/report`、`GET /api/report/{id}`、`GET /api/report/{id}/meta`）、MCP `export_report`。
+- `tools/check_report.py`：报告数值一致性校验（docx/pdf 中总分、满分、风险数、双指纹必须与评审 JSON 一致）。
+- `tests/test_report.py` 5 条：生成与数值一致、幂等、meta、下载、错误处理。
+- 截图：`docs/screenshots/D7-报告docx样例.png`、`D7-报告pdf样例.png`。
+
+### Changed
+
+- `/api/health`：`report_export` 能力开关置 true。
+- `agent.json`：`mcp_info` 补齐 8 个工具名；`prompt` 同步 v3。
+- `data/reports/` 加入 `.gitignore`（报告为运行时产物）。
+
+### Verified
+
+- 报告：docx 41.5 KB（PK 头）/ pdf 10.7 KB（%PDF-），九章齐全，页脚免责 + 页码；
+- `check_report.py`：docx/pdf 数值与评审 JSON 逐项一致（68.0/100、风险 0、双指纹）；
+- `pytest` **47 passed**；`smoke_test.py` **10/10**；MCP 协议实测 8 工具可用。
 
 ## [0.6.0] — 2026-11-15（D6 风险扫描 + 误报治理）
 
