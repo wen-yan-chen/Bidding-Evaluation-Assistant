@@ -9,7 +9,7 @@ data/
 ├── parsed/                # 解析结果 JSON（运行时生成，git 忽略）✅ D2
 ├── samples/               # 投标文件样本 + manifest.json（标准答案）✅ 15 份（含 5 份扫描件）
 │   └── boundary/          # 边界样本：空白页 / 低分辨率 / 旋转 90° ✅ D3
-├── rules/                 # D4：40 条规则 YAML（资质/废标/围标/报价 各 10 条）
+├── rules/rules.yaml       # 40 条规则（四类各 10 条，依据三态）✅ D4
 ├── scoring/               # D5：评分细则 YAML（至少两套，用于"换细则"演示）
 ├── labels/                # D6/D9：人工标注（风险条目、专家分、核验结论）
 ├── review/                # D7：评审结果落盘（JSON）

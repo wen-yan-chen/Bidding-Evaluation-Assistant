@@ -1,8 +1,8 @@
 # 招投标评审助手
 
 > 魔擎开发者激励 1 期 · 课题 8 · 政企采购 · 中级（¥6,000）
-> 当前版本 **v0.3.0（D3 解析层收尾）**：docx / pdf / txt / 扫描件（OCR）全部能解析，页码与字符偏移映射 + 6 个关键字段带溯源；
-> 15 份样本（含 5 份扫描件）解析成功率 100%、字段准确率 100%、溯源 0 处不一致。规则库与评审逻辑 D4 起接入。
+> 当前版本 **v0.4.0（D4 规则库 + 知识库 + MCP）**：40 条规则库（依据三态）、知识库自动导出（指纹锁一致）、
+> MCP 三个工具（解析 / 扫描 / 溯源）已通过协议实测。资格性核验与评分 D5 起接入。
 
 面向政企采购场景的招投标文件辅助评审系统：解析招标/投标文件并**溯源到页码**，按招标文件的评分细则**逐项算分**，按 40 条规则库核验**资格性与合规风险**，输出可**点击跳回原文**的风险清单与可下载的审核报告。
 
@@ -13,6 +13,22 @@
 ---
 
 ## 一、当前进度
+
+### D4 规则库 + 知识库 + MCP（v0.4.0）
+
+| D4 任务 | 交付物 | 状态 | 验证方式 |
+| --- | --- | :-: | --- |
+| 40 条规则（四类各 10 条） | `data/rules/rules.yaml` | ✅ | `python tools/validate_rules.py` |
+| 依据三态（verified/pending/na） | `Rule.legal_basis` 唯一出口 | ✅ | 单测逐条断言：pending 必输出「未检索到权威依据」 |
+| 知识库导出 + 指纹 | `knowledge/rules-full.md`（40 块）+ `manifest.json` | ✅ | 与 YAML 指纹一致 |
+| 知识库导入 | 平台 `bid-review-rules`，索引 `2-c6515aaca42f46c58554031ab149e820` | ✅ | 平台文档状态 COMPLETED |
+| 规则库接口 | `GET /api/rules`、`/stats`、`/{rule_id}` | ✅ | 返回 40 条 + 统计 + 指纹 |
+| MCP 三工具 | `parse_tender` / `scan_risks` / `locate_span` | ✅ | MCP 协议实测（SSE，3 工具可用） |
+| compose 双服务 | `app` + `mcp`（8765，共用 `./data`） | ✅ | `docker compose ps` 两容器 healthy |
+
+**D4 验收**：40 条规则、四类各 10、依据 21 验证 / 15 待核验 / 4 经验判据；知识库 40 块与规则库指纹一致；
+MCP 扫描 20 条可自动检测规则、命中 6 条且每条带 `page/quote`。
+证据见 [`docs/D4-自测记录.md`](docs/D4-自测记录.md)，交接说明见 [`docs/D4-交接文档.md`](docs/D4-交接文档.md)。
 
 ### D3 解析层收尾（v0.3.0）
 
@@ -112,12 +128,13 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 │   ├── index.html  style.css  app.js
 ├── data/                    # 模拟数据与运行时产物
 │   ├── samples/             #   15 份样本（含 5 份扫描件）+ boundary + manifest.json
+│   ├── rules/rules.yaml     #   40 条规则（四类各 10 条，依据三态）
 │   ├── parsed/              #   解析结果 JSON（运行时生成，不进仓库）
 │   └── meta/milestones.json #   里程碑与阶段交付清单（页面与文档同源）
 ├── agent.json               # Nexent 导入配置（草案：MCP 6 工具 + 4 Skill + 知识库检索）
 ├── prompt.md                # 系统提示词唯一来源，agent.json.prompt 由脚本同步
-├── knowledge/               # 知识库资产（D4：40 条规则按节切分）            —— 待填充
-├── mcps/                    # MCP 工具服务（D4：server.py + tools schema）    —— 待填充
+├── knowledge/               # 知识库资产：rules-full.md（40 块）+ manifest 指纹 ✅
+├── mcps/                    # MCP 工具服务：bid_review_mcp.py（3 个工具）✅
 ├── skills/                  # 4 个自定义 Skill（D5）                          —— 待填充
 ├── docs/                    # 交接文档、自测记录、测试报告、截图、演示视频
 ├── tools/                   # 配置校验 / 冒烟 / 样本生成 / 溯源校验 / 指标复算 / fork 同步
@@ -136,8 +153,8 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | # | 交付物 | 路径 | 状态 |
 | :-: | --- | --- | :-: |
 | 1 | 前端工程 | `web/` | 🟡 D3 状态页 + 解析面板（含 OCR 徽标，D8 补看板） |
-| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 解析链路（含 OCR）已通，MCP/Skill 待 D4–D5 |
-| 3 | 知识库资产 | `knowledge/` | ⬜ D4 |
+| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 解析 + MCP 已通，Skill 待 D5 |
+| 3 | 知识库资产 | `knowledge/` | 🟡 D4 已导出并导入（40 块，指纹一致） |
 | 4 | 模拟数据 | `data/samples/` | 🟡 D3 已有 15 份（含 5 份扫描件）+ 3 份边界 + 标准答案（D9 扩到 20 份） |
 | 5 | 部署文档 | `DEPLOY.md` `docker-compose.yml` | 🟡 D1 已可部署 |
 | 6 | 使用文档 | `USAGE.md` | ⬜ D8 |
@@ -151,8 +168,8 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | 能力 | 落地方式 | 当前状态 | 证据位 |
 | --- | --- | --- | --- |
 | 智能体编排 | `max_steps=15`；4 个 Skill 分阶段；步骤/终局校验开启 | 草案 | `agent.json` |
-| 工具调用 | MCP 6 工具：`parse_tender` / `check_qualification` / `score_item` / `scan_risks` / `locate_span` / `export_report` | 已登记未挂载（D4） | `agent.json` → `mcp_info` |
-| 知识库挂载 | 40 条规则按节切分，`hybrid` + `top_k=3` | 待建（D4） | `agent.json` → `index_names` |
+| 工具调用 | MCP 已实现 3 个（`parse_tender` / `scan_risks` / `locate_span`），D5–D7 补 `check_qualification` / `score_item` / `export_report` | 服务已上线（8765），平台登记待导入 | `mcps/`、`agent.json` → `mcp_info` |
+| 知识库挂载 | 40 条规则一块一条，`bge-m3` 1024 维，`hybrid` + `top_k=3` | 已导入（索引 `2-c6515a…`） | `agent.json` → `index_names` |
 | 自定义 Skill | `bid-rule-cards` / `missing-qualification` / `risk-selfcheck` / `summary-compiler` | 已登记未上传（D5） | `skills/` |
 
 > 页面「平台能力接入」卡片直接读 `agent.json` 判断状态：**登记 ≠ 可用**，未落地一律显示"待接入"。
@@ -167,6 +184,8 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | GET | `/health` | 容器探针，最小返回体 | ✅ D1 |
 | GET | `/api/health` | 运行时长、9 项能力开关（D2 起 `parse` / `clause_split` 为 true） | ✅ D2 |
 | GET | `/api/info` | 智能体配置摘要 + 里程碑 + 免责声明 | ✅ D1 |
+| GET | `/api/rules` | 规则库（40 条 + 统计 + 指纹） | ✅ D4 |
+| GET | `/api/rules/{rule_id}` | 单条规则（含依据三态解析） | ✅ D4 |
 | GET | `/api/docs` | OpenAPI 交互文档 | ✅ D1 |
 | POST | `/api/upload` | 上传招标/投标文件 → 解析 → 落盘 → 返回字段与溯源 | ✅ D2 |
 | GET | `/api/documents` | 已解析文档列表 | ✅ D2 |
@@ -183,7 +202,9 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 ```bash
 python tools/agent_config.py sync     # prompt.md → agent.json.prompt（唯一写入方向）
 python tools/agent_config.py check    # 配置校验：temperature、Skill/MCP 数量、占位符、免责声明
-python tools/smoke_test.py            # 服务起来后的 9 项验收（含上传→解析→溯源自洽）
+python tools/smoke_test.py            # 服务起来后的 10 项验收（含扫描件 OCR）
+python tools/validate_rules.py        # 规则库门禁：条数/分类/依据三态/知识库指纹
+python tools/export_kb.py --check     # 校验知识库导出是否与 YAML 一致
 python tools/make_samples.py          # 重新生成 10 份样本 + 标准答案（--no-pdf 跳过 pdf）
 python tools/eval_parse.py --strict   # 复算指标（需 OCR 依赖，建议在容器里跑，见 D3 自测记录 §3）
 python tools/validate_quotes.py       # 校验 quote = 原文切片、页码与偏移一致

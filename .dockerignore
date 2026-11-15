@@ -11,11 +11,10 @@ venv
 docs
 tests
 tools
-mcps
 skills
-knowledge
 data/uploads
 data/parsed
 *.md
 !prompt.md
+!knowledge/rules-full.md
 *.log

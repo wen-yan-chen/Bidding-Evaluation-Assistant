@@ -11,7 +11,7 @@ services:
       args:
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
         BASE_IMAGE: ${BASE_IMAGE:-python:3.11-slim}
-    image: bid-review:${APP_TAG:-0.1.0}
+    image: bid-review:${APP_TAG:-0.3.0}
     container_name: bid-review
     ports:
       # 宿主端口可覆盖：HOST_PORT=18080 docker compose up -d
@@ -20,8 +20,8 @@ services:
       APP_ENV: ${APP_ENV:-docker}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
-      # D4 起 mcp 服务上线后改为 http://mcp:8765/sse
-      MCP_URL: ${MCP_URL:-http://127.0.0.1:8765/sse}
+      # D4 起 MCP 与 API 同栈：容器内用服务名互访
+      MCP_URL: ${MCP_URL:-http://mcp:8765/sse}
       NEXENT_BASE: ${NEXENT_BASE:-}
       TZ: Asia/Shanghai
     volumes:
@@ -30,4 +30,27 @@ services:
     extra_hosts:
       # 容器内访问宿主机上的 Nexent
       - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # MCP 工具服务（D4 起）：把解析/扫描/溯源能力暴露给 Nexent 智能体调用
+  mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
+        BASE_IMAGE: ${BASE_IMAGE:-python:3.11-slim}
+    image: bid-review:${APP_TAG:-0.3.0}
+    container_name: bid-review-mcp
+    command: ["python", "-m", "mcps.bid_review_mcp"]
+    ports:
+      # 平台侧登记 mcp_url 时用宿主可达地址；同栈内用 http://mcp:8765/sse
+      - "${MCP_PORT:-8765}:8765"
+    environment:
+      MCP_PORT: "8765"
+      APP_ENV: ${APP_ENV:-docker}
+      TZ: Asia/Shanghai
+    volumes:
+      # 与 app 共用同一份解析结果（MCP 工具按 doc_id 读取）
+      - ./data:/app/data
     restart: unless-stopped

@@ -1,0 +1,462 @@
+# 招投标评审规则库（40 条，四类各 10 条）
+#
+# 字段说明：
+#   id            规则编号（R01–R40，按类连续：资质 01–10、废标 11–20、围标 21–30、报价 31–40）
+#   category      资质门槛 | 废标条款 | 围标串标 | 报价异常
+#   level         高 | 中 | 低（高=可能直接导致否决投标；中=需澄清/扣分；低=表述不规范）
+#   title         一句话规则名
+#   condition     判定条件（人读，进知识库的原文）
+#   detect        pattern（关键词/正则命中）| manual（需人工核对，不参与自动扫描）| price（报价计算类，D6 实现）
+#   patterns      自动扫描用的关键词/正则；命中即产生一条待复核项
+#   basis_status  verified（已对齐现行法规名称+条号）| pending（未逐条核验）| na（经验判据，无法条依据）
+#   basis         法规名称 + 条号；pending 时为空，运行期一律输出「未检索到权威依据」
+#   compliant     「合规定式」：出现这些表述时**不要**报风险（写进提示词，不进知识库）
+#
+# 合规红线：basis 只填能确认的条号；不确定就置 pending 并留空，绝不编造。
+
+version: 1
+updated: "2026-11-15"
+categories:
+  - name: 资质门槛
+    code: qualification
+  - name: 废标条款
+    code: rejection
+  - name: 围标串标
+    code: collusion
+  - name: 报价异常
+    code: price
+
+rules:
+  # ---------------------------------------------------------------- 资质门槛（R01–R10）
+  - id: R01
+    category: 资质门槛
+    level: 高
+    title: 未提供营业执照
+    condition: 投标文件中未见营业执照，或未见统一社会信用代码等可核验的登记信息。
+    detect: manual
+    patterns: ["营业执照", "统一社会信用代码"]
+    basis_status: pending
+    basis: ""
+    basis_note: 依据来自招标文件资格条款，具体条款需按项目核对，不套用统一法条。
+
+  - id: R02
+    category: 资质门槛
+    level: 高
+    title: 未提供行业资质证书
+    condition: 招标文件要求特定行业资质（如信息系统集成、建筑装修装饰等），投标文件未提供对应资质证书。
+    detect: manual
+    patterns: ["资质证书", "资质等级"]
+    basis_status: pending
+    basis: ""
+    basis_note: 资质要求逐项目不同，需比对招标文件资格条件原文。
+
+  - id: R03
+    category: 资质门槛
+    level: 高
+    title: 安全生产许可证缺失
+    condition: 施工类项目要求安全生产许可证，投标文件未提供或已过有效期。
+    detect: manual
+    patterns: ["安全生产许可证"]
+    basis_status: pending
+    basis: ""
+    basis_note: 由招标文件资格条款约定；许可有效期需核验证件本身。
+
+  - id: R04
+    category: 资质门槛
+    level: 中
+    title: 法定代表人授权书缺失或不完整
+    condition: 由委托代理人投标但未提供授权委托书，或授权书缺少法定代表人签字、授权范围、有效期。
+    detect: pattern
+    patterns: ["授权委托书", "法定代表人授权"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第一项（投标文件未经投标单位盖章和单位负责人签字）
+    compliant: ["授权委托书已附法定代表人签字并加盖单位公章", "附授权范围与有效期"]
+
+  - id: R05
+    category: 资质门槛
+    level: 中
+    title: 财务状况报告缺失
+    condition: 招标文件要求近年财务报告或审计报告，投标文件未提供。
+    detect: manual
+    patterns: ["财务报告", "审计报告", "资产负债表"]
+    basis_status: pending
+    basis: ""
+
+  - id: R06
+    category: 资质门槛
+    level: 中
+    title: 社保或纳税证明缺失
+    condition: 招标文件要求依法缴纳税收和社会保障资金的证明，投标文件未提供。
+    detect: manual
+    patterns: ["社会保险", "纳税证明", "社保缴纳"]
+    basis_status: pending
+    basis: ""
+
+  - id: R07
+    category: 资质门槛
+    level: 中
+    title: 无重大违法记录声明缺失
+    condition: 未提供参加本次采购活动前三年内无重大违法记录的书面声明。
+    detect: manual
+    patterns: ["重大违法记录", "无违法记录声明"]
+    basis_status: pending
+    basis: ""
+
+  - id: R08
+    category: 资质门槛
+    level: 低
+    title: 中小企业声明函缺失
+    condition: 招标文件明确面向中小企业或允许价格扣除时，未提供中小企业声明函。
+    detect: manual
+    patterns: ["中小企业声明函"]
+    basis_status: pending
+    basis: ""
+
+  - id: R09
+    category: 资质门槛
+    level: 高
+    title: 联合体协议缺失
+    condition: 以联合体形式投标但未提交联合体协议书，或协议未明确各方承担的工作与责任。
+    detect: pattern
+    patterns: ["联合体协议", "联合体协议书"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第二项（投标联合体没有提交共同投标协议）
+    compliant: ["联合体协议书已明确牵头人、各方分工与责任", "联合体各方均具备相应资格条件"]
+
+  - id: R10
+    category: 资质门槛
+    level: 中
+    title: 项目负责人资格不满足
+    condition: 拟派项目负责人的执业资格、职称或业绩不满足招标文件要求。
+    detect: manual
+    patterns: ["项目负责人", "项目经理", "注册建造师"]
+    basis_status: pending
+    basis: ""
+
+  # ---------------------------------------------------------------- 废标条款（R11–R20）
+  - id: R11
+    category: 废标条款
+    level: 高
+    title: 投标人不足三家
+    condition: 投标截止时提交投标文件的投标人少于三个，招标失败应重新招标。
+    detect: manual
+    patterns: ["投标人不足三家", "重新招标"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法》第二十八条（投标人少于三个的，招标人应当依照本法重新招标）
+
+  - id: R12
+    category: 废标条款
+    level: 高
+    title: 投标报价超过最高投标限价
+    condition: 投标报价高于招标文件设定的最高投标限价（或最高限价计算方法算出的上限）。
+    detect: price
+    patterns: ["最高投标限价", "最高限价", "控制价"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第五项（投标报价高于招标文件设定的最高投标限价，评标委员会应当否决其投标）
+
+  - id: R13
+    category: 废标条款
+    level: 高
+    title: 投标报价低于成本
+    condition: 投标报价明显低于成本，且投标人不能合理说明或提供相关证明材料。
+    detect: price
+    patterns: ["低于成本", "成本价"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法》第三十三条（投标人不得以低于成本的报价竞标）；《中华人民共和国招标投标法实施条例》第五十一条第五项
+
+  - id: R14
+    category: 废标条款
+    level: 高
+    title: 投标文件未按要求签字盖章
+    condition: 投标文件未经投标单位盖章，或缺少单位负责人签字（含授权代理人签字）。
+    detect: pattern
+    patterns: ["未加盖公章", "未签字", "无单位盖章"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第一项
+    compliant: ["投标函已加盖单位公章并由法定代表人签字", "逐页小签已完成"]
+
+  - id: R15
+    category: 废标条款
+    level: 高
+    title: 未响应招标文件实质性要求
+    condition: 投标文件对工期、质量、付款、技术参数等实质性要求作出偏离且未说明，或明确不响应。
+    detect: pattern
+    patterns: ["不响应", "无法满足", "偏离说明", "不接受招标文件"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第六项（投标文件没有对招标文件的实质性要求和条件作出响应）
+    compliant: ["对偏离项已作书面说明且经评标委员会认可", "实质性条款全部响应"]
+
+  - id: R16
+    category: 废标条款
+    level: 高
+    title: 同一投标人提交两个以上报价
+    condition: 同一投标人在同一标段提交两个以上不同的投标文件或投标报价（招标文件要求提交备选方案的除外）。
+    detect: pattern
+    patterns: ["备选报价", "两个报价", "另行报价"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第四项
+    compliant: ["招标文件明确允许提交备选方案且已标注主选方案"]
+
+  - id: R17
+    category: 废标条款
+    level: 中
+    title: 投标有效期不足
+    condition: 投标函承诺的投标有效期短于招标文件要求的天数。
+    detect: pattern
+    patterns: ["投标有效期"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第六项（未对实质性要求作出响应）
+    compliant: ["投标有效期不低于招标文件要求"]
+
+  - id: R18
+    category: 废标条款
+    level: 高
+    title: 投标保证金未按要求提交
+    condition: 未提交投标保证金，或金额、形式、到账时间不符合招标文件要求。
+    detect: pattern
+    patterns: ["投标保证金", "保证金未", "保函"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第六项（未对实质性要求作出响应）
+    compliant: ["保证金已在截止时间前从基本账户转出", "保函由招标文件认可的银行出具"]
+
+  - id: R19
+    category: 废标条款
+    level: 高
+    title: 投标文件逾期送达或未按要求密封
+    condition: 投标文件在截止时间后送达，或未按招标文件要求密封、标记。
+    detect: pattern
+    patterns: ["逾期送达", "未密封", "密封不符合"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法》第二十八条（投标人应当在招标文件要求提交投标文件的截止时间前，将投标文件送达投标地点）
+
+  - id: R20
+    category: 废标条款
+    level: 高
+    title: 弄虚作假或行贿情形
+    condition: 投标文件存在伪造资质、业绩、财务数据，或存在向评标委员会成员行贿等情形。
+    detect: pattern
+    patterns: ["伪造", "虚假材料", "行贿", "提供虚假"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第五十一条第七项（投标人有串通投标、弄虚作假、行贿等违法行为）
+    compliant: []
+
+  # ---------------------------------------------------------------- 围标串标（R21–R30）
+  - id: R21
+    category: 围标串标
+    level: 高
+    title: 不同投标人投标文件由同一单位或个人编制
+    condition: 不同投标人的投标文件由同一单位或个人编制（如文档属性作者、编辑记录一致）。
+    detect: pattern
+    patterns: ["同一编制人", "文档属性作者", "制作单位"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第四十条第一项（不同投标人的投标文件由同一单位或者个人编制，视为投标人相互串通投标）
+    compliant: []
+
+  - id: R22
+    category: 围标串标
+    level: 高
+    title: 不同投标人委托同一单位或个人办理投标事宜
+    condition: 不同投标人委托同一单位或个人办理投标、递交、澄清等事宜。
+    detect: pattern
+    patterns: ["委托同一", "同一代理人", "同一委托人"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第四十条第二项
+    compliant: []
+
+  - id: R23
+    category: 围标串标
+    level: 高
+    title: 不同投标人的项目管理成员为同一人
+    condition: 不同投标人投标文件载明的项目负责人、技术负责人等项目管理成员出现同一人。
+    detect: pattern
+    patterns: ["项目管理成员", "项目负责人为同一人"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第四十条第三项
+    compliant: []
+
+  - id: R24
+    category: 围标串标
+    level: 高
+    title: 不同投标人投标文件异常一致
+    condition: 不同投标人的投标文件内容、错别字、排版、报价构成异常一致（非通用模板导致）。
+    detect: pattern
+    patterns: ["异常一致", "内容雷同", "排版一致"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第四十条第四项
+    compliant: ["使用招标文件统一提供的格式文本", "行业通用表述"]
+
+  - id: R25
+    category: 围标串标
+    level: 高
+    title: 投标报价呈规律性差异
+    condition: 多家投标人的报价呈固定比例、固定差额等规律性差异，疑似事先约定。
+    detect: price
+    patterns: ["规律性差异", "报价呈等差", "报价呈固定比例"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第四十条第四项
+    compliant: []
+
+  - id: R26
+    category: 围标串标
+    level: 高
+    title: 不同投标人投标文件相互混装
+    condition: 一份投标文件中出现其他投标人的名称、印章、业绩或联系方式（混装）。
+    detect: pattern
+    patterns: ["混装", "他方盖章", "其他投标人名称"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第四十条第五项
+    compliant: []
+
+  - id: R27
+    category: 围标串标
+    level: 高
+    title: 投标保证金从同一账户转出
+    condition: 不同投标人的投标保证金从同一单位或个人的账户转出。
+    detect: pattern
+    patterns: ["保证金同一账户", "同一账户转出"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第四十条第六项
+    compliant: []
+
+  - id: R28
+    category: 围标串标
+    level: 高
+    title: 存在控股或管理关系的单位参加同一标段投标
+    condition: 单位负责人为同一人，或存在控股、管理关系的不同单位，参加同一标段（或未划分标段的同一项目）投标。
+    detect: pattern
+    patterns: ["控股关系", "管理关系", "同一法定代表人"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第三十四条（单位负责人为同一人或者存在控股、管理关系的不同单位，不得参加同一标段投标或者未划分标段的同一招标项目投标）
+    compliant: []
+
+  - id: R29
+    category: 围标串标
+    level: 高
+    title: 与招标人存在利害关系仍参加投标
+    condition: 投标人与招标人存在可能影响招标公正性的利害关系（如关联交易、人员交叉）。
+    detect: pattern
+    patterns: ["利害关系", "关联关系"]
+    basis_status: verified
+    basis: 《中华人民共和国招标投标法实施条例》第三十四条（与招标人存在利害关系可能影响招标公正性的法人、其他组织或者个人，不得参加投标）
+    compliant: []
+
+  - id: R30
+    category: 围标串标
+    level: 中
+    title: 联系方式或递交信息异常相同
+    condition: 不同投标人的联系人电话、邮箱、通信地址相同，或投标文件由同一终端/IP 递交。
+    detect: pattern
+    patterns: ["联系电话相同", "邮箱相同", "同一IP", "同一终端"]
+    basis_status: na
+    basis: ""
+    basis_note: 经验判据，无法条直接对应；仅作"疑似，需人工复核"提示，不单独作为否决依据。
+
+  # ---------------------------------------------------------------- 报价异常（R31–R40）
+  - id: R31
+    category: 报价异常
+    level: 中
+    title: 报价贴近最高限价
+    condition: 投标报价达到最高投标限价的 97% 以上，存在围标或"贴标"嫌疑。
+    detect: price
+    patterns: ["贴近最高限价", "报价接近上限"]
+    basis_status: na
+    basis: ""
+    basis_note: 经验判据（阈值可配置），无直接法条；仅提示复核。
+
+  - id: R32
+    category: 报价异常
+    level: 中
+    title: 报价明显低于其他投标人
+    condition: 投标报价低于同包其他有效投标报价平均值 20% 以上。
+    detect: price
+    patterns: ["明显低于", "低于平均值"]
+    basis_status: pending
+    basis: ""
+    basis_note: 是否构成"低于成本"需结合成本说明判断，见 R13。
+
+  - id: R33
+    category: 报价异常
+    level: 低
+    title: 多家报价尾数高度一致
+    condition: 多家投标人报价的尾数（如末两位/末三位）完全相同，疑似协同。
+    detect: price
+    patterns: ["尾数一致", "报价尾数相同"]
+    basis_status: na
+    basis: ""
+    basis_note: 经验判据；与 R25（规律性差异）配合看。
+
+  - id: R34
+    category: 报价异常
+    level: 中
+    title: 分项报价合计与总价不一致
+    condition: 报价明细各分项金额合计与投标总价不一致，且差额无法由暂列金额、税金等解释。
+    detect: price
+    patterns: ["分项合计", "总价不一致"]
+    basis_status: pending
+    basis: ""
+    basis_note: 属算术错误，按招标文件澄清规则处理；无统一法条。
+
+  - id: R35
+    category: 报价异常
+    level: 低
+    title: 报价币种或单位错误
+    condition: 报价未按招标文件要求的币种（人民币）或单位（元/万元）填写。
+    detect: pattern
+    patterns: ["美元", "USD", "欧元", "以万元为单位"]
+    basis_status: pending
+    basis: ""
+    compliant: ["报价以人民币元为单位填写"]
+
+  - id: R36
+    category: 报价异常
+    level: 中
+    title: 暂列金额或暂估价未按招标文件计取
+    condition: 招标文件给定暂列金额/暂估价，投标人擅自改动或未计入总价。
+    detect: price
+    patterns: ["暂列金额", "暂估价"]
+    basis_status: pending
+    basis: ""
+    basis_note: 依据招标文件报价要求，逐项目不同。
+
+  - id: R37
+    category: 报价异常
+    level: 中
+    title: 报价大写与小写不一致
+    condition: 投标报价的大写金额与小写金额不一致。
+    detect: pattern
+    patterns: ["大写", "小写"]
+    basis_status: pending
+    basis: ""
+    basis_note: 通常以大写为准并要求澄清；无统一法条。
+
+  - id: R38
+    category: 报价异常
+    level: 中
+    title: 单价与数量乘积不符
+    condition: 报价明细中单价 × 数量 ≠ 该项合价。
+    detect: price
+    patterns: ["单价", "数量", "合价"]
+    basis_status: pending
+    basis: ""
+
+  - id: R39
+    category: 报价异常
+    level: 高
+    title: 报价缺漏项
+    condition: 报价明细缺少招标文件要求的必报分项（如安装费、运输费、税费）。
+    detect: price
+    patterns: ["缺项", "未报价", "漏报"]
+    basis_status: pending
+    basis: ""
+    basis_note: 是否构成废标取决于招标文件"缺项即废标"条款，需按项目确认。
+
+  - id: R40
+    category: 报价异常
+    level: 低
+    title: 报价呈异常整数或吉祥数字
+    condition: 多家报价均为整数万元或含明显"吉利"尾数（如 888、666），疑似协同定价。
+    detect: price
+    patterns: ["整数报价", "888", "666"]
+    basis_status: na
+    basis: ""
+    basis_note: 经验判据，仅作提示；不得单独作为否决依据。

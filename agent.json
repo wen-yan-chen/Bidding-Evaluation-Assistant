@@ -16,7 +16,7 @@
           "params": {
             "top_k": 3,
             "index_names": [
-              "REPLACE_ME-1-00000000000000000000000000000000"
+              "2-c6515aaca42f46c58554031ab149e820"
             ],
             "search_mode": "hybrid"
           },
@@ -55,7 +55,7 @@
   "mcp_info": [
     {
       "mcp_server_name": "bid-review",
-      "mcp_url": "http://127.0.0.1:8765/sse",
+      "mcp_url": "http://mcp:8765/sse",
       "tools": [
         {
           "name": "parse_tender",

@@ -2,6 +2,36 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与语义化版本。
 
+## [0.4.0] — 2026-11-15（D4 规则库 + 知识库 + MCP）
+
+### Added
+
+- 规则库 `data/rules/rules.yaml`：40 条（资质门槛/废标条款/围标串标/报价异常 各 10 条），
+  每条含 `condition / level / detect / patterns / basis_status / basis / compliant`；
+  依据三态分布：verified 21、pending 15、na 4；等级分布：高 23 / 中 13 / 低 4。
+- `api/rules.py`：规则加载（YAML 唯一来源）、指纹（sha256 前 16 位）、统计、确定性扫描
+  （字面量匹配 + 条款定位，命中带 `clause_id/page/char_start/char_end/quote`），`legal_basis` 由三态统一出口。
+- `api/routes/rules.py`：`GET /api/rules`、`/api/rules/stats`、`/api/rules/{rule_id}`。
+- `tools/validate_rules.py`：条数/分类/id 连续/依据三态/知识库指纹一致性门禁（退出码可接 CI）。
+- `tools/export_kb.py`：YAML → `knowledge/rules-full.md`（40 块，22.0 KB）+ `knowledge/manifest.json` 指纹清单；
+  `--check` 模式校验"规则库 ↔ 知识库"未漂移。
+- `mcps/bid_review_mcp.py`：FastMCP（SSE，8765）三个工具 `parse_tender` / `scan_risks` / `locate_span`；
+  失败返回 `{"error": ...}` 不抛异常；内网关闭 DNS rebinding 防护（否则容器内 Host=mcp:8765 回 421）。
+- `docker-compose.yml` 新增 `mcp` 服务（与 app 共用 `./data`），`MCP_URL` 默认 `http://mcp:8765/sse`。
+- `tests/test_rules.py` 7 条：条数分类、依据三态、指纹一致、扫描溯源、扫描幂等、接口、MCP 工具直调。
+
+### Changed
+
+- `agent.json`：`index_names` 填入平台知识库索引 `2-c6515aaca42f46c58554031ab149e820`，
+  `mcp_url` 改为 `http://mcp:8765/sse`；`agent_config.py check` 变为 **0 WARN / 0 ERROR**。
+- `/api/health` 能力开关 `mcp` 置为 true；里程碑 M2 置为已完成、当前进度切到 D4。
+
+### Verified
+
+- `validate_rules.py`：40 条、四类各 10、依据 21/15/4、知识库指纹一致，0 提示；
+- MCP 协议实测（SSE）：`tools(3)`，`scan_risks` 扫描 20 条可自动检测规则命中 6 条，`locate_span` 正负例均正确；
+- `pytest` **27 passed**；`smoke_test.py` **10/10**。
+
 ## [0.3.0] — 2026-11-15（D3 扫描件 OCR + 边界样本）
 
 ### Added

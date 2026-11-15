@@ -8,3 +8,6 @@ pypdf>=5.0
 # D3 OCR：模型随 wheel 内置，离线可跑；锁版本，避免识别行为漂移导致"同一输入两次结果不同"
 rapidocr-onnxruntime==1.2.3
 pypdfium2>=5.0
+# D4 规则库 + MCP 工具服务
+pyyaml>=6.0
+mcp>=1.2,<2

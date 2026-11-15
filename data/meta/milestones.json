@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-15",
-  "current": "D3",
+  "current": "D4",
   "note": "页面与文档同源：改这里不用改前端。status 取 done / doing / planned。",
   "items": [
     {
@@ -15,14 +15,14 @@
       "name": "解析层",
       "day": "D2–D3",
       "status": "done",
-      "target": "15 份样本（含 5 份扫描件）解析成功率 100%；字段准确率 100%；quote 全为原文子串，溯源 0 处不一致"
+      "target": "15 份样本（含 5 份扫描件）解析成功率 100%；字段准确率 100%；溯源 0 处不一致"
     },
     {
       "id": "M2",
       "name": "规则库",
       "day": "D4",
-      "status": "planned",
-      "target": "40 条规则 YAML（四类各 10 条）+ 依据状态机 + 知识库可检索"
+      "status": "done",
+      "target": "40 条规则（四类各 10 条）+ 依据三态（verified 21 / pending 15 / na 4）+ 知识库导出与指纹校验"
     },
     {
       "id": "M3",
@@ -54,15 +54,15 @@
     }
   ],
   "stage": {
-    "label": "D3 交付物",
+    "label": "D4 交付物",
     "items": [
-      { "item": "OCR 通道（锁版本、离线）", "path": "api/parsers/ocr.py", "status": "done" },
-      { "item": "扫描页并入页码表", "path": "api/parsers/pdf_parser.py", "status": "done" },
-      { "item": "docx 页码改按行数估算", "path": "api/parsers/docx_parser.py", "status": "done" },
-      { "item": "5 份扫描件样本", "path": "data/samples/scan-*.pdf", "status": "done" },
-      { "item": "3 份边界样本（空白/低清/旋转）", "path": "data/samples/boundary/", "status": "done" },
-      { "item": "端到端冒烟增扫描件一项", "path": "tools/smoke_test.py", "status": "done" },
-      { "item": "扫描件指标单列", "path": "tools/eval_parse.py", "status": "done" }
+      { "item": "40 条规则库（四类各 10）", "path": "data/rules/rules.yaml", "status": "done" },
+      { "item": "规则校验（条数/依据三态/指纹）", "path": "tools/validate_rules.py", "status": "done" },
+      { "item": "知识库导出 + 指纹清单", "path": "knowledge/rules-full.md", "status": "done" },
+      { "item": "规则库接口", "path": "api/routes/rules.py", "status": "done" },
+      { "item": "MCP 工具服务（3 个工具）", "path": "mcps/bid_review_mcp.py", "status": "done" },
+      { "item": "compose 双服务（app + mcp）", "path": "docker-compose.yml", "status": "done" },
+      { "item": "规则扫描命中带溯源", "path": "api/rules.py", "status": "done" }
     ]
   }
 }

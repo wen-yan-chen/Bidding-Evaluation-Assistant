@@ -52,8 +52,8 @@ def health_detail() -> dict[str, Any]:
             "scoring": False,      # D5 分项评分
             "risk_scan": False,    # D6 风险扫描
             "report_export": False,  # D7 docx/pdf 导出
-            "mcp": False,          # D4 MCP 工具服务
-            "knowledge_base": False,  # D4 知识库
+            "mcp": True,           # D4 MCP 工具服务（compose 内 mcp 服务，8765）
+            "knowledge_base": False,  # D4 知识库（待平台导入后替换索引名）
             "skills": False,       # D5 Skill 挂载
         },
         "disclaimer": config.DISCLAIMER,

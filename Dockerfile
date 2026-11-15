@@ -32,6 +32,8 @@ COPY VERSION agent.json prompt.md ./
 COPY api ./api
 COPY web ./web
 COPY data ./data
+COPY mcps ./mcps
+COPY knowledge ./knowledge
 
 # 上传目录先建好，compose 会把宿主机 ./data 挂上来
 RUN mkdir -p data/uploads
