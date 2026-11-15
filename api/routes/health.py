@@ -53,7 +53,7 @@ def health_detail() -> dict[str, Any]:
             "risk_scan": False,    # D6 风险扫描
             "report_export": False,  # D7 docx/pdf 导出
             "mcp": True,           # D4 MCP 工具服务（compose 内 mcp 服务，8765）
-            "knowledge_base": False,  # D4 知识库（待平台导入后替换索引名）
+            "knowledge_base": True,   # D4 知识库（平台已导入，检索命中 R12）
             "skills": False,       # D5 Skill 挂载
         },
         "disclaimer": config.DISCLAIMER,
