@@ -1,14 +1,16 @@
 ﻿# 把开发仓库同步到 AgentsHub fork 的提交目录，并（可选）提交 / 推送。
 #
 # 用法（在项目任意位置执行）：
-#   pwsh tools/sync_to_agentshub.ps1                      # 只同步文件，看差异
-#   pwsh tools/sync_to_agentshub.ps1 -Commit              # 同步 + 提交（消息取本仓库最新 commit 标题）
-#   pwsh tools/sync_to_agentshub.ps1 -Commit -Push         # 同步 + 提交 + 推送
-#   pwsh tools/sync_to_agentshub.ps1 -Message "..."        # 自定义提交消息
-#   pwsh tools/sync_to_agentshub.ps1 -IncludeVideo         # 连 docs/video/*.mp4 一起同步（D10 用）
+#   powershell -File tools/sync_to_agentshub.ps1                  # 只同步文件，看差异
+#   powershell -File tools/sync_to_agentshub.ps1 -Commit          # 同步 + 提交（消息取本仓库最新 commit 标题）
+#   powershell -File tools/sync_to_agentshub.ps1 -Commit -Push     # 同步 + 提交 + 推送
+#   powershell -File tools/sync_to_agentshub.ps1 -Message "..."     # 自定义提交消息
+#   powershell -File tools/sync_to_agentshub.ps1 -IncludeVideo      # 连 docs/video/*.mp4 一起同步（D10 用）
 #
 # 为什么要有这个脚本：开发在独立仓库（含 Dockerfile / api / web / tests），
 # 提交目录只是其中一部分。手工复制必然漏文件（32 题就踩过 Dockerfile COPY api 却漏 api/ 的坑）。
+#
+# 注意：本文件含中文路径，必须保存为 UTF-8 with BOM，否则 Windows PowerShell 5.1 按 GBK 解析会报错。
 
 [CmdletBinding()]
 param(
@@ -20,9 +22,25 @@ param(
     [switch]$IncludeVideo
 )
 
-$ErrorActionPreference = 'Stop'
+# 原生命令（git/robocopy）会把 warning 写到 stderr，PS 5.1 会当成错误记录；
+# 用 Continue 避免整脚本中断，失败一律靠 $LASTEXITCODE 判断。
+$ErrorActionPreference = 'Continue'
+
 $Source = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $Target = Join-Path $Repo $AgentDir
+
+function Invoke-Checked {
+    param(
+        [scriptblock]$Action,
+        [string]$What
+    )
+    $out = & $Action 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        $out | ForEach-Object { Write-Host $_ }
+        throw "$What 失败（exit $LASTEXITCODE）"
+    }
+    return $out
+}
 
 Write-Host "源目录 : $Source"
 Write-Host "目标   : $Target"
@@ -53,7 +71,7 @@ if ($excludeDirs.Count) { $roboArgs += '/XD'; $roboArgs += $excludeDirs }
 if ($excludeFiles.Count) { $roboArgs += '/XF'; $roboArgs += $excludeFiles }
 
 $null = robocopy @roboArgs
-# robocopy 退出码 0-7 都算成功（0=无变化, 1=有复制, 2=有额外文件被删 …）
+# robocopy 退出码 0-7 都算成功（0=无变化, 1=有复制, 2=有额外文件被删 …），>=8 才是失败
 if ($LASTEXITCODE -ge 8) { throw "robocopy 失败，退出码 $LASTEXITCODE" }
 
 # data/uploads 在目标里保留占位文件，保证目录结构一致
@@ -64,8 +82,8 @@ if (-not (Test-Path $keep)) { New-Item -ItemType File -Path $keep | Out-Null }
 
 Write-Host ''
 Write-Host '--- 提交目录差异（git status）---'
-$status = git -C $Repo status --short -- $AgentDir
-if ($status) { $status } else { Write-Host '(无差异)' }
+$status = git -C $Repo status --short -- $AgentDir 2>&1
+if ($status) { $status | ForEach-Object { Write-Host $_ } } else { Write-Host '(无差异)' }
 Write-Host ''
 
 if (-not $Commit) {
@@ -74,22 +92,23 @@ if (-not $Commit) {
 }
 
 if (-not $Message) {
-    $subject = (git -C $Source log -1 --pretty=%s) | Out-String
-    $subject = $subject.Trim()
+    $subject = (git -C $Source log -1 --pretty=%s 2>&1 | Out-String).Trim()
     if (-not $subject) { $subject = "sync $(Get-Date -Format 'yyyy-MM-dd HH:mm')" }
     $Message = "kw8: $subject"
 }
 
-git -C $Repo add -- $AgentDir
-if (-not (git -C $Repo diff --cached --name-only)) {
+# core.autocrlf=false：仓库里存 LF，避免 Windows 默认把文本转成 CRLF 产生噪声 diff
+$null = Invoke-Checked { git -C $Repo -c core.autocrlf=false add -- $AgentDir } 'git add'
+$staged = (git -C $Repo diff --cached --name-only 2>&1 | Out-String).Trim()
+if (-not $staged) {
     Write-Host '没有需要提交的变更。'
     return
 }
-git -C $Repo commit -m $Message
+$null = Invoke-Checked { git -C $Repo -c core.autocrlf=false commit -m $Message } 'git commit'
 Write-Host "已提交：$Message"
 
 if ($Push) {
-    git -C $Repo push -u origin HEAD
+    $null = Invoke-Checked { git -C $Repo push -u origin HEAD } 'git push'
     Write-Host '已推送。'
 } else {
     Write-Host "未推送。推送：git -C `"$Repo`" push -u origin HEAD"
