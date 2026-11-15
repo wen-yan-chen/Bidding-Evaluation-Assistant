@@ -1,6 +1,6 @@
 {
   "version": "v1",
-  "generated_at": "2026-11-15T20:45:37",
+  "generated_at": "2026-11-15T21:06:37",
   "context": {
     "max_price": 2000000,
     "min_validity_days": 90,
@@ -96,6 +96,56 @@
       "note": "报价 1,990,000 元，达到限价 99.5%（贴标）",
       "expect_rules": [
         "R31"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-011.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "投标文件未加盖公章（签章缺失）",
+      "expect_rules": [
+        "R14"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-012.docx",
+      "split": "holdout",
+      "clean": false,
+      "note": "明确声明不接受招标文件的付款条件（实质性偏离）",
+      "expect_rules": [
+        "R15"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-013.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "同一投标人提交两个报价（备选报价未按要求标注）",
+      "expect_rules": [
+        "R16"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-014.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "投标文件逾期送达",
+      "expect_rules": [
+        "R19"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-015.docx",
+      "split": "holdout",
+      "clean": false,
+      "note": "报价币种使用美元（未按人民币报价）",
+      "expect_rules": [
+        "R35"
       ],
       "expect_qualification": []
     },

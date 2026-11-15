@@ -15,7 +15,7 @@
       "name": "解析层",
       "day": "D2–D3",
       "status": "done",
-      "target": "15 份样本（含 5 份扫描件）解析成功率 100%；字段准确率 100%；溯源 0 处不一致"
+      "target": "25 份样本（20 文本层 + 5 扫描件）解析成功率 100%；字段 146/146 = 100%；溯源 0 处不一致"
     },
     {
       "id": "M2",
@@ -50,7 +50,7 @@
       "name": "评测与交付",
       "day": "D9–D10",
       "status": "planned",
-      "target": "六条验收标准逐项有数字；干净环境 docker compose up 一次成功"
+      "target": "25 份样本 + 15 份植入风险样本 + 标注；六条验收标准逐项有数字；干净环境 docker compose up 一次成功"
     }
   ],
   "stage": {
@@ -67,7 +67,7 @@
         "status": "done"
       },
       {
-        "item": "10 份植入风险样本 + 标注",
+        "item": "15 份植入风险样本 + 标注",
         "path": "data/samples/risk/",
         "status": "done"
       },
