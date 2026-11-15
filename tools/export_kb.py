@@ -35,7 +35,7 @@ BASIS_TEXT = {
     "pending": "未逐条核验（输出「未检索到权威依据」）",
     "na": "经验判据，无法条依据",
 }
-DETECT_TEXT = {"pattern": "关键词命中（自动扫描）", "manual": "人工核对（不参与自动扫描）", "price": "报价计算（D6 实现）"}
+DETECT_TEXT = {"pattern": "关键词命中（自动扫描）", "manual": "人工核对（不参与自动扫描）", "price": "报价计算（自动计算）"}
 
 
 def render(rules: list) -> str:

@@ -1,0 +1,245 @@
+{
+  "count": 40,
+  "items": [
+    {
+      "rule_id": "R01",
+      "title": "未提供营业执照",
+      "file": "rules/R01.md",
+      "chars": 298
+    },
+    {
+      "rule_id": "R02",
+      "title": "未提供行业资质证书",
+      "file": "rules/R02.md",
+      "chars": 299
+    },
+    {
+      "rule_id": "R03",
+      "title": "安全生产许可证缺失",
+      "file": "rules/R03.md",
+      "chars": 281
+    },
+    {
+      "rule_id": "R04",
+      "title": "法定代表人授权书缺失或不完整",
+      "file": "rules/R04.md",
+      "chars": 354
+    },
+    {
+      "rule_id": "R05",
+      "title": "财务状况报告缺失",
+      "file": "rules/R05.md",
+      "chars": 256
+    },
+    {
+      "rule_id": "R06",
+      "title": "社保或纳税证明缺失",
+      "file": "rules/R06.md",
+      "chars": 261
+    },
+    {
+      "rule_id": "R07",
+      "title": "无重大违法记录声明缺失",
+      "file": "rules/R07.md",
+      "chars": 258
+    },
+    {
+      "rule_id": "R08",
+      "title": "中小企业声明函缺失",
+      "file": "rules/R08.md",
+      "chars": 251
+    },
+    {
+      "rule_id": "R09",
+      "title": "联合体协议缺失",
+      "file": "rules/R09.md",
+      "chars": 340
+    },
+    {
+      "rule_id": "R10",
+      "title": "项目负责人资格不满足",
+      "file": "rules/R10.md",
+      "chars": 261
+    },
+    {
+      "rule_id": "R11",
+      "title": "投标人不足三家",
+      "file": "rules/R11.md",
+      "chars": 281
+    },
+    {
+      "rule_id": "R12",
+      "title": "投标报价超过最高投标限价",
+      "file": "rules/R12.md",
+      "chars": 308
+    },
+    {
+      "rule_id": "R13",
+      "title": "投标报价低于成本",
+      "file": "rules/R13.md",
+      "chars": 293
+    },
+    {
+      "rule_id": "R14",
+      "title": "投标文件未按要求签字盖章",
+      "file": "rules/R14.md",
+      "chars": 323
+    },
+    {
+      "rule_id": "R15",
+      "title": "未响应招标文件实质性要求",
+      "file": "rules/R15.md",
+      "chars": 365
+    },
+    {
+      "rule_id": "R16",
+      "title": "同一投标人提交两个以上报价",
+      "file": "rules/R16.md",
+      "chars": 330
+    },
+    {
+      "rule_id": "R17",
+      "title": "投标有效期不足",
+      "file": "rules/R17.md",
+      "chars": 291
+    },
+    {
+      "rule_id": "R18",
+      "title": "投标保证金未按要求提交",
+      "file": "rules/R18.md",
+      "chars": 359
+    },
+    {
+      "rule_id": "R19",
+      "title": "投标文件逾期送达或未按要求密封",
+      "file": "rules/R19.md",
+      "chars": 301
+    },
+    {
+      "rule_id": "R20",
+      "title": "弄虚作假或行贿情形",
+      "file": "rules/R20.md",
+      "chars": 348
+    },
+    {
+      "rule_id": "R21",
+      "title": "不同投标人投标文件由同一单位或个人编制",
+      "file": "rules/R21.md",
+      "chars": 320
+    },
+    {
+      "rule_id": "R22",
+      "title": "不同投标人委托同一单位或个人办理投标事宜",
+      "file": "rules/R22.md",
+      "chars": 276
+    },
+    {
+      "rule_id": "R23",
+      "title": "不同投标人的项目管理成员为同一人",
+      "file": "rules/R23.md",
+      "chars": 278
+    },
+    {
+      "rule_id": "R24",
+      "title": "不同投标人投标文件异常一致",
+      "file": "rules/R24.md",
+      "chars": 321
+    },
+    {
+      "rule_id": "R25",
+      "title": "投标报价呈规律性差异",
+      "file": "rules/R25.md",
+      "chars": 271
+    },
+    {
+      "rule_id": "R26",
+      "title": "不同投标人投标文件相互混装",
+      "file": "rules/R26.md",
+      "chars": 273
+    },
+    {
+      "rule_id": "R27",
+      "title": "投标保证金从同一账户转出",
+      "file": "rules/R27.md",
+      "chars": 261
+    },
+    {
+      "rule_id": "R28",
+      "title": "存在控股或管理关系的单位参加同一标段投标",
+      "file": "rules/R28.md",
+      "chars": 349
+    },
+    {
+      "rule_id": "R29",
+      "title": "与招标人存在利害关系仍参加投标",
+      "file": "rules/R29.md",
+      "chars": 308
+    },
+    {
+      "rule_id": "R30",
+      "title": "联系方式或递交信息异常相同",
+      "file": "rules/R30.md",
+      "chars": 307
+    },
+    {
+      "rule_id": "R31",
+      "title": "报价贴近最高限价",
+      "file": "rules/R31.md",
+      "chars": 268
+    },
+    {
+      "rule_id": "R32",
+      "title": "报价明显低于其他投标人",
+      "file": "rules/R32.md",
+      "chars": 281
+    },
+    {
+      "rule_id": "R33",
+      "title": "多家报价尾数高度一致",
+      "file": "rules/R33.md",
+      "chars": 262
+    },
+    {
+      "rule_id": "R34",
+      "title": "分项报价合计与总价不一致",
+      "file": "rules/R34.md",
+      "chars": 290
+    },
+    {
+      "rule_id": "R35",
+      "title": "报价币种或单位错误",
+      "file": "rules/R35.md",
+      "chars": 294
+    },
+    {
+      "rule_id": "R36",
+      "title": "暂列金额或暂估价未按招标文件计取",
+      "file": "rules/R36.md",
+      "chars": 277
+    },
+    {
+      "rule_id": "R37",
+      "title": "报价大写与小写不一致",
+      "file": "rules/R37.md",
+      "chars": 259
+    },
+    {
+      "rule_id": "R38",
+      "title": "单价与数量乘积不符",
+      "file": "rules/R38.md",
+      "chars": 238
+    },
+    {
+      "rule_id": "R39",
+      "title": "报价缺漏项",
+      "file": "rules/R39.md",
+      "chars": 284
+    },
+    {
+      "rule_id": "R40",
+      "title": "报价呈异常整数或吉祥数字",
+      "file": "rules/R40.md",
+      "chars": 282
+    }
+  ]
+}
