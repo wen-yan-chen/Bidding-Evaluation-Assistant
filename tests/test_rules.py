@@ -64,9 +64,11 @@ def test_digest_matches_knowledge_base():
 
 
 def test_scan_hits_carry_traceable_span():
-    doc = parse_sample("bid-001.docx")
-    hits = rules_api.scan_doc(doc)
-    assert hits, "正常投标文件也应至少命中一条（如『投标保证金』类规则）"
+    # 干净样本不应命中；用植入风险样本验证溯源字段
+    assert rules_api.scan_doc(parse_sample("bid-001.docx")) == []
+    doc = parse_sample("risk/risk-001.docx")
+    hits = rules_api.scan_doc(doc, context={"max_price": 2000000, "min_validity_days": 90})
+    assert hits
     for hit in hits[:10]:
         assert doc.slice_text(hit["char_start"], hit["char_end"]) == hit["quote"]
         assert doc.page_of(hit["char_start"]) == hit["page"]

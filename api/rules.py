@@ -133,44 +133,114 @@ def get_rule(rule_id: str) -> Rule | None:
     return None
 
 
-def scan_doc(doc: Any, rules: tuple[Rule, ...] | None = None) -> list[dict[str, Any]]:
-    """确定性扫描：只跑 `detect=pattern` 的规则，按条款做字面量匹配。
+NEGATIVE_CONTEXT = ("无需", "不需要", "不要求", "免于", "不必", "没收", "不予退还", "扣除")
 
-    返回每条命中都带条款、页码与原文片段；同一规则在同一文档最多保留 3 处命中。
+
+def _is_compliant(clause_text: str, rule: Rule) -> bool:
+    """合规定式命中：条款写法已明确合规，不报本条。"""
+    return any(phrase and phrase in clause_text for phrase in rule.compliant)
+
+
+def _has_negative_context(text: str, start: int, end: int, window: int = 18) -> bool:
+    """命中词附近出现"无需/不要求"等否定语，说明不是问题条款。"""
+    context = text[max(0, start - window) : min(len(text), end + window)]
+    return any(word in context for word in NEGATIVE_CONTEXT)
+
+
+def scan_doc(
+    doc: Any,
+    rules: tuple[Rule, ...] | None = None,
+    context: dict[str, Any] | None = None,
+) -> list[dict[str, Any]]:
+    """确定性扫描：关键词规则（带合规/否定过滤）+ 计算型规则。
+
+    `context` 用于计算型规则的外部参照，例如：
+    `{"max_price": 2000000, "min_validity_days": 90, "below_cost_ratio": 0.6, "near_cap_ratio": 0.97}`
+    没传时，最高限价优先从文档正文里读。
     """
+    from api import checks
+
     rules = rules or load_rules()
+    context = context or {}
     hits: list[dict[str, Any]] = []
+
     for rule in rules:
-        if rule.detect != "pattern" or not rule.patterns:
+        # 资质门槛由 qualification.py 按三态核验，这里不重复扫描（否则"授权书"这类章节标题会被误报）
+        if rule.category == "资质门槛":
             continue
-        found = 0
-        for clause in doc.clauses:
-            text = clause.text
-            for pattern in rule.patterns:
-                pos = text.find(pattern)
-                if pos < 0:
+        if rule.detect == "pattern" and rule.patterns:
+            found = 0
+            for clause in doc.clauses:
+                text = clause.text
+                if _is_compliant(text, rule):
                     continue
-                start = clause.char_start + pos
-                end = start + len(pattern)
+                for pattern in rule.patterns:
+                    pos = text.find(pattern)
+                    if pos < 0:
+                        continue
+                    start = clause.char_start + pos
+                    end = start + len(pattern)
+                    if _has_negative_context(doc.full_text, start, end):
+                        continue
+                    hits.append(
+                        {
+                            "rule_id": rule.id,
+                            "category": rule.category,
+                            "level": rule.level,
+                            "title": rule.title,
+                            "clause_id": clause.clause_id,
+                            "page": doc.page_of(start),
+                            "char_start": start,
+                            "char_end": end,
+                            "quote": doc.slice_text(start, end),
+                            "legal_basis": rule.legal_basis,
+                            "basis_status": rule.basis_status,
+                            "matched_pattern": pattern,
+                            "detect": "pattern",
+                            "needs_review": True,
+                        }
+                    )
+                    found += 1
+                    break
+                if found >= 3:
+                    break
+        elif rule.detect == "price" and rule.id in checks.CHECKS:
+            for raw in checks.CHECKS[rule.id](doc, context):
                 hits.append(
                     {
                         "rule_id": rule.id,
                         "category": rule.category,
                         "level": rule.level,
                         "title": rule.title,
-                        "clause_id": clause.clause_id,
-                        "page": doc.page_of(start),
-                        "char_start": start,
-                        "char_end": end,
-                        "quote": doc.slice_text(start, end),
+                        "clause_id": None,
+                        "page": raw["page"],
+                        "char_start": raw["char_start"],
+                        "char_end": raw["char_end"],
+                        "quote": raw["quote"],
                         "legal_basis": rule.legal_basis,
                         "basis_status": rule.basis_status,
-                        "matched_pattern": pattern,
+                        "matched_pattern": rule.id,
+                        "detect": "check",
+                        "reason": raw.get("reason", ""),
+                        "values": raw.get("values", {}),
                         "needs_review": True,
                     }
                 )
-                found += 1
-                break
-            if found >= 3:
-                break
     return hits
+
+
+def scan_notes(doc: Any, rules: tuple[Rule, ...] | None = None) -> list[str]:
+    """说明哪些规则本次不参与自动扫描（人工核对 / 未实现的计算型），供报告如实展示。"""
+    from api import checks
+
+    rules = rules or load_rules()
+    notes: list[str] = []
+    manual = [r.id for r in rules if r.detect == "manual"]
+    unimplemented = [r.id for r in rules if r.detect == "price" and r.id not in checks.CHECKS]
+    if manual:
+        notes.append(f"需人工核对的规则（{len(manual)} 条）：{'、'.join(manual)}")
+    if unimplemented:
+        notes.append(f"暂未实现自动检测的报价类规则（{len(unimplemented)} 条）：{'、'.join(unimplemented)}")
+    if not checks.CAP_RE.search(doc.full_text):
+        notes.append("文档未载明最高投标限价，R12/R13/R31 未参与判定（避免拿别的项目限价硬比）")
+    return notes

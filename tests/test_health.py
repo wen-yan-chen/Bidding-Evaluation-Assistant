@@ -34,7 +34,7 @@ def test_api_health_has_capability_switches():
     # D2 已上线的能力为 true，没做的能力不能提前标 true
     assert caps["parse"] is True
     assert caps["clause_split"] is True
-    assert caps["risk_scan"] is False
+    assert caps["risk_scan"] is True
     assert caps["report_export"] is False
 
 

@@ -1,10 +1,10 @@
 {
   "name": "bid-review-rules",
   "source": "data/rules/rules.yaml",
-  "digest": "a3c00ef30b02aabb",
+  "digest": "188bf9a7ff58f159",
   "rule_count": 40,
   "blocks": 40,
-  "generated_at": "2026-11-15T16:49:52+08:00",
+  "generated_at": "2026-11-15T20:46:06+08:00",
   "embedding_suggestion": "bge-m3",
   "split": "按 `## Rxx` 标题切分，一块一条规则",
   "note": "由 tools/export_kb.py 自动生成；导入平台后用 agent.json 的 index_names 指向本库。"

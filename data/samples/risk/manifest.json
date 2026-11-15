@@ -1,0 +1,153 @@
+{
+  "version": "v1",
+  "generated_at": "2026-11-15T20:45:37",
+  "context": {
+    "max_price": 2000000,
+    "min_validity_days": 90,
+    "below_cost_ratio": 0.6,
+    "near_cap_ratio": 0.97
+  },
+  "note": "全部为自造虚构数据；风险样本每份只植入一类，干净对照用于测误报。",
+  "items": [
+    {
+      "file": "risk/risk-001.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "报价 2,300,000 元 > 最高限价 2,000,000 元",
+      "expect_rules": [
+        "R12"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-002.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "报价 900,000 元，仅为限价 45%，疑似低于成本",
+      "expect_rules": [
+        "R13"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-003.docx",
+      "split": "holdout",
+      "clean": false,
+      "note": "投标有效期 60 天 < 要求 90 天",
+      "expect_rules": [
+        "R17"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-004.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "大写「壹佰贰拾万元整」与小写 1,286,000.00 不一致",
+      "expect_rules": [
+        "R37"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-005.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "删除营业执照章节与统一社会信用代码（资格性缺失）",
+      "expect_rules": [],
+      "expect_qualification": [
+        "R01"
+      ]
+    },
+    {
+      "file": "risk/risk-006.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "正文写明由同一编制人统一编制（串标特征）",
+      "expect_rules": [
+        "R21"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-007.docx",
+      "split": "holdout",
+      "clean": false,
+      "note": "投标保证金与另一投标人从同一账户转出",
+      "expect_rules": [
+        "R27"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-008.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "正文承认提供虚假材料",
+      "expect_rules": [
+        "R20"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-009.docx",
+      "split": "dev",
+      "clean": false,
+      "note": "报价 1,990,000 元，达到限价 99.5%（贴标）",
+      "expect_rules": [
+        "R31"
+      ],
+      "expect_qualification": []
+    },
+    {
+      "file": "risk/risk-010.docx",
+      "split": "holdout",
+      "clean": false,
+      "note": "以联合体形式投标但未提交联合体协议",
+      "expect_rules": [],
+      "expect_qualification": [
+        "R09"
+      ]
+    },
+    {
+      "file": "bid-001.docx",
+      "split": "dev",
+      "clean": true,
+      "note": "干净对照（仅含合规定式表述）",
+      "expect_rules": [],
+      "expect_qualification": []
+    },
+    {
+      "file": "bid-002.docx",
+      "split": "holdout",
+      "clean": true,
+      "note": "干净对照（仅含合规定式表述）",
+      "expect_rules": [],
+      "expect_qualification": []
+    },
+    {
+      "file": "bid-003.docx",
+      "split": "dev",
+      "clean": true,
+      "note": "干净对照（仅含合规定式表述）",
+      "expect_rules": [],
+      "expect_qualification": []
+    },
+    {
+      "file": "bid-004.pdf",
+      "split": "dev",
+      "clean": true,
+      "note": "干净对照（仅含合规定式表述）",
+      "expect_rules": [],
+      "expect_qualification": []
+    },
+    {
+      "file": "bid-005.pdf",
+      "split": "holdout",
+      "clean": true,
+      "note": "干净对照（仅含合规定式表述）",
+      "expect_rules": [],
+      "expect_qualification": []
+    }
+  ]
+}

@@ -202,7 +202,7 @@ rules:
     level: 中
     title: 投标有效期不足
     condition: 投标函承诺的投标有效期短于招标文件要求的天数。
-    detect: pattern
+    detect: price
     patterns: ["投标有效期"]
     basis_status: verified
     basis: 《中华人民共和国招标投标法实施条例》第五十一条第六项（未对实质性要求作出响应）
@@ -217,7 +217,7 @@ rules:
     patterns: ["投标保证金", "保证金未", "保函"]
     basis_status: verified
     basis: 《中华人民共和国招标投标法实施条例》第五十一条第六项（未对实质性要求作出响应）
-    compliant: ["保证金已在截止时间前从基本账户转出", "保函由招标文件认可的银行出具"]
+    compliant: ["保证金已在截止时间前从基本账户转出", "保函由招标文件认可的银行出具", "已按招标文件要求提交投标保证金", "已提交投标保证金"]
 
   - id: R19
     category: 废标条款
@@ -238,7 +238,7 @@ rules:
     patterns: ["伪造", "虚假材料", "行贿", "提供虚假"]
     basis_status: verified
     basis: 《中华人民共和国招标投标法实施条例》第五十一条第七项（投标人有串通投标、弄虚作假、行贿等违法行为）
-    compliant: []
+    compliant: ["如经查实存在虚假材料", "如发现虚假材料", "愿接受取消投标资格"]
 
   # ---------------------------------------------------------------- 围标串标（R21–R30）
   - id: R21
@@ -423,7 +423,7 @@ rules:
     level: 中
     title: 报价大写与小写不一致
     condition: 投标报价的大写金额与小写金额不一致。
-    detect: pattern
+    detect: price
     patterns: ["大写", "小写"]
     basis_status: pending
     basis: ""
@@ -455,7 +455,7 @@ rules:
     level: 低
     title: 报价呈异常整数或吉祥数字
     condition: 多家报价均为整数万元或含明显"吉利"尾数（如 888、666），疑似协同定价。
-    detect: price
+    detect: manual
     patterns: ["整数报价", "888", "666"]
     basis_status: na
     basis: ""
