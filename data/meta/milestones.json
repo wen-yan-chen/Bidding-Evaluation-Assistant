@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-15",
-  "current": "D4",
+  "current": "D5",
   "note": "页面与文档同源：改这里不用改前端。status 取 done / doing / planned。",
   "items": [
     {
@@ -28,8 +28,8 @@
       "id": "M3",
       "name": "评审逻辑",
       "day": "D5–D6",
-      "status": "planned",
-      "target": "资质核验一致率 ≥ 90%；评分偏差 ±5 分内 ≥ 85%；检出 ≥ 85%、误报 ≤ 15%"
+      "status": "doing",
+      "target": "资格性核验一致率 ≥ 90%；评分偏差 ±5 分内 ≥ 85%；检出 ≥ 85%、误报 ≤ 15%（D5 完成核验与评分，D6 完成风险扫描调优）"
     },
     {
       "id": "M4",
@@ -54,15 +54,43 @@
     }
   ],
   "stage": {
-    "label": "D4 交付物",
+    "label": "D5 交付物",
     "items": [
-      { "item": "40 条规则库（四类各 10）", "path": "data/rules/rules.yaml", "status": "done" },
-      { "item": "规则校验（条数/依据三态/指纹）", "path": "tools/validate_rules.py", "status": "done" },
-      { "item": "知识库导出 + 指纹清单", "path": "knowledge/rules-full.md", "status": "done" },
-      { "item": "规则库接口", "path": "api/routes/rules.py", "status": "done" },
-      { "item": "MCP 工具服务（3 个工具）", "path": "mcps/bid_review_mcp.py", "status": "done" },
-      { "item": "compose 双服务（app + mcp）", "path": "docker-compose.yml", "status": "done" },
-      { "item": "规则扫描命中带溯源", "path": "api/rules.py", "status": "done" }
+      {
+        "item": "评分细则两套（可切换）",
+        "path": "data/scoring/",
+        "status": "done"
+      },
+      {
+        "item": "确定性评分引擎",
+        "path": "api/scoring.py",
+        "status": "done"
+      },
+      {
+        "item": "资格性核验三态",
+        "path": "api/review/qualification.py",
+        "status": "done"
+      },
+      {
+        "item": "评审编排 + 落盘",
+        "path": "api/review/service.py",
+        "status": "done"
+      },
+      {
+        "item": "评审接口",
+        "path": "api/routes/review.py",
+        "status": "done"
+      },
+      {
+        "item": "MCP 增核验/算分工具",
+        "path": "mcps/bid_review_mcp.py",
+        "status": "done"
+      },
+      {
+        "item": "评审结果落盘（data/reviews）",
+        "path": "api/review/service.py",
+        "status": "done"
+      }
     ]
   }
 }

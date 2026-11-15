@@ -48,8 +48,8 @@ def health_detail() -> dict[str, Any]:
             "parse": True,         # D2 文档解析 + 页码映射 + 字段抽取（已上线）
             "clause_split": True,  # D2 条款切分（已上线）
             "ocr": True,           # D3 扫描件 OCR（已上线）
-            "qualification": False,  # D5 资格性核验
-            "scoring": False,      # D5 分项评分
+            "qualification": True,   # D5 资格性核验（R01–R10 三态）
+            "scoring": True,       # D5 分项评分（两套细则可切换）
             "risk_scan": False,    # D6 风险扫描
             "report_export": False,  # D7 docx/pdf 导出
             "mcp": True,           # D4 MCP 工具服务（compose 内 mcp 服务，8765）

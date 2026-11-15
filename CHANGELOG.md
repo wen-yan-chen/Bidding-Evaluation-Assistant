@@ -2,6 +2,37 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与语义化版本。
 
+## [0.5.0] — 2026-11-15（D5 资格性核验 + 评分细则）
+
+### Added
+
+- 评分细则 `data/scoring/profile-a.yaml`（价格 40 / 技术 40 / 商务 20）与 `profile-b.yaml`（30/50/20），
+  每套 9 个评分项，含分档（`tiers`）、依据（`basis`）、依据状态；`requirements` 声明最高限价与工期要求。
+- `api/scoring.py`：细则加载与指纹、报价解析（元/万元/￥）、工期解析（天/月/年）、
+  三类评分（`price_ratio` / `duration` / `presence`）、分项得分与扣分汇总、每项带 `evidence`。
+- `api/review/qualification.py`：R01–R10 资格性三态（`provided` / `insufficient` / `missing`），
+  含否定词上下文判定，明确"文本核验不替代原件核验"。
+- `api/review/service.py`：评审编排（核验 → 算分 → 扫描 → 汇总 → 落盘 `data/reviews/`），
+  结果带 `profile.digest` 与 `rule_digest` 双指纹。
+- `api/routes/review.py`：`GET /api/scoring/profiles`、`POST /api/review`、`GET /api/review/{id}`、`GET /api/review`。
+- MCP 新增 `check_qualification` 与 `score_item`（累计 5 个工具），协议实测 `tools(5)`。
+- `tests/test_review.py` 8 条：细则加载/解析/分档/超限价/工期档/资格三态/确定性与换细则/接口往返。
+
+### Changed
+
+- `/api/health`：`qualification` 与 `scoring` 能力开关置 true；里程碑 M3 置为进行中、当前进度切到 D5。
+- `.gitignore` 增加 `data/reviews/`（评审结果为运行时产物）。
+
+### Verified
+
+- 同一份 bid-001：A 套 **68.0/100**、B 套 **62.0/100**（P1 40→30、T2 10→12、T5 6→8）；
+- 同一 `doc_id + profile_id` 连续两次调用均 68.0，风险列表一致；
+- `pytest` **35 passed**；`smoke_test.py` **10/10**；`validate_rules.py` 0 提示；`agent_config.py check` 0 ERROR。
+
+### Known issues
+
+- 风险扫描存在 3 类误报（R18 合规定式、R17 需比较天数、R37 大小写金额），D6 通过 `compliant` 过滤与计算型规则修复。
+
 ## [0.4.0] — 2026-11-15（D4 规则库 + 知识库 + MCP）
 
 ### Added

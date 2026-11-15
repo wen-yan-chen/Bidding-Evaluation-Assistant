@@ -170,6 +170,42 @@ def locate_span(doc_id: str, quote: str) -> dict[str, Any]:
     }
 
 
+@mcp.tool()
+def check_qualification(doc_id: str) -> dict[str, Any]:
+    """资格性核验：按 R01–R10 逐项给出「已提供 / 效力不足 / 缺失」。
+
+    只做文本层面判断（是否提供、上下文是否自相矛盾），不判断证件真伪；
+    返回每项带 page/quote 与依据状态，供前端点击跳原文与报告引用。
+    """
+    doc, err = _load(doc_id)
+    if err:
+        return err
+
+    from api.review import qualification
+
+    result = qualification.check(doc)
+    return {"doc_id": doc.doc_id, "file_name": doc.file_name, **result}
+
+
+@mcp.tool()
+def score_item(doc_id: str, profile_id: str = "profile-a") -> dict[str, Any]:
+    """按评分细则逐项算分：返回分项得分、满分、扣分理由、依据与溯源。
+
+    `profile_id` 对应 `data/scoring/{profile_id}.yaml`；换一套细则再算一次，
+    分数会跟着变——这是"评分口径可配置"的可验证证据。
+    """
+    doc, err = _load(doc_id)
+    if err:
+        return err
+
+    from api import scoring
+
+    result = scoring.score_doc(doc, profile_id)
+    if "error" in result:
+        return result
+    return {"doc_id": doc.doc_id, "file_name": doc.file_name, **result}
+
+
 def _relax_transport_security() -> None:
     """容器内以服务名互访时 Host 头是 mcp:8765；新版 MCP 的 DNS rebinding 防护会返回 421。
 

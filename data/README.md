@@ -10,7 +10,7 @@ data/
 ├── samples/               # 投标文件样本 + manifest.json（标准答案）✅ 15 份（含 5 份扫描件）
 │   └── boundary/          # 边界样本：空白页 / 低分辨率 / 旋转 90° ✅ D3
 ├── rules/rules.yaml       # 40 条规则（四类各 10 条，依据三态）✅ D4
-├── scoring/               # D5：评分细则 YAML（至少两套，用于"换细则"演示）
+├── scoring/               # 两套评分细则（profile-a 40/40/20、profile-b 30/50/20）✅ D5
 ├── labels/                # D6/D9：人工标注（风险条目、专家分、核验结论）
 ├── review/                # D7：评审结果落盘（JSON）
 └── predictions/           # D9：批量评测输出（git 忽略）
