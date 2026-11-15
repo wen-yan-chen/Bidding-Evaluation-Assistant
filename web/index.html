@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>招投标评审助手 · 服务状态</title>
+<meta name="description" content="招投标评审助手（课题 8）D1 立骨版本：服务健康检查、平台能力接入状态与里程碑进度。">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">标</span>
+    <div class="brand-text">
+      <strong>招投标评审助手</strong>
+      <small>政企采购 · 招标/投标文件解析与辅助评审</small>
+    </div>
+  </div>
+
+  <div class="topbar-meta">
+    <span class="chip" id="chip-version" title="版本号来自根目录 VERSION">v—</span>
+    <span class="chip" id="chip-env" title="APP_ENV 环境变量">env:—</span>
+    <button class="btn" id="btn-refresh" type="button">重新自检</button>
+  </div>
+</header>
+
+<div class="disclaimer" role="note">
+  <span class="disclaimer-mark" aria-hidden="true">!</span>
+  <span class="disclaimer-text" id="disclaimer-text">AI 辅助评审结果，最终以评标委员会评审结论为准</span>
+  <span class="disclaimer-tag">合规提示</span>
+</div>
+
+<main class="layout">
+
+  <section class="card card-selfcheck" aria-labelledby="h-selfcheck">
+    <div class="card-head">
+      <h2 id="h-selfcheck">服务自检</h2>
+      <span class="card-hint" id="check-stamp">尚未检测</span>
+    </div>
+
+    <ul class="check-list" id="check-list" aria-live="polite">
+      <li class="check-row is-pending"><span class="dot"></span><span class="check-name">等待首次检测…</span></li>
+    </ul>
+
+    <p class="card-foot">
+      页面每 15 秒自动复检一次；数据全部来自
+      <code>/health</code>、<code>/api/health</code>、<code>/api/info</code>，无写死的状态。
+    </p>
+  </section>
+
+  <section class="card" aria-labelledby="h-runtime">
+    <div class="card-head">
+      <h2 id="h-runtime">运行信息</h2>
+    </div>
+    <dl class="kv">
+      <dt>服务名</dt><dd id="k-service">—</dd>
+      <dt>版本</dt><dd id="k-version">—</dd>
+      <dt>环境</dt><dd id="k-env">—</dd>
+      <dt>启动时间</dt><dd id="k-started">—</dd>
+      <dt>已运行</dt><dd id="k-uptime">—</dd>
+      <dt>容器内运行</dt><dd id="k-container">—</dd>
+    </dl>
+  </section>
+
+  <section class="card" aria-labelledby="h-platform">
+    <div class="card-head">
+      <h2 id="h-platform">平台能力接入（Nexent 三件套）</h2>
+      <span class="card-hint">D1 只登记，未挂载</span>
+    </div>
+
+    <div class="plat-grid">
+      <div class="plat">
+        <div class="plat-head">
+          <span class="plat-name">MCP 工具</span>
+          <span class="badge badge-todo" id="badge-mcp">待接入</span>
+        </div>
+        <p class="plat-value"><span id="k-mcp-tools">—</span> 个已登记</p>
+        <p class="plat-note">解析 / 核验 / 评分 / 扫描 / 定位 / 导出，D4 起提供服务</p>
+      </div>
+
+      <div class="plat">
+        <div class="plat-head">
+          <span class="plat-name">知识库</span>
+          <span class="badge badge-todo" id="badge-kb">待接入</span>
+        </div>
+        <p class="plat-value"><span id="k-kb">—</span></p>
+        <p class="plat-note">40 条规则按节切分，导入后需替换索引名</p>
+      </div>
+
+      <div class="plat">
+        <div class="plat-head">
+          <span class="plat-name">自定义 Skill</span>
+          <span class="badge badge-todo" id="badge-skill">待接入</span>
+        </div>
+        <p class="plat-value"><span id="k-skill">—</span> 个已登记</p>
+        <p class="plat-note">规则卡 / 缺项判定 / 输出自检 / 摘要成文</p>
+      </div>
+    </div>
+
+    <p class="card-foot">
+      三件套的落地口径见 <code>agent.json</code> 与本页"里程碑"；登记 ≠ 可用，
+      页面按真实配置显示状态，不提前标"已接入"。
+    </p>
+  </section>
+
+  <section class="card card-wide" aria-labelledby="h-milestone">
+    <div class="card-head">
+      <h2 id="h-milestone">里程碑进度</h2>
+      <span class="card-hint" id="ms-hint">—</span>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr><th>编号</th><th>里程碑</th><th>计划</th><th>状态</th><th>验收口径</th></tr>
+        </thead>
+        <tbody id="ms-body">
+          <tr><td colspan="5" class="empty">加载中…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card card-wide" aria-labelledby="h-d1">
+    <div class="card-head">
+      <h2 id="h-d1">D1 立骨交付物</h2>
+      <span class="card-hint">今日范围：能起服务、能自证</span>
+    </div>
+    <ul class="deliver-list" id="deliver-list">
+      <li class="empty">加载中…</li>
+    </ul>
+  </section>
+
+</main>
+
+<footer class="pagefoot">
+  <p>
+    D1 版本仅包含服务骨架：<strong>D2 起依次接入文档上传与解析、资格性核验、分项评分、风险扫描与报告导出</strong>。
+    本页不提供任何占位按钮，未实现的能力一律显示"待接入"。
+  </p>
+  <p class="pagefoot-sub">
+    课题 8 · 招投标评审助手 ｜ 魔擎开发者激励 1 期 ｜ 模拟数据，不含任何真实招投标信息
+  </p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

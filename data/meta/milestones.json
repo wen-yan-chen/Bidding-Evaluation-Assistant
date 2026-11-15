@@ -1,0 +1,65 @@
+{
+  "updated": "2026-11-15",
+  "current": "D1",
+  "note": "页面与文档同源：改这里不用改前端。status 取 done / doing / planned。",
+  "items": [
+    {
+      "id": "M0",
+      "name": "立骨",
+      "day": "D1",
+      "status": "done",
+      "target": "docker compose up 一次成功；/health 返回 200；浏览器打开有页面"
+    },
+    {
+      "id": "M1",
+      "name": "解析层",
+      "day": "D2–D3",
+      "status": "planned",
+      "target": "20 份样本解析成功率 ≥ 90%；字段准确率 ≥ 90%；quote 全为原文子串"
+    },
+    {
+      "id": "M2",
+      "name": "规则库",
+      "day": "D4",
+      "status": "planned",
+      "target": "40 条规则 YAML（四类各 10 条）+ 依据状态机 + 知识库可检索"
+    },
+    {
+      "id": "M3",
+      "name": "评审逻辑",
+      "day": "D5–D6",
+      "status": "planned",
+      "target": "资质核验一致率 ≥ 90%；评分偏差 ±5 分内 ≥ 85%；检出 ≥ 85%、误报 ≤ 15%"
+    },
+    {
+      "id": "M4",
+      "name": "报告与摘要",
+      "day": "D7",
+      "status": "planned",
+      "target": "docx/pdf 一键下载；报告数值 = 页面数值"
+    },
+    {
+      "id": "M5",
+      "name": "前端看板",
+      "day": "D8",
+      "status": "planned",
+      "target": "双栏对照、点击跳原文、换细则入口、报告中心、无占位按钮"
+    },
+    {
+      "id": "M6",
+      "name": "评测与交付",
+      "day": "D9–D10",
+      "status": "planned",
+      "target": "六条验收标准逐项有数字；干净环境 docker compose up 一次成功"
+    }
+  ],
+  "d1_deliverables": [
+    { "item": "目录结构", "path": "./", "status": "done" },
+    { "item": "Dockerfile", "path": "Dockerfile", "status": "done" },
+    { "item": "compose 编排", "path": "docker-compose.yml", "status": "done" },
+    { "item": "api 空壳（/health）", "path": "api/", "status": "done" },
+    { "item": "web 空壳", "path": "web/", "status": "done" },
+    { "item": "agent.json 草案", "path": "agent.json", "status": "done" },
+    { "item": "README 骨架", "path": "README.md", "status": "done" }
+  ]
+}

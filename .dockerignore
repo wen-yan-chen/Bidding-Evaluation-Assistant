@@ -1,0 +1,20 @@
+# 构建上下文瘦身：镜像里只需要运行时代码
+.git
+.gitignore
+.dockerignore
+**/__pycache__
+**/*.py[cod]
+.venv
+venv
+.env
+.env.example
+docs
+tests
+tools
+mcps
+skills
+knowledge
+data/uploads
+*.md
+!prompt.md
+*.log

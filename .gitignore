@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# 本地配置（含密钥）不进仓库
+.env
+
+# 上传件与运行时产物
+data/uploads/*
+!data/uploads/.gitkeep
+data/predictions/
+*.log
+
+# 编辑器和系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 演示视频若超限，可改为外链后忽略大文件（D10 决定）
+# docs/video/*.mp4
