@@ -225,7 +225,10 @@ function renderMilestones(ms) {
     body.append(tr);
   }
 
-  renderDeliverables(ms.d1_deliverables || []);
+  renderDeliverables((ms.stage && ms.stage.items) || ms.d1_deliverables || []);
+  if (ms.stage && ms.stage.label) {
+    $('stage-label').textContent = `${ms.stage.label} · 已完成 ${(ms.stage.items || []).length} 项`;
+  }
 }
 
 function renderDeliverables(items) {
@@ -252,6 +255,160 @@ function renderDeliverables(items) {
   }
 }
 
+/* ------------------------------------------------------------ 上传与解析（D2） */
+
+let selectedFile = null;
+
+function setParseStatus(text, kind) {
+  const box = $('parse-status');
+  box.hidden = false;
+  box.className = `parse-status ${kind || ''}`.trim();
+  box.textContent = text;
+}
+
+function formatSize(bytes) {
+  if (!Number.isFinite(bytes)) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+}
+
+function renderParseResult(data) {
+  const ok = data.parse_status !== 'failed';
+  setParseStatus(
+    ok
+      ? `解析完成：${data.file_name} · ${data.parse_status === 'degraded' ? '部分降级（见下方说明）' : '状态正常'}`
+      : `解析失败：${(data.degraded || []).join('；') || '未知原因'}`,
+    ok ? 'is-ok' : 'is-error'
+  );
+
+  $('parse-result').hidden = false;
+
+  const chips = [
+    ['文档 ID', data.doc_id],
+    ['页数', `${data.page_count}${data.page_source === 'estimated' ? '（估算）' : ''}`],
+    ['字符数', data.char_count],
+    ['条款', `${data.clause_count} 条`],
+    ['字段', `${data.fields.length} / 6`],
+    ['SHA256', `${(data.sha256 || '').slice(0, 12)}…`],
+  ];
+  const meta = $('parse-meta');
+  meta.textContent = '';
+  for (const [label, value] of chips) {
+    const chip = document.createElement('span');
+    chip.className = 'meta-chip';
+    const strong = document.createElement('strong');
+    strong.textContent = String(value);
+    chip.append(`${label} `, strong);
+    meta.append(chip);
+  }
+
+  const body = $('field-body');
+  body.textContent = '';
+  if (!data.fields.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 4;
+    td.className = 'empty';
+    td.textContent = '未抽取到任何字段（该文件可能不含标准字段标签）';
+    tr.append(td);
+    body.append(tr);
+  }
+  for (const field of data.fields) {
+    const tr = document.createElement('tr');
+    const tdName = document.createElement('td');
+    tdName.textContent = field.name;
+    const tdValue = document.createElement('td');
+    const value = document.createElement('span');
+    value.className = 'field-value';
+    value.textContent = field.value;
+    tdValue.append(value);
+    const tdPage = document.createElement('td');
+    tdPage.textContent = `第 ${field.page} 页`;
+    const tdQuote = document.createElement('td');
+    const quote = document.createElement('span');
+    quote.className = 'field-quote';
+    quote.textContent = `「${field.quote}」`;
+    tdQuote.append(quote);
+    tr.append(tdName, tdValue, tdPage, tdQuote);
+    body.append(tr);
+  }
+
+  const extra = $('parse-extra');
+  extra.textContent = '';
+  if (data.missing_fields && data.missing_fields.length) {
+    const note = document.createElement('p');
+    note.className = 'parse-note';
+    note.textContent = `未抽取到：${data.missing_fields.join('、')}（缺失即如实留空，不做推测）`;
+    extra.append(note);
+  }
+  for (const item of data.degraded || []) {
+    const note = document.createElement('p');
+    note.className = 'parse-note';
+    note.textContent = `降级说明：${item}`;
+    extra.append(note);
+  }
+}
+
+async function uploadSelected() {
+  if (!selectedFile) return;
+  $('btn-parse').disabled = true;
+  setParseStatus(`正在解析 ${selectedFile.name} …`, '');
+  try {
+    const form = new FormData();
+    form.append('file', selectedFile, selectedFile.name);
+    const res = await fetch('/api/upload', { method: 'POST', body: form });
+    const text = await res.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      data = { detail: text };
+    }
+    if (!res.ok) {
+      setParseStatus(`上传失败：${data.detail || res.status}`, 'is-error');
+      return;
+    }
+    renderParseResult(data);
+    refresh(); // 能力开关与页面状态同步刷新
+  } catch (err) {
+    setParseStatus(`上传失败：${err}`, 'is-error');
+  } finally {
+    $('btn-parse').disabled = !selectedFile;
+  }
+}
+
+function initUpload() {
+  $('btn-choose').addEventListener('click', () => $('file-input').click());
+
+  $('file-input').addEventListener('change', (event) => {
+    selectedFile = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+    $('file-name').textContent = selectedFile
+      ? `${selectedFile.name} · ${formatSize(selectedFile.size)}`
+      : '未选择文件';
+    $('btn-parse').disabled = !selectedFile;
+    if (selectedFile) setParseStatus('已选择文件，点击「上传并解析」开始', '');
+  });
+
+  $('btn-parse').addEventListener('click', uploadSelected);
+}
+
+const FIELD_NAMES = ['项目名称', '项目编号', '采购人', '投标人', '报价', '工期'];
+
+async function restoreLastDocument() {
+  const list = await request('/api/documents');
+  const items = (list.body && list.body.items) || [];
+  if (!items.length) return;
+  const detail = await request(`/api/doc/${items[0].doc_id}`);
+  const data = detail.body;
+  if (!detail.ok || !data || !Array.isArray(data.fields)) return;
+  renderParseResult({
+    ...data,
+    clause_count: (data.clauses || []).length,
+    missing_fields: FIELD_NAMES.filter((name) => !data.fields.some((f) => f.name === name)),
+  });
+}
+
 /* ------------------------------------------------------------ 启动 */
 
 async function refresh() {
@@ -265,6 +422,7 @@ async function refresh() {
 
 function start() {
   $('btn-refresh').addEventListener('click', refresh);
+  initUpload();
 
   // 切回标签页时立即复检，避免看到过期状态
   document.addEventListener('visibilitychange', () => {
@@ -272,6 +430,7 @@ function start() {
   });
 
   refresh();
+  restoreLastDocument();
   timer = setInterval(refresh, REFRESH_MS);
   window.addEventListener('beforeunload', () => clearInterval(timer));
 }

@@ -67,7 +67,7 @@
   <section class="card" aria-labelledby="h-platform">
     <div class="card-head">
       <h2 id="h-platform">平台能力接入（Nexent 三件套）</h2>
-      <span class="card-hint">D1 只登记，未挂载</span>
+      <span class="card-hint">已登记，D4 起挂载</span>
     </div>
 
     <div class="plat-grid">
@@ -105,6 +105,41 @@
     </p>
   </section>
 
+  <section class="card card-wide" aria-labelledby="h-parse">
+    <div class="card-head">
+      <h2 id="h-parse">文档解析（D2 已上线）</h2>
+      <span class="card-hint">docx / pdf / txt / md，单文件 ≤ 50 MB</span>
+    </div>
+
+    <div class="upload-row">
+      <input type="file" id="file-input" accept=".docx,.pdf,.txt,.md" hidden>
+      <button class="btn" id="btn-choose" type="button">选择文件</button>
+      <button class="btn btn-primary" id="btn-parse" type="button" disabled>上传并解析</button>
+      <span class="file-name" id="file-name">未选择文件</span>
+    </div>
+
+    <div id="parse-status" class="parse-status" hidden></div>
+
+    <div id="parse-result" hidden>
+      <div class="parse-meta" id="parse-meta"></div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr><th>字段</th><th>值</th><th>页码</th><th>原文片段（可溯源）</th></tr>
+          </thead>
+          <tbody id="field-body"></tbody>
+        </table>
+      </div>
+      <div id="parse-extra"></div>
+    </div>
+
+    <p class="card-foot">
+      解析全部在服务层完成、不经过模型：每个字段都带 <code>page</code> / <code>char_start</code> /
+      <code>char_end</code> / <code>quote</code>，可用 <code>python tools/validate_quotes.py</code> 复算。
+      docx 无分页符时页码为估算值，会显式标注为「估算」。
+    </p>
+  </section>
+
   <section class="card card-wide" aria-labelledby="h-milestone">
     <div class="card-head">
       <h2 id="h-milestone">里程碑进度</h2>
@@ -124,8 +159,8 @@
 
   <section class="card card-wide" aria-labelledby="h-d1">
     <div class="card-head">
-      <h2 id="h-d1">D1 立骨交付物</h2>
-      <span class="card-hint">今日范围：能起服务、能自证</span>
+      <h2 id="h-d1">本阶段交付物</h2>
+      <span class="card-hint" id="stage-label">D2：能解析、能溯源</span>
     </div>
     <ul class="deliver-list" id="deliver-list">
       <li class="empty">加载中…</li>

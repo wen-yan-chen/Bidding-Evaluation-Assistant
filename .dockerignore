@@ -15,6 +15,7 @@ mcps
 skills
 knowledge
 data/uploads
+data/parsed
 *.md
 !prompt.md
 *.log

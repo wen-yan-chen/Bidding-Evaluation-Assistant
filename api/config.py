@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parent.parent
 WEB_DIR = ROOT / "web"
 DATA_DIR = ROOT / "data"
 UPLOAD_DIR = DATA_DIR / "uploads"
+PARSED_DIR = DATA_DIR / "parsed"
 META_DIR = DATA_DIR / "meta"
 AGENT_FILE = ROOT / "agent.json"
 PROMPT_FILE = ROOT / "prompt.md"

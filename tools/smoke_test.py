@@ -19,6 +19,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -69,6 +70,82 @@ def as_json(result: dict[str, Any]) -> dict[str, Any]:
         return {}
 
 
+def upload_file(base: str, path: Path, field: str = "file", timeout: float = 60.0) -> dict[str, Any]:
+    """构造 multipart 请求上传一个文件（只用标准库，不依赖 requests）。"""
+    boundary = "----bidreview" + uuid.uuid4().hex
+    body = bytearray()
+    body += f"--{boundary}\r\n".encode("utf-8")
+    body += (
+        f'Content-Disposition: form-data; name="{field}"; filename="{path.name}"\r\n'
+    ).encode("utf-8")
+    body += b"Content-Type: application/octet-stream\r\n\r\n"
+    body += path.read_bytes()
+    body += f"\r\n--{boundary}--\r\n".encode("utf-8")
+
+    url = base.rstrip("/") + "/api/upload"
+    request = urllib.request.Request(
+        url,
+        data=bytes(body),
+        method="POST",
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"},
+    )
+    t0 = time.perf_counter()
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as resp:
+            raw = resp.read().decode("utf-8", "replace")
+            return {
+                "ok": True,
+                "status": resp.status,
+                "headers": {},
+                "body": raw,
+                "ms": (time.perf_counter() - t0) * 1000,
+                "url": url,
+            }
+    except urllib.error.HTTPError as exc:
+        return {
+            "ok": False,
+            "status": exc.code,
+            "headers": {},
+            "body": exc.read().decode("utf-8", "replace"),
+            "ms": (time.perf_counter() - t0) * 1000,
+            "url": url,
+            "error": f"HTTP {exc.code}",
+        }
+    except Exception as exc:  # noqa: BLE001
+        return {
+            "ok": False,
+            "status": 0,
+            "headers": {},
+            "body": "",
+            "ms": (time.perf_counter() - t0) * 1000,
+            "url": url,
+            "error": f"{type(exc).__name__}: {exc}",
+        }
+
+
+def verify_doc_payload(data: dict[str, Any]) -> list[str]:
+    """在前端/脚本侧独立复核：字段切片必须等于 quote，页码必须与偏移一致。"""
+    text = data.get("full_text") or ""
+    pages = data.get("pages") or []
+    problems: list[str] = []
+
+    def page_of(offset: int) -> int | None:
+        for span in pages:
+            if span["start"] <= offset < span["end"]:
+                return span["page"]
+        return pages[-1]["page"] if pages and offset == len(text) else None
+
+    for field in data.get("fields") or []:
+        sliced = text[field["char_start"] : field["char_end"]]
+        if sliced != field["quote"]:
+            problems.append(f"{field['name']}: 切片≠quote")
+            continue
+        actual_page = page_of(field["char_start"])
+        if actual_page is not None and actual_page != field["page"]:
+            problems.append(f"{field['name']}: 声明第 {field['page']} 页，实际第 {actual_page} 页")
+    return problems
+
+
 def run(base: str) -> list[dict[str, Any]]:
     checks: list[dict[str, Any]] = []
 
@@ -112,14 +189,14 @@ def run(base: str) -> list[dict[str, Any]]:
     inf = as_json(info)
     ms = inf.get("milestones") or {}
     ms_items = ms.get("items") or []
-    d1_items = ms.get("d1_deliverables") or []
+    stage_items = (ms.get("stage") or {}).get("items") or ms.get("d1_deliverables") or []
     add(
-        "5. /api/info 配置齐全（里程碑 + D1 交付清单 + 无错误）",
+        "5. /api/info 配置齐全（里程碑 + 阶段交付清单 + 无错误）",
         info["status"] == 200
         and len(ms_items) >= 7
-        and len(d1_items) >= 7
+        and len(stage_items) >= 7
         and not (inf.get("errors") or []),
-        f"HTTP {info['status']} · 里程碑 {len(ms_items)} · D1 交付 {len(d1_items)}"
+        f"HTTP {info['status']} · 里程碑 {len(ms_items)} · 阶段交付 {len(stage_items)}"
         f" · errors {len(inf.get('errors') or [])}",
     )
 
@@ -144,6 +221,33 @@ def run(base: str) -> list[dict[str, Any]]:
         f"nosniff={headers.get('x-content-type-options')} "
         f"frame={headers.get('x-frame-options')}",
     )
+
+    # ---- D2：上传 → 解析 → 溯源自洽（端到端，走真实 HTTP）
+    sample = ROOT / "data" / "samples" / "bid-001.docx"
+    if sample.exists():
+        uploaded = upload_file(base, sample)
+        payload = as_json(uploaded)
+        fields = payload.get("fields") or []
+        add(
+            "8. 上传样本 → 解析成功且抽到 6 个字段",
+            uploaded["status"] == 200
+            and payload.get("parse_status") in ("ok", "degraded")
+            and len(fields) >= 6,
+            f"HTTP {uploaded['status']} · status={payload.get('parse_status')} · "
+            f"字段={len(fields)} · 页={payload.get('page_count')} · 条款={payload.get('clause_count')}",
+        )
+
+        doc_id = payload.get("doc_id")
+        detail = fetch(base, f"/api/doc/{doc_id}") if doc_id else {"status": 0, "body": "{}"}
+        problems = verify_doc_payload(as_json(detail))
+        add(
+            "9. 字段溯源自洽（quote = 原文切片，页码与偏移一致）",
+            detail["status"] == 200 and not problems,
+            "全部自洽" if not problems else "；".join(problems[:3]),
+        )
+    else:
+        add("8. 上传样本 → 解析成功且抽到 6 个字段", False, "缺少 data/samples/bid-001.docx")
+        add("9. 字段溯源自洽（quote = 原文切片，页码与偏移一致）", False, "无样本，跳过")
 
     return checks
 

@@ -281,6 +281,89 @@ code {
 .badge-todo { background: var(--todo-soft); color: var(--todo); border-color: #f0dcb4; }
 .badge-plan { background: #f3f5f9; color: var(--ink-3); border-color: var(--line); }
 
+/* ---------------------------------------------------------------- 上传与解析 */
+
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  color: #fff;
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.btn-primary:hover:not(:disabled) { background: #1a43bd; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.file-name {
+  font-size: 13px;
+  color: var(--ink-3);
+  word-break: break-all;
+}
+
+.parse-status {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  border: 1px solid var(--line);
+  background: #f8fafd;
+  color: var(--ink-2);
+}
+
+.parse-status.is-error {
+  background: var(--fail-soft);
+  border-color: #f2c5bf;
+  color: #8c2d22;
+}
+
+.parse-status.is-ok {
+  background: var(--ok-soft);
+  border-color: #c4e8d8;
+  color: #0d6b4d;
+}
+
+.parse-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 10px;
+}
+
+.meta-chip {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  background: #f5f7fb;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.meta-chip strong { color: var(--ink); font-weight: 600; }
+
+.field-quote {
+  color: var(--ink-3);
+  font-size: 12.5px;
+  display: block;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.field-value { font-weight: 600; color: var(--ink); }
+
+.parse-note {
+  margin: 10px 0 0;
+  font-size: 12.5px;
+  color: var(--todo);
+  line-height: 1.6;
+}
+
+.parse-note.is-warn { color: var(--fail); }
+
 /* ---------------------------------------------------------------- 表格 */
 
 .table-wrap { overflow-x: auto; }

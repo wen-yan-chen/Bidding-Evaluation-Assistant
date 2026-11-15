@@ -13,6 +13,7 @@ venv/
 # 上传件与运行时产物
 data/uploads/*
 !data/uploads/.gitkeep
+data/parsed/
 data/predictions/
 *.log
 

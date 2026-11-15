@@ -1,7 +1,8 @@
 # 招投标评审助手
 
 > 魔擎开发者激励 1 期 · 课题 8 · 政企采购 · 中级（¥6,000）
-> 当前版本 **v0.1.0（D1 立骨完成）**：仓库能一次起服务，页面能自证，评审能力 D2 起接入。
+> 当前版本 **v0.2.0（D2 解析层完成）**：docx / pdf / txt 解析 + 页码与字符偏移映射 + 6 个关键字段抽取（带溯源），
+> 10 份样本实测解析成功率 100%、字段准确率 100%、0 处溯源不一致。规则库与评审逻辑 D4 起接入。
 
 面向政企采购场景的招投标文件辅助评审系统：解析招标/投标文件并**溯源到页码**，按招标文件的评分细则**逐项算分**，按 40 条规则库核验**资格性与合规风险**，输出可**点击跳回原文**的风险清单与可下载的审核报告。
 
@@ -11,7 +12,26 @@
 
 ---
 
-## 一、D1 交付状态
+## 一、当前进度
+
+### D2 解析层（v0.2.0）
+
+| D2 任务 | 交付物 | 状态 | 验证方式 |
+| --- | --- | :-: | --- |
+| 文档模型 + 页码/偏移映射 | `api/docmodel.py` | ✅ | `page_of()` 二分查页，页码表连续覆盖全文 |
+| docx / pdf / txt 解析 | `api/parsers/` | ✅ | 10 份样本解析成功率 100% |
+| 条款切分（章/条/一、/1.1/（一）） | `api/parsers/clauses.py` | ✅ | 10 份样本共切出 182 条条款 |
+| 6 字段抽取 + 溯源三元组 | `api/extract/fields.py` | ✅ | 58/58 字段命中，0 处编造 |
+| 上传 / 查询 / 取原文接口 | `api/routes/docs.py` | ✅ | `POST /api/upload` → `200` |
+| 10 份模拟样本 + 标准答案 | `data/samples/` | ✅ | `python tools/eval_parse.py` |
+| 溯源校验脚本 | `tools/validate_quotes.py` | ✅ | 58 字段 / 182 条款，0 处不一致 |
+| 前端解析面板（选择文件→解析→看字段与原文） | `web/` | ✅ | 页面「文档解析（D2 已上线）」 |
+
+**D2 验收（当晚自测）**：解析成功率 **10/10 = 100%**（要求 ≥90%）；字段准确率 **58/58 = 100%**（要求 ≥90%）；
+`quote` 与原文切片、页码与偏移 **100% 自洽**；边界样本（缺报价/缺工期）**0 处编造**。
+证据见 [`docs/D2-自测记录.md`](docs/D2-自测记录.md)，交接说明见 [`docs/D2-交接文档.md`](docs/D2-交接文档.md)。
+
+### D1 立骨（v0.1.0，已完成）
 
 | D1 任务 | 交付物 | 状态 | 验证方式 |
 | --- | --- | :-: | --- |
@@ -23,7 +43,7 @@
 | `agent.json` 草案 | `agent.json` `prompt.md` | ✅ | `python tools/agent_config.py check` |
 | `README` 骨架 | 本文件 | ✅ | — |
 
-D1 验收（当晚自测）：**干净目录一次起服务成功；`/health` 返回 200；浏览器打开有页面。**
+D1 验收：**干净目录一次起服务成功；`/health` 返回 200；浏览器打开有页面。**
 证据见 [`docs/D1-自测记录.md`](docs/D1-自测记录.md)，交接说明见 [`docs/D1-交接文档.md`](docs/D1-交接文档.md)。
 
 ---
@@ -64,22 +84,28 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 
 ```text
 行业智能体/政务/招投标评审助手/
-├── api/                     # 服务层（FastAPI）：/health、/api/health、/api/info、静态托管
-│   ├── main.py              #   应用入口（含安全头中间件、静态挂载）
+├── api/                     # 服务层（FastAPI）
+│   ├── main.py              #   应用入口（安全头中间件、路由挂载、静态托管）
 │   ├── config.py            #   路径 / 环境变量 / 免责声明 / 版本号的唯一出口
-│   └── routes/              #   health.py（探针）、meta.py（页面数据）
-├── web/                     # 前端工程：状态页（D1），D8 补齐评审看板
+│   ├── docmodel.py          #   Doc / PageSpan / Clause / SourceField + 页码映射（二分）
+│   ├── store.py             #   原文与解析结果落盘（data/uploads、data/parsed）
+│   ├── parsers/             #   docx / pdf / txt 解析 + 条款切分 + 分发（失败降级）
+│   ├── extract/             #   6 个关键字段抽取（确定性规则 + 溯源三元组）
+│   └── routes/              #   health / meta / docs（上传、查询、取原文）
+├── web/                     # 前端工程：状态页 + D2 解析面板（D8 补齐评审看板）
 │   ├── index.html  style.css  app.js
 ├── data/                    # 模拟数据与运行时产物
-│   └── meta/milestones.json #   里程碑与 D1 清单（页面与文档同源）
+│   ├── samples/             #   10 份样本 + manifest.json（标准答案）
+│   ├── parsed/              #   解析结果 JSON（运行时生成，不进仓库）
+│   └── meta/milestones.json #   里程碑与阶段交付清单（页面与文档同源）
 ├── agent.json               # Nexent 导入配置（草案：MCP 6 工具 + 4 Skill + 知识库检索）
 ├── prompt.md                # 系统提示词唯一来源，agent.json.prompt 由脚本同步
 ├── knowledge/               # 知识库资产（D4：40 条规则按节切分）            —— 待填充
 ├── mcps/                    # MCP 工具服务（D4：server.py + tools schema）    —— 待填充
 ├── skills/                  # 4 个自定义 Skill（D5）                          —— 待填充
-├── docs/                    # 交接文档、测试报告、截图、演示视频
-├── tools/                   # agent_config.py（配置校验）、smoke_test.py（冒烟）
-├── tests/                   # pytest 接口单测
+├── docs/                    # 交接文档、自测记录、测试报告、截图、演示视频
+├── tools/                   # 配置校验 / 冒烟 / 样本生成 / 溯源校验 / 指标复算 / fork 同步
+├── tests/                   # pytest：接口 + 解析链路单测
 ├── Dockerfile  docker-compose.yml  .env.example
 ├── requirements.txt  requirements-dev.txt
 ├── CHANGELOG.md  LICENSE  README.md  DEPLOY.md  VERSION
@@ -93,10 +119,10 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 
 | # | 交付物 | 路径 | 状态 |
 | :-: | --- | --- | :-: |
-| 1 | 前端工程 | `web/` | 🟡 D1 骨架（状态页） |
-| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 D1 草案（配置校验通过） |
+| 1 | 前端工程 | `web/` | 🟡 D2 状态页 + 解析面板（D8 补看板） |
+| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 解析链路已通，MCP/Skill 待 D4–D5 |
 | 3 | 知识库资产 | `knowledge/` | ⬜ D4 |
-| 4 | 模拟数据 | `data/` | ⬜ D2 起 |
+| 4 | 模拟数据 | `data/samples/` | 🟡 D2 已有 10 份 + 标准答案（D3 补扫描件、D9 扩到 20 份） |
 | 5 | 部署文档 | `DEPLOY.md` `docker-compose.yml` | 🟡 D1 已可部署 |
 | 6 | 使用文档 | `USAGE.md` | ⬜ D8 |
 | 7 | 演示视频 | `docs/video/` | ⬜ D10 |
@@ -123,10 +149,13 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | 方法 | 路径 | 说明 | 状态 |
 | --- | --- | :-: | --- |
 | GET | `/health` | 容器探针，最小返回体 | ✅ D1 |
-| GET | `/api/health` | 运行时长、能力开关（D1 全 false） | ✅ D1 |
+| GET | `/api/health` | 运行时长、9 项能力开关（D2 起 `parse` / `clause_split` 为 true） | ✅ D2 |
 | GET | `/api/info` | 智能体配置摘要 + 里程碑 + 免责声明 | ✅ D1 |
 | GET | `/api/docs` | OpenAPI 交互文档 | ✅ D1 |
-| POST | `/api/upload` | 上传招标/投标文件并解析 | ⬜ D2 |
+| POST | `/api/upload` | 上传招标/投标文件 → 解析 → 落盘 → 返回字段与溯源 | ✅ D2 |
+| GET | `/api/documents` | 已解析文档列表 | ✅ D2 |
+| GET | `/api/doc/{doc_id}` | 解析全文（含 `full_text`、页码表、条款、字段） | ✅ D2 |
+| GET | `/api/doc/{doc_id}/raw` | 取原始文件（双栏对照用） | ✅ D2 |
 | POST | `/api/review` | 触发一次完整评审 | ⬜ D5 |
 | GET | `/api/review/{id}` | 取评审结果（含风险溯源） | ⬜ D5 |
 | POST | `/api/report` | 导出 docx/pdf | ⬜ D7 |
@@ -138,8 +167,11 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 ```bash
 python tools/agent_config.py sync     # prompt.md → agent.json.prompt（唯一写入方向）
 python tools/agent_config.py check    # 配置校验：temperature、Skill/MCP 数量、占位符、免责声明
-python tools/smoke_test.py            # 服务起来后的 7 项验收
-pytest -q                             # 接口单测（需 requirements-dev.txt）
+python tools/smoke_test.py            # 服务起来后的 9 项验收（含上传→解析→溯源自洽）
+python tools/make_samples.py          # 重新生成 10 份样本 + 标准答案（--no-pdf 跳过 pdf）
+python tools/eval_parse.py --strict   # 复算解析成功率与字段准确率（低于 90% 退出码 1）
+python tools/validate_quotes.py       # 校验 quote = 原文切片、页码与偏移一致
+pytest -q                             # 接口 + 解析链路单测（需 requirements-dev.txt）
 ```
 
 ---
@@ -182,5 +214,7 @@ powershell -File tools/sync_to_agentshub.ps1
 - 仅覆盖货物/服务类招标，工程类（清单计价、施工组织）未覆盖；
 - 围标串标特征为经验判据，无法条依据；
 - 规则库法规依据需法务复核，`pending` 状态如实标注；
-- OCR 对低分辨率扫描件会退化，届时显式提示"解析降级"而不是硬凑；
-- D1 版本无任何评审能力，页面上未实现的功能一律标注"待接入"。
+- **docx 无分页符时页码为估算值**（每页约 1100 字），只承诺"大致位置"；PDF 与带分页符的 docx 页码精确；
+- **字段抽取只覆盖 6 个关键字段**，且依赖"标签：值"同行的写法；字段藏在表格单元格里的情况 D3/D9 增强；
+- **扫描件（无文本层 PDF）目前只标记降级、不猜内容**，OCR 在 D3 接入；
+- 解析链路仍无资格核验 / 评分 / 风险扫描 / 报告导出（D4–D7），页面上未实现的能力一律标注"待接入"。

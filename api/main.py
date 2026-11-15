@@ -21,7 +21,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from api import config
-from api.routes import health, meta
+from api.routes import docs, health, meta
 
 class CstFormatter(logging.Formatter):
     """日志时间固定东八区：slim 镜像没有 tzdata，系统时区不可靠。"""
@@ -44,6 +44,7 @@ log = logging.getLogger("bid-review")
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     # 上传目录必须存在：D2 起直接往里写，且它是 compose 的挂载点
     config.UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    config.PARSED_DIR.mkdir(parents=True, exist_ok=True)
     log.info(
         "start service=%s version=%s env=%s container=%s",
         config.settings.service,
@@ -85,6 +86,7 @@ async def security_headers(request, call_next):  # type: ignore[no-untyped-def]
 
 app.include_router(health.router)
 app.include_router(meta.router)
+app.include_router(docs.router)
 
 # 静态资源必须最后挂载，否则 "/" 会吃掉上面的 API 路由
 app.mount("/", StaticFiles(directory=str(config.WEB_DIR), html=True), name="web")

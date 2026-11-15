@@ -43,9 +43,10 @@ def health_detail() -> dict[str, Any]:
         "uptime_seconds": _uptime_seconds(),
         "python": platform.python_version(),
         "in_container": config.settings.is_container,
-        # 能力开关：D1 全部为 false，随里程碑推进逐项置 true，页面据此显示"待接入"
+        # 能力开关：随里程碑推进逐项置 true，页面据此显示"待接入"
         "capabilities": {
-            "parse": False,        # D2–D3 文档解析与页码映射
+            "parse": True,         # D2 文档解析 + 页码映射 + 字段抽取（已上线）
+            "clause_split": True,  # D2 条款切分（已上线）
             "qualification": False,  # D5 资格性核验
             "scoring": False,      # D5 分项评分
             "risk_scan": False,    # D6 风险扫描
