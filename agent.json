@@ -5,7 +5,7 @@
       "name": "bid_reviewer",
       "display_name": "招投标评审助手",
       "description": "面向政企采购的招投标文件辅助评审智能体：解析招标/投标文件并溯源到页码，按招标文件评分细则逐项给分，按 40 条规则核验资格性与合规风险，输出可点击跳转原文的风险清单与审核报告。",
-      "author": "REPLACE_ME_ATOMGIT_ID",
+      "author": "gcw_N79tXvDq",
       "max_steps": 15,
       "enabled": true,
       "tools": [
