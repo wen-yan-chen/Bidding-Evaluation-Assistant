@@ -7,8 +7,8 @@ data/
 ├── meta/milestones.json   # 里程碑与阶段交付清单（页面/文档同源）✅
 ├── uploads/               # 运行时上传件（git 忽略）✅
 ├── parsed/                # 解析结果 JSON（运行时生成，git 忽略）✅ D2
-├── samples/               # 投标文件样本 + manifest.json（标准答案）✅ D2 10 份
-│   └── boundary/          # D3：边界样本（跨页、无编号、低质量扫描）
+├── samples/               # 投标文件样本 + manifest.json（标准答案）✅ 15 份（含 5 份扫描件）
+│   └── boundary/          # 边界样本：空白页 / 低分辨率 / 旋转 90° ✅ D3
 ├── rules/                 # D4：40 条规则 YAML（资质/废标/围标/报价 各 10 条）
 ├── scoring/               # D5：评分细则 YAML（至少两套，用于"换细则"演示）
 ├── labels/                # D6/D9：人工标注（风险条目、专家分、核验结论）
@@ -33,5 +33,15 @@ data/
 | `bid-009.txt` | txt | **边界：报价只写 ￥968,000.00 无单位；工期"6 个月"** |
 | `bid-010.docx` | docx | 工程类长文档，含表格 |
 
-`manifest.json` 是人工标准答案（58 个字段），`tools/eval_parse.py` 以它为唯一口径复算指标。
+### D3 扫描件与边界样本
+
+| 文件 | 说明 |
+| --- | --- |
+| `scan-001..005.pdf` | 5 份**无文本层**扫描件（docx→pdf→逐页图像→图像 PDF，200 DPI，约 0.6 MB/份） |
+| `boundary/blank-page.pdf` | 第 1 页空白 + 第 2 页正常扫描，验证空白页降级 |
+| `boundary/lowres-scan.pdf` | 原图缩到 35% 再放大，模拟低分辨率，允许少抽字段但不得编造 |
+| `boundary/rotated-scan.pdf` | 图像旋转 90°，允许识别失败，必须如实降级 |
+
+`manifest.json` 是人工标准答案（15 条、88 个字段），扫描件条目带 `"ocr": true`，
+`tools/eval_parse.py` 以它为唯一口径并按"文本层 / 扫描件"分列复算。
 重新生成：`python tools/make_samples.py`（`--no-pdf` 可在没有 LibreOffice 的环境跳过 pdf）。

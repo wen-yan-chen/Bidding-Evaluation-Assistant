@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-15",
-  "current": "D2",
+  "current": "D3",
   "note": "页面与文档同源：改这里不用改前端。status 取 done / doing / planned。",
   "items": [
     {
@@ -14,8 +14,8 @@
       "id": "M1",
       "name": "解析层",
       "day": "D2–D3",
-      "status": "doing",
-      "target": "20 份样本解析成功率 ≥ 90%；字段准确率 ≥ 90%；quote 全为原文子串（D2 已完成 10 份文本层样本；D3 补 5 份扫描件 OCR）"
+      "status": "done",
+      "target": "15 份样本（含 5 份扫描件）解析成功率 100%；字段准确率 100%；quote 全为原文子串，溯源 0 处不一致"
     },
     {
       "id": "M2",
@@ -54,15 +54,15 @@
     }
   ],
   "stage": {
-    "label": "D2 交付物",
+    "label": "D3 交付物",
     "items": [
-      { "item": "文档模型 + 页码映射", "path": "api/docmodel.py", "status": "done" },
-      { "item": "docx / pdf / txt 解析器", "path": "api/parsers/", "status": "done" },
-      { "item": "条款切分（章/条/一、/1.1）", "path": "api/parsers/clauses.py", "status": "done" },
-      { "item": "6 字段抽取 + 溯源三元组", "path": "api/extract/fields.py", "status": "done" },
-      { "item": "上传 / 查询接口", "path": "api/routes/docs.py", "status": "done" },
-      { "item": "10 份样本 + 标准答案", "path": "data/samples/", "status": "done" },
-      { "item": "溯源校验 + 指标复算", "path": "tools/validate_quotes.py", "status": "done" }
+      { "item": "OCR 通道（锁版本、离线）", "path": "api/parsers/ocr.py", "status": "done" },
+      { "item": "扫描页并入页码表", "path": "api/parsers/pdf_parser.py", "status": "done" },
+      { "item": "docx 页码改按行数估算", "path": "api/parsers/docx_parser.py", "status": "done" },
+      { "item": "5 份扫描件样本", "path": "data/samples/scan-*.pdf", "status": "done" },
+      { "item": "3 份边界样本（空白/低清/旋转）", "path": "data/samples/boundary/", "status": "done" },
+      { "item": "端到端冒烟增扫描件一项", "path": "tools/smoke_test.py", "status": "done" },
+      { "item": "扫描件指标单列", "path": "tools/eval_parse.py", "status": "done" }
     ]
   }
 }

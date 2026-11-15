@@ -47,6 +47,7 @@ def health_detail() -> dict[str, Any]:
         "capabilities": {
             "parse": True,         # D2 文档解析 + 页码映射 + 字段抽取（已上线）
             "clause_split": True,  # D2 条款切分（已上线）
+            "ocr": True,           # D3 扫描件 OCR（已上线）
             "qualification": False,  # D5 资格性核验
             "scoring": False,      # D5 分项评分
             "risk_scan": False,    # D6 风险扫描

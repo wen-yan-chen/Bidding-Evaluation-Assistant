@@ -277,7 +277,13 @@ function renderParseResult(data) {
   const ok = data.parse_status !== 'failed';
   setParseStatus(
     ok
-      ? `解析完成：${data.file_name} · ${data.parse_status === 'degraded' ? '部分降级（见下方说明）' : '状态正常'}`
+      ? `解析完成：${data.file_name} · ${
+          data.ocr_pages && data.ocr_pages.length
+            ? `含 ${data.ocr_pages.length} 页 OCR 识别`
+            : data.parse_status === 'degraded'
+              ? '部分降级（见下方说明）'
+              : '状态正常'
+        }`
       : `解析失败：${(data.degraded || []).join('；') || '未知原因'}`,
     ok ? 'is-ok' : 'is-error'
   );
@@ -292,6 +298,9 @@ function renderParseResult(data) {
     ['字段', `${data.fields.length} / 6`],
     ['SHA256', `${(data.sha256 || '').slice(0, 12)}…`],
   ];
+  if (data.ocr_pages && data.ocr_pages.length) {
+    chips.splice(2, 0, ['OCR 页', `${data.ocr_pages.length} 页`]);
+  }
   const meta = $('parse-meta');
   meta.textContent = '';
   for (const [label, value] of chips) {
@@ -405,6 +414,7 @@ async function restoreLastDocument() {
   renderParseResult({
     ...data,
     clause_count: (data.clauses || []).length,
+    ocr_pages: (data.meta && data.meta.ocr_pages) || data.ocr_pages || [],
     missing_fields: FIELD_NAMES.filter((name) => !data.fields.some((f) => f.name === name)),
   });
 }

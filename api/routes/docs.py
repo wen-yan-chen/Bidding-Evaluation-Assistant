@@ -40,6 +40,9 @@ def _summary(doc) -> dict[str, Any]:  # noqa: ANN001 - Doc，避免循环导入
         "page_source": doc.page_source,
         "parse_status": doc.parse_status,
         "degraded": doc.degraded,
+        "text_pages": doc.meta.get("text_pages") or [],
+        "ocr_pages": doc.meta.get("ocr_pages") or [],
+        "empty_pages": doc.meta.get("empty_pages") or [],
         "clause_count": len(doc.clauses),
         "fields": [
             {

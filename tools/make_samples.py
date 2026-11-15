@@ -349,9 +349,136 @@ SAMPLES: list[dict] = [
 ]
 
 
+# ---------------------------------------------------------------- 扫描件与边界样本（D3）
+
+SCAN_DPI = 200
+SCAN_SAMPLES: list[dict] = [
+    {
+        "file": "scan-001.pdf",
+        "kind": "货物",
+        "with_table": True,
+        "项目名称": "示例市政务云平台二期设备采购项目",
+        "项目编号": "SJ-2026-GK-014",
+        "采购人": "示例市公共资源交易中心",
+        "投标人": "示例数智科技有限公司",
+        "报价": "1,286,000.00 元",
+        "报价文本": "人民币 1,286,000.00 元（大写：壹佰贰拾捌万陆仟元整）",
+        "工期": "90 日历天",
+    },
+    {
+        "file": "scan-002.pdf",
+        "kind": "服务",
+        "with_table": False,
+        "项目名称": "示例区政务服务中心窗口辅助服务外包项目",
+        "项目编号": "FW-2026-CS-027",
+        "采购人": "示例区行政审批服务局",
+        "投标人": "示例人力服务集团有限公司",
+        "报价": "2,460,000.00 元",
+        "报价文本": "人民币 2,460,000.00 元（大写：贰佰肆拾陆万元整）",
+        "工期": "365 日历天",
+    },
+    {
+        "file": "scan-003.pdf",
+        "kind": "工程",
+        "with_table": False,
+        "项目名称": "示例县城北片区雨污分流改造工程",
+        "项目编号": "GC-2026-SG-108",
+        "采购人": "示例县住房和城乡建设局",
+        "投标人": "示例建工集团有限公司",
+        "报价": "18,960,000.00 元",
+        "报价文本": "人民币 18,960,000.00 元（大写：壹仟捌佰玖拾陆万元整）",
+        "工期": "180 日历天",
+    },
+    {
+        "file": "scan-004.pdf",
+        "kind": "货物",
+        "with_table": True,
+        "项目名称": "示例市医保信息平台接口改造采购项目",
+        "项目编号": "YB-2026-GK-006",
+        "采购人": "示例市医疗保障局",
+        "投标人": "示例健康数据科技有限公司",
+        "报价": "768,500.00 元",
+        "报价文本": "人民币 768,500.00 元（大写：柒拾陆万捌仟伍佰元整）",
+        "工期": "120 日历天",
+    },
+    {
+        "file": "scan-005.pdf",
+        "kind": "服务",
+        "with_table": False,
+        "项目名称": "示例市公共数据开放平台运营服务项目",
+        "项目编号": "SJ-2026-FW-052",
+        "采购人": "示例市大数据管理局",
+        "投标人": "示例数据运营服务有限公司",
+        "报价": "1,920,000.00 元",
+        "报价文本": "人民币 1,920,000.00 元（大写：壹佰玖拾贰万元整）",
+        "工期": "12 个月",
+    },
+]
+
+
+def _pdf_to_images(pdf_bytes: bytes, dpi: int) -> list:
+    """PDF → 每页 PIL 图像（造扫描件用）。"""
+    import pypdfium2 as pdfium
+
+    pdf = pdfium.PdfDocument(pdf_bytes)
+    return [page.render(scale=dpi / 72).to_pil().convert("RGB") for page in pdf]
+
+
+def _images_to_pdf(images: list, out_path: Path, dpi: int) -> None:
+    """PIL 图像 → 无文本层 PDF（扫描件的本质就是"一张张图"）。"""
+    first, rest = images[0], images[1:]
+    first.save(out_path, "PDF", resolution=float(dpi), save_all=True, append_images=rest)
+
+
+def make_scan(item: dict, out_path: Path, src_docx: Path, dpi: int = SCAN_DPI) -> None:
+    """docx → pdf → 逐页图像 → 图像 PDF：得到一份"看起来像扫描件"的样本。"""
+    build_document(item).save(src_docx)
+    tmp_pdf = src_docx.with_suffix(".pdf")
+    convert_pdf(src_docx, tmp_pdf)
+    images = _pdf_to_images(tmp_pdf.read_bytes(), dpi)
+    _images_to_pdf(images, out_path, dpi)
+    tmp_pdf.unlink(missing_ok=True)
+
+
+def make_boundary(base: Path, dpi: int = SCAN_DPI) -> list[str]:
+    """三类边界样本：空白页、低分辨率、旋转 90°。目的是"不崩、可解释"，不追求识别率。"""
+    from PIL import Image
+
+    out = base / "boundary"
+    out.mkdir(parents=True, exist_ok=True)
+    item = dict(SAMPLES[0])
+    item["basic_lines"] = basic_lines(item)
+    src = SRC / "boundary-src.docx"
+    build_document(item).save(src)
+    pdf = SRC / "boundary-src.pdf"
+    convert_pdf(src, pdf)
+    images = _pdf_to_images(pdf.read_bytes(), dpi)
+
+    blank = Image.new("RGB", images[0].size, "white")
+    _images_to_pdf([blank, images[0]], out / "blank-page.pdf", dpi)
+
+    low_size = (max(1, int(images[0].width * 0.35)), max(1, int(images[0].height * 0.35)))
+    low = images[0].resize(low_size, Image.LANCZOS).resize(images[0].size, Image.BICUBIC)
+    _images_to_pdf([low], out / "lowres-scan.pdf", dpi)
+
+    _images_to_pdf([images[0].rotate(90, expand=True)], out / "rotated-scan.pdf", dpi)
+
+    readme = out / "README.md"
+    readme.write_text(
+        "# 边界样本（D3）\n\n"
+        "| 文件 | 构造方式 | 期望表现 |\n| --- | --- | --- |\n"
+        "| `blank-page.pdf` | 第 1 页全白 + 第 2 页正常扫描 | 空白页记为 `empty_pages` 并给降级说明，第 2 页正常 OCR |\n"
+        "| `lowres-scan.pdf` | 原图缩到 35% 再放大回原尺寸（模拟低分辨率） | 允许识别率下降，但不得崩、不得编造字段 |\n"
+        "| `rotated-scan.pdf` | 图像旋转 90° | 允许识别失败，必须如实降级 |\n",
+        encoding="utf-8",
+    )
+    return [p.name for p in out.iterdir() if p.suffix == ".pdf"]
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="生成 D2 模拟投标文件样本")
     ap.add_argument("--no-pdf", action="store_true", help="不转 pdf（不依赖 LibreOffice）")
+    ap.add_argument("--no-scan", action="store_true", help="不生成扫描件与边界样本（不依赖 pypdfium2/Pillow）")
     args = ap.parse_args(argv)
 
     if OUT.exists():
@@ -392,6 +519,31 @@ def main(argv: list[str] | None = None) -> int:
                 "expect": expect,
             }
         )
+
+    if not args.no_scan:
+        try:
+            import pypdfium2  # noqa: F401
+            from PIL import Image  # noqa: F401
+        except Exception as exc:  # noqa: BLE001
+            print(f"skip scan samples: 缺少 pypdfium2/Pillow（{exc}）")
+        else:
+            for raw in SCAN_SAMPLES:
+                item = dict(raw)
+                item["basic_lines"] = basic_lines(item)
+                out_path = OUT / item["file"]
+                make_scan(item, out_path, SRC / (out_path.stem + ".docx"))
+                entries.append(
+                    {
+                        "file": item["file"],
+                        "kind": item["kind"],
+                        "format": "pdf",
+                        "ocr": True,
+                        "boundary": "扫描件（无文本层，走 OCR）",
+                        "expect": {k: item[k] for k in EXPECT_KEYS if k in item},
+                    }
+                )
+            boundary = make_boundary(OUT)
+            print(f"边界样本：{'、'.join(boundary)}")
 
     shutil.rmtree(SRC, ignore_errors=True)
 

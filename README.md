@@ -1,8 +1,8 @@
 # 招投标评审助手
 
 > 魔擎开发者激励 1 期 · 课题 8 · 政企采购 · 中级（¥6,000）
-> 当前版本 **v0.2.0（D2 解析层完成）**：docx / pdf / txt 解析 + 页码与字符偏移映射 + 6 个关键字段抽取（带溯源），
-> 10 份样本实测解析成功率 100%、字段准确率 100%、0 处溯源不一致。规则库与评审逻辑 D4 起接入。
+> 当前版本 **v0.3.0（D3 解析层收尾）**：docx / pdf / txt / 扫描件（OCR）全部能解析，页码与字符偏移映射 + 6 个关键字段带溯源；
+> 15 份样本（含 5 份扫描件）解析成功率 100%、字段准确率 100%、溯源 0 处不一致。规则库与评审逻辑 D4 起接入。
 
 面向政企采购场景的招投标文件辅助评审系统：解析招标/投标文件并**溯源到页码**，按招标文件的评分细则**逐项算分**，按 40 条规则库核验**资格性与合规风险**，输出可**点击跳回原文**的风险清单与可下载的审核报告。
 
@@ -14,12 +14,28 @@
 
 ## 一、当前进度
 
+### D3 解析层收尾（v0.3.0）
+
+| D3 任务 | 交付物 | 状态 | 验证方式 |
+| --- | --- | :-: | --- |
+| 扫描件 OCR（锁版本、离线） | `api/parsers/ocr.py` | ✅ | 5 份扫描件全部识别 |
+| 扫描页并入页码表 | `api/parsers/pdf_parser.py` | ✅ | `meta.ocr_pages` 标注，溯源仍 0 不一致 |
+| 低质量件降级提示 | 置信度 < 0.30 丢行并计数 | ✅ | 低清样本少抽 1 字段、0 编造 |
+| 边界样本 | `data/samples/boundary/`（空白/低清/旋转） | ✅ | 3 份全部降级但不崩 |
+| docx 页码改按行估算 | `api/parsers/docx_parser.py` | ✅ | 每页 38 行 × 38 字，更贴近 Word 分页 |
+| 扫描件指标单列 | `tools/eval_parse.py` | ✅ | 文本层 10/10、扫描件 5/5 |
+| 端到端冒烟增扫描件 | `tools/smoke_test.py` | ✅ | 10/10 |
+
+**D3 验收（当晚自测）**：15 份样本（10 文本层 + 5 扫描件）解析成功率 **100%**、字段准确率 **88/88 = 100%**、
+溯源 **0 处不一致**；扫描件最慢 16.2 s/份（3 页 / 200 DPI）。
+证据见 [`docs/D3-自测记录.md`](docs/D3-自测记录.md)，交接说明见 [`docs/D3-交接文档.md`](docs/D3-交接文档.md)。
+
 ### D2 解析层（v0.2.0）
 
 | D2 任务 | 交付物 | 状态 | 验证方式 |
 | --- | --- | :-: | --- |
 | 文档模型 + 页码/偏移映射 | `api/docmodel.py` | ✅ | `page_of()` 二分查页，页码表连续覆盖全文 |
-| docx / pdf / txt 解析 | `api/parsers/` | ✅ | 10 份样本解析成功率 100% |
+| docx / pdf / txt 解析 | `api/parsers/` | ✅ | 10 份文本层样本解析成功率 100% |
 | 条款切分（章/条/一、/1.1/（一）） | `api/parsers/clauses.py` | ✅ | 10 份样本共切出 182 条条款 |
 | 6 字段抽取 + 溯源三元组 | `api/extract/fields.py` | ✅ | 58/58 字段命中，0 处编造 |
 | 上传 / 查询 / 取原文接口 | `api/routes/docs.py` | ✅ | `POST /api/upload` → `200` |
@@ -89,13 +105,13 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 │   ├── config.py            #   路径 / 环境变量 / 免责声明 / 版本号的唯一出口
 │   ├── docmodel.py          #   Doc / PageSpan / Clause / SourceField + 页码映射（二分）
 │   ├── store.py             #   原文与解析结果落盘（data/uploads、data/parsed）
-│   ├── parsers/             #   docx / pdf / txt 解析 + 条款切分 + 分发（失败降级）
+│   ├── parsers/             #   docx / pdf / txt / OCR 解析 + 条款切分 + 分发（失败降级）
 │   ├── extract/             #   6 个关键字段抽取（确定性规则 + 溯源三元组）
 │   └── routes/              #   health / meta / docs（上传、查询、取原文）
 ├── web/                     # 前端工程：状态页 + D2 解析面板（D8 补齐评审看板）
 │   ├── index.html  style.css  app.js
 ├── data/                    # 模拟数据与运行时产物
-│   ├── samples/             #   10 份样本 + manifest.json（标准答案）
+│   ├── samples/             #   15 份样本（含 5 份扫描件）+ boundary + manifest.json
 │   ├── parsed/              #   解析结果 JSON（运行时生成，不进仓库）
 │   └── meta/milestones.json #   里程碑与阶段交付清单（页面与文档同源）
 ├── agent.json               # Nexent 导入配置（草案：MCP 6 工具 + 4 Skill + 知识库检索）
@@ -119,10 +135,10 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 
 | # | 交付物 | 路径 | 状态 |
 | :-: | --- | --- | :-: |
-| 1 | 前端工程 | `web/` | 🟡 D2 状态页 + 解析面板（D8 补看板） |
-| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 解析链路已通，MCP/Skill 待 D4–D5 |
+| 1 | 前端工程 | `web/` | 🟡 D3 状态页 + 解析面板（含 OCR 徽标，D8 补看板） |
+| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 解析链路（含 OCR）已通，MCP/Skill 待 D4–D5 |
 | 3 | 知识库资产 | `knowledge/` | ⬜ D4 |
-| 4 | 模拟数据 | `data/samples/` | 🟡 D2 已有 10 份 + 标准答案（D3 补扫描件、D9 扩到 20 份） |
+| 4 | 模拟数据 | `data/samples/` | 🟡 D3 已有 15 份（含 5 份扫描件）+ 3 份边界 + 标准答案（D9 扩到 20 份） |
 | 5 | 部署文档 | `DEPLOY.md` `docker-compose.yml` | 🟡 D1 已可部署 |
 | 6 | 使用文档 | `USAGE.md` | ⬜ D8 |
 | 7 | 演示视频 | `docs/video/` | ⬜ D10 |
@@ -169,7 +185,7 @@ python tools/agent_config.py sync     # prompt.md → agent.json.prompt（唯一
 python tools/agent_config.py check    # 配置校验：temperature、Skill/MCP 数量、占位符、免责声明
 python tools/smoke_test.py            # 服务起来后的 9 项验收（含上传→解析→溯源自洽）
 python tools/make_samples.py          # 重新生成 10 份样本 + 标准答案（--no-pdf 跳过 pdf）
-python tools/eval_parse.py --strict   # 复算解析成功率与字段准确率（低于 90% 退出码 1）
+python tools/eval_parse.py --strict   # 复算指标（需 OCR 依赖，建议在容器里跑，见 D3 自测记录 §3）
 python tools/validate_quotes.py       # 校验 quote = 原文切片、页码与偏移一致
 pytest -q                             # 接口 + 解析链路单测（需 requirements-dev.txt）
 ```
@@ -216,5 +232,8 @@ powershell -File tools/sync_to_agentshub.ps1
 - 规则库法规依据需法务复核，`pending` 状态如实标注；
 - **docx 无分页符时页码为估算值**（每页约 1100 字），只承诺"大致位置"；PDF 与带分页符的 docx 页码精确；
 - **字段抽取只覆盖 6 个关键字段**，且依赖"标签：值"同行的写法；字段藏在表格单元格里的情况 D3/D9 增强；
-- **扫描件（无文本层 PDF）目前只标记降级、不猜内容**，OCR 在 D3 接入；
-- 解析链路仍无资格核验 / 评分 / 风险扫描 / 报告导出（D4–D7），页面上未实现的能力一律标注"待接入"。
+- **扫描件走 OCR**：单份 3 页约 13–16 s（200 DPI）；OCR 页面会在 `meta.ocr_pages` 标注并提示人工复核；
+- **低质量扫描件**（低分辨率/旋转）允许识别率下降，宁可少抽字段也不编造；
+- **docx 内嵌图片不做 OCR**（只接 PDF 空文本页），列为已知限制；
+- **扫描件样本与文本层样本同源**（内容一致），不能据此宣称真实业务泛化能力，测试报告会写清；
+- 解析链路已完整（含 OCR），但仍无资格核验 / 评分 / 风险扫描 / 报告导出（D4–D7），页面未实现的能力一律标注"待接入"。

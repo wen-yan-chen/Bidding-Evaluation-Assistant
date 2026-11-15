@@ -21,6 +21,12 @@ ARG PIP_INDEX_URL=https://pypi.tuna.tsinghua.edu.cn/simple
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -i "${PIP_INDEX_URL}" -r requirements.txt
 
+# OCR 依赖修正：rapidocr 默认拉 opencv-python（GUI 版），在 slim 里缺 libGL/libxcb 会 import 失败。
+# 换成 headless 版（无 GUI 依赖），并在构建期做一次 import 自检，失败就早点炸而不是等到运行。
+RUN pip uninstall -y opencv-python \
+    && pip install --no-cache-dir -i "${PIP_INDEX_URL}" --no-deps opencv-python-headless \
+    && python -c "import cv2, pypdfium2, rapidocr_onnxruntime; print('ocr deps ok:', cv2.__version__)"
+
 # 代码分层复制：VERSION / agent.json / prompt.md 是运行时配置，必须一起进镜像
 COPY VERSION agent.json prompt.md ./
 COPY api ./api

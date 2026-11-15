@@ -2,6 +2,36 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与语义化版本。
 
+## [0.3.0] — 2026-11-15（D3 扫描件 OCR + 边界样本）
+
+### Added
+
+- OCR 通道 `api/parsers/ocr.py`：`rapidocr-onnxruntime==1.2.3`（模型随 wheel 内置、离线可跑）+
+  `pypdfium2` 渲染 200 DPI；引擎懒加载；按阅读顺序重排；置信度 < 0.30 的行丢弃并计数；异常不穿透。
+- `pdf_parser` 逐页判定：有文本层走文本层、无文本层走 OCR、都失败记 `empty_pages`；
+  `meta` 新增 `text_pages / ocr_pages / empty_pages / ocr_low_conf_lines`，并在 `degraded` 里写明
+  "第 X 页为 OCR 识别文本（可能有识别误差，建议人工复核）"。
+- 样本：`data/samples/scan-001..005.pdf`（5 份无文本层扫描件，200 DPI，约 0.6 MB/份）；
+  `data/samples/boundary/`（空白页 / 低分辨率 / 旋转 90° + 说明）；`manifest.json` 扩到 15 条并加 `ocr` 标记。
+- `tools/eval_parse.py` 指标按"文本层 / 扫描件"分列，新增 `OCR` 列与"多抽"统计。
+- `tools/smoke_test.py` 第 10 项：扫描件走 OCR 的端到端检查（含耗时）。
+- `tests/test_scan.py` 5 条：扫描件 OCR、字段、空白页、低清不编造、旋转优雅降级。
+- 页面：解析面板显示「含 N 页 OCR 识别」与 `OCR 页 N 页` 徽标；`/api/upload` 返回 `text_pages/ocr_pages/empty_pages`。
+
+### Changed
+
+- `docx_parser` 页码估算从"按字符数（1100 字/页）"改为**按段落行数（每页 38 行 × 38 字）**，更贴近 Word 分页。
+- `Dockerfile`：`rapidocr` 自带的 `opencv-python`（GUI 版）在 slim 镜像缺 `libxcb/libGL` 会导致 `import cv2` 失败，
+  改为安装 `opencv-python-headless`，并在构建期执行 `import cv2, pypdfium2, rapidocr_onnxruntime` 自检。
+- `/api/health` 能力开关新增 `ocr`（true）；里程碑 M1 置为已完成、当前进度切到 D3。
+
+### Verified
+
+- 15 份样本（10 文本层 + 5 扫描件）：解析成功率 **15/15 = 100%**、字段准确率 **88/88 = 100%**、多抽 **0**；
+- `validate_quotes.py`：23 份文档 / 117 字段 / 336 条款，**0 处不一致**；
+- 扫描件单份耗时 13.8–16.2 s（3 页 / 200 DPI）；边界样本 3 份全部降级但不崩；
+- `smoke_test.py` **10/10**；`pytest` **20 passed**（59.84 s）。
+
 ## [0.2.0] — 2026-11-15（D2 解析层）
 
 ### Added

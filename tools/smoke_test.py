@@ -249,6 +249,25 @@ def run(base: str) -> list[dict[str, Any]]:
         add("8. 上传样本 → 解析成功且抽到 6 个字段", False, "缺少 data/samples/bid-001.docx")
         add("9. 字段溯源自洽（quote = 原文切片，页码与偏移一致）", False, "无样本，跳过")
 
+    # ---- D3：扫描件走 OCR（无文本层 PDF）
+    scan = ROOT / "data" / "samples" / "scan-001.pdf"
+    if scan.exists():
+        scanned = upload_file(base, scan, timeout=180.0)
+        payload = as_json(scanned)
+        ocr_pages = payload.get("ocr_pages") or []
+        fields = payload.get("fields") or []
+        add(
+            "10. 扫描件走 OCR 解析（无文本层 PDF）",
+            scanned["status"] == 200
+            and payload.get("parse_status") in ("ok", "degraded")
+            and len(ocr_pages) >= 1
+            and len(fields) >= 4,
+            f"HTTP {scanned['status']} · 状态={payload.get('parse_status')} · "
+            f"OCR 页={len(ocr_pages)} · 字段={len(fields)} · 耗时={scanned['ms'] / 1000:.1f}s",
+        )
+    else:
+        add("10. 扫描件走 OCR 解析（无文本层 PDF）", False, "缺少 data/samples/scan-001.pdf")
+
     return checks
 
 

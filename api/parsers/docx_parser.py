@@ -2,24 +2,28 @@
 
 docx 没有"页"的概念（分页是排版时算的），所以这里分两种情况，并且**如实标注**：
 - 文档里有显式分页符（`w:br type="page"`）→ 按分页符切页，`page_source=native`；
-- 没有分页符 → 按字符预算估算页，`page_source=estimated`，并在 `degraded` 里说明。
-下游（跳转原文）会读 `page_source`，估算页只承诺"大致位置"，不承诺精确到页。
+- 没有分页符 → **按行数估算**（每页约 38 行、每行约 38 字，小四宋体 A4），`page_source=estimated`，
+  并在 `degraded` 里说明。D3 把 D2 的"按字符数"换成"按段落行数"，与 Word 的分页更接近：
+  短段落多的文档不会再被压成两页。
 """
 
 from __future__ import annotations
 
 import io
+import math
 
 from docx import Document as WordDocument
 from docx.oxml.ns import qn
 from docx.table import Table
 from docx.text.paragraph import Paragraph
 
-from api.docmodel import Doc, build_pages, estimate_pages
+from api.docmodel import Doc, build_pages
 from api.parsers import ParseError
 
 PAGE_BREAK_XPATH = './/w:br[@w:type="page"]'
-ESTIMATE_NOTE = "docx 无分页符，页码按每页约 1100 字估算（跳转可能偏 1 页）"
+LINES_PER_PAGE = 38
+CHARS_PER_LINE = 38
+ESTIMATE_NOTE = f"docx 无分页符，页码按每页约 {LINES_PER_PAGE} 行估算（跳转可能偏 1 页）"
 
 
 def _iter_blocks(document):
@@ -44,41 +48,62 @@ def _table_text(table: Table) -> str:
     return "\n".join(lines)
 
 
+def _visual_lines(text: str) -> int:
+    """估算一段文字排版后占几行（按每行 38 字硬折）。"""
+    if not text:
+        return 0
+    return sum(max(1, math.ceil(len(line) / CHARS_PER_LINE)) for line in text.split("\n"))
+
+
 def parse(blob: bytes, file_name: str, doc_id: str, sha256: str) -> Doc:
     try:
         document = WordDocument(io.BytesIO(blob))
     except Exception as exc:  # 损坏、非 docx、加密
         raise ParseError(f"docx 无法打开：{exc}") from exc
 
-    chunks: list[str] = []
-    current: list[str] = []
-    explicit_breaks = 0
-
+    segments: list[tuple[str, int]] = []  # (文本, 该段后的分页符个数)
+    table_blocks = 0
     for block in _iter_blocks(document):
         if isinstance(block, Paragraph):
-            breaks = block._p.xpath(PAGE_BREAK_XPATH)
-            text = block.text.strip()
-            if text:
-                current.append(text)
-            if breaks:
-                explicit_breaks += len(breaks)
-                chunks.append("\n".join(current))
-                current = []
+            segments.append((block.text.strip(), len(block._p.xpath(PAGE_BREAK_XPATH))))
         else:
-            table_text = _table_text(block)
-            if table_text:
-                current.append(table_text)
+            table_blocks += 1
+            segments.append((_table_text(block), 0))
 
-    if current or not chunks:
-        chunks.append("\n".join(current))
+    explicit_breaks = sum(breaks for _, breaks in segments)
 
     if explicit_breaks:
         page_source = "native"
-        full_text, pages = build_pages([c + "\n" for c in chunks])
+        chunks: list[str] = []
+        current: list[str] = []
+        for text, breaks in segments:
+            if text:
+                current.append(text)
+            if breaks:
+                chunks.append("\n".join(current))
+                current = []
+        if current or not chunks:
+            chunks.append("\n".join(current))
     else:
         page_source = "estimated"
-        raw = "\n".join(chunks)
-        full_text, pages = build_pages(estimate_pages(raw))
+        chunks = []
+        current = []
+        lines_in_page = 0
+        for text, _ in segments:
+            if not text:
+                continue
+            lines = _visual_lines(text)
+            # 超页就换页；单段超长时独占一页，不再硬切（切了会破坏 quote 连续性）
+            if current and lines_in_page + lines > LINES_PER_PAGE:
+                chunks.append("\n".join(current))
+                current = []
+                lines_in_page = 0
+            current.append(text)
+            lines_in_page += lines
+        if current:
+            chunks.append("\n".join(current))
+
+    full_text, pages = build_pages([chunk + "\n" for chunk in chunks])
 
     doc = Doc(
         doc_id=doc_id,
@@ -88,12 +113,17 @@ def parse(blob: bytes, file_name: str, doc_id: str, sha256: str) -> Doc:
         page_source=page_source,
         full_text=full_text,
         pages=pages,
-        meta={"explicit_page_breaks": explicit_breaks, "table_blocks": sum(1 for b in _iter_blocks(document) if isinstance(b, Table))},
+        meta={
+            "explicit_page_breaks": explicit_breaks,
+            "table_blocks": table_blocks,
+            "lines_per_page": LINES_PER_PAGE,
+            "chars_per_line": CHARS_PER_LINE,
+        },
     )
 
     if not full_text.strip():
         doc.parse_status = "failed"
-        doc.degraded.append("文档中未提取到任何文本（可能是纯图片内容，D3 接 OCR）")
+        doc.degraded.append("文档中未提取到任何文本（可能是纯图片内容，D3 的 OCR 只接 PDF）")
     elif page_source == "estimated":
         doc.add_degraded(ESTIMATE_NOTE)
 
