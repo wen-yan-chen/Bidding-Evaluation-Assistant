@@ -53,4 +53,11 @@ services:
     volumes:
       # 与 app 共用同一份解析结果（MCP 工具按 doc_id 读取）
       - ./data:/app/data
+    # Dockerfile 里的 /health 探针在这里不适用（MCP 只开 8765），换成 TCP 探活
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.create_connection(('127.0.0.1', 8765), 3); s.close()"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
     restart: unless-stopped

@@ -55,7 +55,7 @@
   "mcp_info": [
     {
       "mcp_server_name": "bid-review",
-      "mcp_url": "http://mcp:8765/sse",
+      "mcp_url": "http://host.docker.internal:8765/sse",
       "tools": [
         {
           "name": "parse_tender",
