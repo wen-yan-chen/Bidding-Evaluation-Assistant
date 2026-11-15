@@ -17,8 +17,11 @@
   `prompt.md` 系统提示词 v0.1（角色/边界/七步流程/输出结构/免责）。
 - 工具：`tools/agent_config.py`（prompt 同步 + 配置校验）、`tools/smoke_test.py`（7 项验收，仅标准库）。
 - 测试：`tests/test_health.py` 7 条接口单测。
-- 文档：`README.md`（交付物索引 + 平台能力对照 + 接口一览）、`DEPLOY.md`（干净环境复现清单）、
+- 工具：`tools/sync_to_agentshub.ps1`（开发仓库 → fork 提交目录的镜像同步 + 可选提交/推送）。
+- 文档：`README.md`（交付物索引 + 平台能力对照 + 接口一览 + fork 提交工作流）、`DEPLOY.md`（干净环境复现清单）、
   `docs/D1-交接文档.md`、`docs/D1-自测记录.md`。
+- 仓库：fork <https://gitcode.com/gcw_N79tXvDq/AgentsHub_3978>，长期分支 `feat/kw8-bid-reviewer`；
+  `agent.json` 的 `author` 填为 AtomGit 用户名 `gcw_N79tXvDq`。
 
 ### Notes
 

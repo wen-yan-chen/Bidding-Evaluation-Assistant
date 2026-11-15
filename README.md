@@ -144,7 +144,32 @@ pytest -q                             # 接口单测（需 requirements-dev.txt�
 
 ---
 
-## 八、合规声明
+## 八、提交到 AgentsHub（fork 工作流）
+
+提交目录必须是 fork 里的 `行业智能体/政务/招投标评审助手/`，开发在独立仓库进行，两者用脚本同步，避免漏文件。
+
+```bash
+# 一次性准备（已完成）
+git clone --depth 1 --filter=blob:none --no-checkout https://gitcode.com/gcw_N79tXvDq/AgentsHub_3978.git D:\contest-8\AgentsHub
+git -C D:\contest-8\AgentsHub sparse-checkout set 行业智能体/政务
+git -C D:\contest-8\AgentsHub checkout -b feat/kw8-bid-reviewer
+
+# 每天收工（同步 → 提交 → 推送）
+powershell -File tools/sync_to_agentshub.ps1 -Commit -Push
+
+# 只看差异不提交
+powershell -File tools/sync_to_agentshub.ps1
+```
+
+- 脚本用 `robocopy /MIR` 镜像，排除 `.git` `__pycache__` `.pytest_cache` `data/uploads`（运行时产物）；
+- 提交消息默认取开发仓库最新 commit 标题并加 `kw8:` 前缀，可用 `-Message` 覆盖；
+- 演示视频默认不同步（`-IncludeVideo` 才带上），避免日常提交塞入大文件；
+- fork 仓库：<https://gitcode.com/gcw_N79tXvDq/AgentsHub_3978>，长期分支 `feat/kw8-bid-reviewer`；
+- PR 在 D10 提，标题按仓库规范：`[new agent] 招投标评审助手`。
+
+> 注意：该脚本含中文路径，必须保存为 **UTF-8 with BOM**，否则 Windows PowerShell 5.1 会按 GBK 解析报错。
+
+## 九、合规声明
 
 - **无真实数据**：全部自造，主体名称为虚构（"示例市公共资源交易中心""某某建设工程有限公司"）。
 - **不编造依据**：`basis_status=pending` 一律输出「未检索到权威依据」；`na` 输出「经验判据，无法条依据」。
@@ -152,7 +177,7 @@ pytest -q                             # 接口单测（需 requirements-dev.txt�
 - **个人信息脱敏**：界面与报告不展示真实姓名、身份证号、联系方式。
 - **开源协议**：MIT（见 [`LICENSE`](LICENSE)）。
 
-## 九、已知限制
+## 十、已知限制
 
 - 仅覆盖货物/服务类招标，工程类（清单计价、施工组织）未覆盖；
 - 围标串标特征为经验判据，无法条依据；
