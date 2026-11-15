@@ -17,6 +17,9 @@ data/parsed/
 data/predictions/
 *.log
 
+# Office / WPS 生成的锁文件
+~$*
+
 # 编辑器和系统
 .vscode/
 .idea/
