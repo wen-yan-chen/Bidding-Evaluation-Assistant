@@ -57,7 +57,9 @@ def get_document(doc_id: str) -> dict[str, Any]:
     doc = store.load_doc(doc_id)
     if doc is None:
         raise HTTPException(404, "文档不存在或尚未解析")
-    return doc.to_dict(with_text=True)
+    payload = doc.to_dict(with_text=True)
+    payload["has_raw"] = store.raw_file(doc_id) is not None
+    return payload
 
 
 @router.get("/doc/{doc_id}/html", response_class=HTMLResponse, summary="docx 的 Word 渲染预览")

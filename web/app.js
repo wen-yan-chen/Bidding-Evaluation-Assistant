@@ -378,6 +378,13 @@ function renderPages(doc) {
   renderSourceFile(doc);
 }
 
+function docHasRaw(doc) {
+  if (!doc) return false;
+  if (doc.has_raw === false) return false;
+  const meta = (state.docs || []).find((item) => item.doc_id === doc.doc_id);
+  return !(meta && meta.has_raw === false);
+}
+
 function renderSourceFile(doc) {
   const wrap = $('source-preview-body');
   if (!wrap) return;
@@ -388,6 +395,21 @@ function renderSourceFile(doc) {
     return;
   }
   if (wrap.dataset.docId === doc.doc_id) return;
+  wrap.dataset.docId = doc.doc_id;
+  wrap.textContent = '';
+  if (!docHasRaw(doc)) {
+    const card = el('div', 'source-file-card');
+    card.append(el('h3', '', doc.file_name || doc.doc_id));
+    card.append(el('p', '', '这条文档只有解析结果，没有可用的上传原件（常见于历史/测试数据）。'));
+    const actions = el('div', 'source-file-actions');
+    const text = el('button', 'btn btn-sm', '查看解析文本');
+    text.type = 'button';
+    text.addEventListener('click', () => setSourceTab('text'));
+    actions.append(text);
+    card.append(actions);
+    wrap.append(card);
+    return;
+  }
   const ext = String(doc.ext || (doc.file_name || '').split('.').pop() || '').replace(/^\./, '').toLowerCase();
   wrap.dataset.docId = doc.doc_id;
   wrap.textContent = '';
@@ -1901,7 +1923,9 @@ function renderAdminData() {
     del.type = 'button';
     del.title = `删除文档 ${doc.file_name || doc.doc_id} 及其评审/报告`;
     del.addEventListener('click', () => adminDeleteDoc(doc));
-    actions.append(preview, save, del);
+    actions.append(preview);
+    if (doc.has_raw !== false) actions.append(save);
+    actions.append(del);
     tdAction.append(actions);
     tr.append(tdAction);
     docBody.append(tr);
@@ -1990,6 +2014,17 @@ async function previewDoc(doc) {
   document.body.classList.add('has-preview');
   $('btn-preview-close').focus();
 
+  const save = $('doc-preview-save');
+  if (!docHasRaw(doc)) {
+    if (save) save.hidden = true;
+    const card = el('div', 'source-file-card');
+    card.append(el('h3', '', doc.file_name || doc.doc_id));
+    card.append(el('p', '', '这条文档只有解析结果，没有可用的上传原件（常见于历史/测试数据）。'));
+    body.append(card);
+    return;
+  }
+  if (save) save.hidden = false;
+
   if (ext === 'pdf') {
     const frame = document.createElement('iframe');
     frame.className = 'preview-frame';
@@ -2068,6 +2103,8 @@ async function previewReport(review) {
   title.textContent = `评审预览：${review.file_name || review.review_id}`;
   meta.textContent = `${review.review_id || '—'} · ${review.profile || '—'} · ${fmtScore(review.total)}`;
   setPreviewSave(`/api/report/${encodeURIComponent(review.review_id)}?format=pdf`, `${review.review_id}.pdf`, '保存 PDF');
+  const saveBtn = $('doc-preview-save');
+  if (saveBtn) saveBtn.hidden = false;
   body.textContent = '';
   body.classList.add('preview-report-body');
   modal.hidden = false;
@@ -2087,6 +2124,8 @@ async function previewReport(review) {
   const originalSave = el('a', 'locator', '保存原件');
   originalSave.href = `/api/doc/${encodeURIComponent(review.doc_id)}/raw`;
   originalSave.download = review.file_name || '';
+  const sourceDoc = state.docs.find((item) => item.doc_id === review.doc_id);
+  if (!sourceDoc || sourceDoc.has_raw === false) originalSave.hidden = true;
   originalHead.append(originalSave);
   const originalBody = el('div', 'preview-original-content');
   originalBody.append(el('p', 'preview-loading', '点「查看原件」后加载'));
@@ -2143,6 +2182,17 @@ async function loadOriginalPane(review) {
   const doc = state.docs.find((item) => item.doc_id === review.doc_id);
   const ext = String((doc && doc.ext) || (review.file_name || '').split('.').pop() || '').replace(/^\./, '').toLowerCase();
   content.textContent = '';
+  if (!doc) {
+    content.append(el('div', 'source-file-card', '找不到对应的文档记录，无法加载原件。'));
+    return;
+  }
+  if (doc.has_raw === false) {
+    const card = el('div', 'source-file-card');
+    card.append(el('h3', '', review.file_name || review.doc_id));
+    card.append(el('p', '', '这条文档只有解析结果，没有可用的上传原件（常见于历史/测试数据）。'));
+    content.append(card);
+    return;
+  }
   content.append(el('p', 'preview-loading', '正在加载原件…'));
   if (ext === 'pdf') {
     const frame = document.createElement('iframe');
@@ -2235,6 +2285,8 @@ function closePreview() {
     body.textContent = '';
     body.classList.remove('preview-report-body');
   }
+  const save = $('doc-preview-save');
+  if (save) save.hidden = false;
   setPreviewSave('#', '', '保存原件');
 }
 

@@ -92,6 +92,7 @@ def list_docs(limit: int = 200) -> list[dict]:
                 "field_count": len(data.get("fields") or []),
                 "clause_count": len(data.get("clauses") or []),
                 "created_at": (data.get("meta") or {}).get("created_at"),
+                "has_raw": raw_file(str(data.get("doc_id") or "")) is not None,
             }
         )
     return items
