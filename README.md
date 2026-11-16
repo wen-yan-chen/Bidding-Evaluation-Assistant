@@ -22,7 +22,7 @@
 | 4 个 Skill 上传 | `bid-rule-cards` / `missing-qualification` / `bid-risk-selfcheck` / `summary-compiler` | ✅ | 平台文件与本地 SHA256 一致；10:02:48 agent v5 发布 |
 | 平台同名冲突 | 第四个 Skill 用唯一名 `bid-risk-selfcheck` | ✅ | 未覆盖 32 题 contract-review 的 `risk-selfcheck` |
 | `scan_risks` 口径 | `scanned_rules` 18 → **23**（+5 计算型）+ breakdown / scan_notes | ✅ | MCP 直调 23/18/5/0；回归断言 23+10+7=40 |
-| 测试报告 | `docs/TEST_REPORT.md` | ✅ | 六条标准逐项数字；专家双盲缺口如实标注 |
+| 测试报告 | `docs/TEST_REPORT.md` | ✅ | 六条标准逐项数字；AI 双盲严格 15/15、专业裁量 0/15，专家项标代理 |
 | 留出集成绩 | `docs/留出集单独成绩.md` | ✅ | dev 10/10、holdout 5/5、误报 0/20 |
 | 使用文档 | `USAGE.md` | ✅ | 页面 / API / MCP / 排错 |
 | 回归 | smoke / pytest / check_report | ✅ | 10/10、49 passed、50/50 |
@@ -33,7 +33,9 @@
 交接见 [`docs/D9-交接文档.md`](docs/D9-交接文档.md)，六条标准见 [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md)，
 状态页截图见 [`docs/screenshots/D9-技能挂载.png`](docs/screenshots/D9-技能挂载.png)。
 
-> 第 2 条「专家评分 ±5 分」没有真实专家双盲数据：不伪造，`TEST_REPORT.md` 标为遗留，D10 前补 10–15 份专家评分。
+> 第 2 条「专家评分 ±5 分」没有人类专家双盲；已补 **AI 双盲参考评分**：
+> 严格按细则 **15/15**、专业裁量 **0/15**（暴露 T2/B2/B3 的 presence 档过粗），
+> 两者都标注为非人类专家，正式验收仍标代理项，D10 前补 10–15 份真人专家评分。
 
 ### D8 评审看板 + 双栏对照 + 报告中心（v0.8.0）
 
@@ -355,7 +357,8 @@ powershell -File tools/sync_to_agentshub.ps1
   跳转允许偏 1 页，页面与报告均标注「估算」；
 - **报告中心默认隐藏文档已不存在的历史评审**（右上角可切换显示），避免用户点到必然 404 的下载；
 - 前端为单机演示：没有登录/权限/多用户隔离，上传件与评审结果落盘在 `data/`（已 gitignore）；
-- **专家评分双盲缺失**：没有真实专家对同一批样本的独立评分，`TEST_REPORT.md` 第 2 条标为遗留，
-  不伪造 ±5 分比例；D10 前补 10–15 份专家评分；
+- **人类专家双盲缺失**：已补 AI 双盲参考评分——严格按细则 **15/15**、专业裁量 **0/15**
+  （系统性低 8–9 分，暴露 T2/B2/B3 的 presence 档过粗）；AI 不是人类专家，正式第 2 条仍标代理，
+  D10 前补 10–15 份真人专家评分；
 - 平台已有 32 题 contract-review 的同名 `risk-selfcheck`，本项目 Skill 使用唯一名 `bid-risk-selfcheck`，
   勿混用。
