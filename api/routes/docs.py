@@ -59,12 +59,17 @@ def get_document(doc_id: str) -> dict[str, Any]:
     return doc.to_dict(with_text=True)
 
 
-@router.get("/doc/{doc_id}/raw", summary="取上传的原始文件（双栏对照用）")
-def get_raw(doc_id: str) -> FileResponse:
+@router.get("/doc/{doc_id}/raw", summary="取上传的原始文件（双栏对照 / 预览）")
+def get_raw(doc_id: str, inline: bool = False) -> FileResponse:
     if not store.valid_doc_id(doc_id):
         raise HTTPException(400, "文档 ID 格式不合法")
     path = store.raw_file(doc_id)
     if path is None:
         raise HTTPException(404, "原始文件不存在")
     media = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
-    return FileResponse(path, media_type=media, filename=path.name)
+    return FileResponse(
+        path,
+        media_type=media,
+        filename=path.name,
+        content_disposition_type="inline" if inline else "attachment",
+    )

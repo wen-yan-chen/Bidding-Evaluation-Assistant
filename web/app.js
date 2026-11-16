@@ -1333,12 +1333,6 @@ function renderReports() {
     const tdFile = el('td');
     tdFile.append(el('span', 'cell-title', review.file_name || '—'));
     tdFile.append(el('span', 'cell-sub', review.doc_id || '—'));
-    const sourceDoc = state.docs.find((doc) => doc.doc_id === review.doc_id);
-    if (sourceDoc && (sourceDoc.parse_status === 'degraded' || (sourceDoc.degraded || []).length)) {
-      const degradedBadge = el('span', 'pill pill-warn', '降级技术');
-      degradedBadge.title = (sourceDoc.degraded || []).join('；') || 'OCR / 页码估算';
-      tdFile.append(degradedBadge);
-    }
     tr.append(tdFile);
 
     const tdProfile = el('td');
@@ -1359,6 +1353,10 @@ function renderReports() {
 
     const tdActions = el('td');
     const actions = el('div', 'report-actions');
+    const previewBtn = el('button', 'locator', '预览');
+    previewBtn.type = 'button';
+    previewBtn.title = '预览评审摘要与报告 PDF';
+    previewBtn.addEventListener('click', () => previewReport(review));
     const docxBtn = el('button', 'btn btn-sm', '下载 docx');
     docxBtn.type = 'button';
     docxBtn.addEventListener('click', () => downloadReport(review.review_id, 'docx', { button: docxBtn, row: tr }));
@@ -1368,7 +1366,7 @@ function renderReports() {
     const openBtn = el('button', 'locator', '查看评审');
     openBtn.type = 'button';
     openBtn.addEventListener('click', () => openReview(review.review_id));
-    actions.append(docxBtn, pdfBtn, openBtn);
+    actions.append(previewBtn, docxBtn, pdfBtn, openBtn);
     tdActions.append(actions);
     tr.append(tdActions);
 
@@ -1877,6 +1875,11 @@ function renderAdminData() {
     tr.append(tdFiles);
     const tdActions = el('td');
     const actions = el('div', 'admin-actions');
+    const previewReview = el('button', 'btn btn-sm', '预览');
+    previewReview.type = 'button';
+    previewReview.title = '预览评审摘要与报告 PDF';
+    previewReview.addEventListener('click', () => previewReport(review));
+    actions.append(previewReview);
     if (docx.exists || pdf.exists) {
       const delReport = el('button', 'btn btn-sm btn-danger', '删报告');
       delReport.type = 'button';
@@ -1902,14 +1905,13 @@ async function previewDoc(doc) {
   const body = $('doc-preview-body');
   const title = $('doc-preview-title');
   const meta = $('doc-preview-meta');
-  const save = $('doc-preview-save');
   if (!modal || !body || !doc) return;
   const ext = String(doc.ext || (doc.file_name || '').split('.').pop() || '').replace(/^\./, '').toLowerCase();
   title.textContent = doc.file_name || '文档预览';
   meta.textContent = `${doc.doc_id || '—'} · ${doc.page_count || '—'} 页 · ${ext ? ext.toUpperCase() : '文件'} · 原文预览`;
-  save.href = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw`;
-  save.download = doc.file_name || `${doc.doc_id}.${ext || 'bin'}`;
+  setPreviewSave(`/api/doc/${encodeURIComponent(doc.doc_id)}/raw`, doc.file_name || `${doc.doc_id}.${ext || 'bin'}`, '保存原件');
   body.textContent = '';
+  body.classList.remove('preview-report-body');
   modal.hidden = false;
   document.body.classList.add('has-preview');
   $('btn-preview-close').focus();
@@ -1918,21 +1920,34 @@ async function previewDoc(doc) {
     const frame = document.createElement('iframe');
     frame.className = 'preview-frame';
     frame.title = `PDF 预览：${doc.file_name || doc.doc_id}`;
-    frame.src = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw`;
+    frame.src = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw?inline=1`;
     body.append(frame);
     return;
   }
 
   body.append(el('p', 'preview-loading', '正在读取解析文本…'));
   try {
-    const data = await api(`/api/doc/${encodeURIComponent(doc.doc_id)}`, { timeout: 15000 });
+    let data;
+    try {
+      data = await api(`/api/doc/${encodeURIComponent(doc.doc_id)}`, { timeout: 15000 });
+    } catch (firstError) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      data = await api(`/api/doc/${encodeURIComponent(doc.doc_id)}`, { timeout: 15000 });
+    }
     body.textContent = '';
     if (ext === 'docx') {
       body.append(el('p', 'preview-note', 'docx 版式不还原，这里显示解析文本；点「保存原件」可查看原版式。'));
     }
     const pages = Array.isArray(data.pages) ? data.pages : [];
     if (!pages.length) {
-      body.append(el('p', 'preview-loading', '没有可预览的文本，请保存原件查看。'));
+      if (data.full_text) {
+        const article = el('article', 'preview-page');
+        article.append(el('h4', '', '全文'));
+        article.append(el('pre', '', data.full_text));
+        body.append(article);
+      } else {
+        body.append(el('p', 'preview-loading', '没有可预览的文本，请保存原件查看。'));
+      }
       return;
     }
     const ocrPages = new Set((data.meta && data.meta.ocr_pages) || []);
@@ -1957,13 +1972,83 @@ async function previewDoc(doc) {
   }
 }
 
+async function previewReport(review) {
+  const modal = $('doc-preview');
+  const body = $('doc-preview-body');
+  const title = $('doc-preview-title');
+  const meta = $('doc-preview-meta');
+  if (!modal || !body || !review) return;
+  title.textContent = `评审预览：${review.file_name || review.review_id}`;
+  meta.textContent = `${review.review_id || '—'} · ${review.profile || '—'} · ${fmtScore(review.total)}`;
+  setPreviewSave(`/api/report/${encodeURIComponent(review.review_id)}?format=pdf`, `${review.review_id}.pdf`, '保存 PDF');
+  body.textContent = '';
+  body.classList.add('preview-report-body');
+  modal.hidden = false;
+  document.body.classList.add('has-preview');
+  $('btn-preview-close').focus();
+
+  const summary = el('div', 'preview-summary');
+  summary.append(el('p', 'preview-loading', '正在读取评审摘要…'));
+  body.append(summary);
+
+  const frame = document.createElement('iframe');
+  frame.className = 'preview-frame preview-report-frame';
+  frame.title = `报告 PDF：${review.review_id}`;
+  frame.src = `/api/report/${encodeURIComponent(review.review_id)}?format=pdf&inline=1`;
+  body.append(frame);
+
+  try {
+    const data = await api(`/api/review/${encodeURIComponent(review.review_id)}`, { timeout: 15000 });
+    const q = (data.qualification && data.qualification.counts) || {};
+    const r = (data.risks && data.risks.counts) || {};
+    const total = (data.summary && data.summary.total_score) ?? review.total;
+    const full = (data.summary && data.summary.total_full) || 100;
+    summary.textContent = '';
+    const head = el('div', 'preview-summary-head');
+    head.append(el('strong', '', `总分 ${fmtScore(total)} / ${full}`));
+    head.append(el('span', '', `资格性 已提供 ${q.provided || 0} / 缺失 ${q.missing || 0} / 效力不足 ${q.insufficient || 0}`));
+    head.append(el('span', '', `风险 高 ${r['高'] || 0} / 中 ${r['中'] || 0} / 低 ${r['低'] || 0}`));
+    summary.append(head);
+    const items = (data.scoring && data.scoring.items) || [];
+    if (items.length) {
+      const line = el('div', 'preview-summary-items');
+      for (const item of items) {
+        line.append(el('span', '', `${item.item_id} ${fmtScore(item.score)}/${fmtScore(item.full_score)}`));
+      }
+      summary.append(line);
+    }
+    const open = el('button', 'locator', '查看完整评审');
+    open.type = 'button';
+    open.addEventListener('click', () => {
+      closePreview();
+      openReview(review.review_id);
+    });
+    summary.append(open);
+  } catch (err) {
+    summary.textContent = '';
+    summary.append(el('p', 'preview-loading', `摘要读取失败：${describeError(err, '读取评审')}；右侧报告 PDF 仍可查看。`));
+  }
+}
+
+function setPreviewSave(href, fileName, label) {
+  const save = $('doc-preview-save');
+  if (!save) return;
+  save.href = href;
+  save.download = fileName || '';
+  save.textContent = label || '保存';
+}
+
 function closePreview() {
   const modal = $('doc-preview');
   const body = $('doc-preview-body');
   if (!modal || modal.hidden) return;
   modal.hidden = true;
   document.body.classList.remove('has-preview');
-  if (body) body.textContent = '';
+  if (body) {
+    body.textContent = '';
+    body.classList.remove('preview-report-body');
+  }
+  setPreviewSave('#', '', '保存原件');
 }
 
 async function adminDeleteDoc(doc) {

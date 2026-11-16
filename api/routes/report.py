@@ -21,13 +21,18 @@ class ReportRequest(BaseModel):
     format: str = Field("docx", description="docx 或 pdf")
 
 
-def _file_response(review_id: str, fmt: str) -> FileResponse:
+def _file_response(review_id: str, fmt: str, inline: bool = False) -> FileResponse:
     try:
         path, _data = report_service.generate(review_id, fmt)
     except report_service.ReportError as exc:
         message = str(exc)
         raise HTTPException(404 if "不存在" in message else 400, message) from exc
-    return FileResponse(path, media_type=report_service.media_type(path), filename=path.name)
+    return FileResponse(
+        path,
+        media_type=report_service.media_type(path),
+        filename=path.name,
+        content_disposition_type="inline" if inline else "attachment",
+    )
 
 
 @router.post("/report", summary="生成并下载报告（docx / pdf）")
@@ -36,8 +41,8 @@ def create_report(payload: ReportRequest) -> FileResponse:
 
 
 @router.get("/report/{review_id}", summary="下载报告（不存在则即时生成）")
-def download_report(review_id: str, format: str = "docx") -> FileResponse:
-    return _file_response(review_id, format)
+def download_report(review_id: str, format: str = "docx", inline: bool = False) -> FileResponse:
+    return _file_response(review_id, format, inline=inline)
 
 
 @router.get("/report/{review_id}/meta", summary="报告元信息（是否已生成 / 大小 / 数值摘要）")
