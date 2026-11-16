@@ -677,6 +677,25 @@ code {
   font-weight: 700;
 }
 .dual-meta { font-size: 11.5px; color: var(--ink-3); font-weight: 400; text-align: right; }
+.dual-tabs { display: inline-flex; align-items: center; gap: 2px; padding: 2px; background: #eef2f9; border-radius: 7px; }
+.dual-tab {
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.dual-tab.is-active { background: #fff; color: var(--brand); font-weight: 700; box-shadow: 0 1px 2px rgba(22, 48, 127, .1); }
+.source-preview { background: #f7f9fd; padding: 8px; max-height: 660px; overflow: auto; }
+.source-preview-body { min-height: 560px; background: #fff; border: 1px solid var(--line); border-radius: 8px; overflow: auto; }
+.source-preview-body .preview-frame { min-height: 600px; height: 600px; }
+.source-file-card { padding: 26px 20px; text-align: center; color: var(--ink-2); }
+.source-file-card h3 { margin: 0 0 6px; font-size: 14px; color: var(--ink); word-break: break-all; }
+.source-file-card p { margin: 0 0 12px; font-size: 12.5px; color: var(--ink-3); line-height: 1.7; }
+.source-file-actions { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
 
 .pages {
   background: #f7f9fd;
@@ -976,13 +995,23 @@ mark.hit {
 .preview-page { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
 .preview-page h4 { margin: 0 0 7px; font-size: 12px; color: var(--ink-3); display: flex; gap: 6px; align-items: center; }
 .preview-page pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 12.5px/1.7 var(--sans); color: var(--ink-2); }
-.preview-report-body { display: flex; flex-direction: column; gap: 10px; }
+.preview-report-body { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
 .preview-summary { flex: 0 0 auto; background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; max-height: 220px; overflow: auto; }
 .preview-summary-head { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--ink-2); }
 .preview-summary-head strong { color: var(--ink); font-size: 14px; }
 .preview-summary-items { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 0; font-size: 11.5px; color: var(--ink-3); }
 .preview-summary-items span { background: #f3f6fc; border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; }
+.preview-report-stage { display: flex; gap: 10px; flex: 1 1 auto; min-height: 0; }
+.preview-report-pane { flex: 1 1 100%; min-width: 0; display: flex; flex-direction: column; min-height: 0; }
+.preview-original-pane { display: none; flex: 1 1 50%; min-width: 0; flex-direction: column; gap: 6px; min-height: 0; }
+.preview-report-stage.is-compare .preview-original-pane { display: flex; }
+.preview-report-stage.is-compare .preview-report-pane { flex: 1 1 50%; }
+.preview-pane-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 5px 8px; border: 1px solid var(--line); border-radius: 7px; background: #fff; font-size: 12px; color: var(--ink-2); }
+.preview-pane-head .locator { font-size: 11px; }
+.preview-original-content { flex: 1 1 auto; min-height: 0; overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 7px; padding: 8px; }
+.preview-original-content .preview-page { margin-bottom: 8px; }
 .preview-report-frame { flex: 1 1 auto; min-height: 55vh; height: 55vh; }
+.preview-panel.is-compare { width: min(1500px, 97vw); }
 .preview-note { margin: 0 0 10px; padding: 8px 10px; border-radius: 8px; background: #fff8e8; color: #7a5a16; font-size: 12px; }
 .preview-loading { color: var(--ink-3); font-size: 13px; padding: 20px; text-align: center; }
 body.has-preview { overflow: hidden; }
@@ -1070,6 +1099,7 @@ body.has-preview { overflow: hidden; }
   .dual { grid-template-columns: 1fr; }
   .dual-pane + .dual-pane { border-left: 0; border-top: 1px solid var(--line); }
   .pages, .evidence-list { max-height: 460px; }
+  .source-preview { max-height: 460px; }
   .admin-columns { grid-template-columns: 1fr; }
   .admin-login { grid-template-columns: 1fr 1fr; }
   .admin-login .btn { grid-column: 1 / -1; width: 100%; }
@@ -1106,7 +1136,7 @@ body.has-preview { overflow: hidden; }
   body { background: #fff; color: #000; font-size: 10.5pt; }
   .topbar, .mainnav, .topbar-meta, .view-head-meta, .workbench,
   .upload-box, .progress, .notice, .empty-state, .evtabs, .locator,
-  .score-actions, .btn, .pagefoot, .preview-modal { display: none !important; }
+  .score-actions, .btn, .pagefoot, .preview-modal, .source-preview { display: none !important; }
 
   .main { max-width: none; padding: 0; }
   .view-head { margin-bottom: 8px; }

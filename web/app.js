@@ -27,6 +27,7 @@ const state = {
   docsReady: false,
   evidence: [],
   evidenceTab: 'all',
+  sourceTab: 'text',
   uploadFiles: [],
   reviewing: false,
   reportsLoaded: false,
@@ -38,6 +39,7 @@ const state = {
   adminLoadSeq: 0,
   adminSelectedDocs: new Set(),
   adminSelectedReviews: new Set(),
+  previewReview: null,
 };
 
 /* ============================================================ 基础工具 */
@@ -352,6 +354,7 @@ function renderPages(doc) {
   wrap.textContent = '';
   if (!doc || !Array.isArray(doc.pages) || !doc.pages.length) {
     wrap.append(el('p', 'empty-inline', '该文档没有可显示的原文页。'));
+    renderSourceFile(doc);
     return;
   }
   const ocrPages = new Set((doc.meta && doc.meta.ocr_pages) || []);
@@ -372,6 +375,63 @@ function renderPages(doc) {
     article.append(head, body);
     wrap.append(article);
   }
+  renderSourceFile(doc);
+}
+
+function renderSourceFile(doc) {
+  const wrap = $('source-preview-body');
+  if (!wrap) return;
+  if (!doc) {
+    wrap.dataset.docId = '';
+    wrap.textContent = '';
+    wrap.append(el('p', 'empty-inline', '选择文档后显示源文件。'));
+    return;
+  }
+  if (wrap.dataset.docId === doc.doc_id) return;
+  const ext = String(doc.ext || (doc.file_name || '').split('.').pop() || '').replace(/^\./, '').toLowerCase();
+  wrap.dataset.docId = doc.doc_id;
+  wrap.textContent = '';
+  if (ext === 'pdf' || ext === 'txt' || ext === 'md') {
+    const frame = document.createElement('iframe');
+    frame.className = 'preview-frame';
+    frame.title = `源文件：${doc.file_name || doc.doc_id}`;
+    frame.src = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw?inline=1`;
+    wrap.append(frame);
+    return;
+  }
+  const card = el('div', 'source-file-card');
+  card.append(el('h3', '', doc.file_name || doc.doc_id));
+  card.append(el('p', '', '浏览器不能直接渲染 Word 原版式。可保存原件用 Word 打开，或切到「解析文本」查看内容。'));
+  const actions = el('div', 'source-file-actions');
+  const save = el('a', 'btn btn-sm', '保存原件');
+  save.href = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw`;
+  save.download = doc.file_name || `${doc.doc_id}.${ext || 'bin'}`;
+  const text = el('button', 'btn btn-sm', '查看解析文本');
+  text.type = 'button';
+  text.addEventListener('click', () => setSourceTab('text'));
+  actions.append(save, text);
+  card.append(actions);
+  wrap.append(card);
+}
+
+function setSourceTab(tab) {
+  state.sourceTab = tab === 'file' ? 'file' : 'text';
+  document.querySelectorAll('.dual-tab').forEach((btn) => {
+    const on = btn.dataset.sourceTab === state.sourceTab;
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  const pages = $('pages');
+  const source = $('source-preview');
+  if (pages) pages.hidden = state.sourceTab !== 'text';
+  if (source) source.hidden = state.sourceTab !== 'file';
+  if (state.sourceTab === 'file') renderSourceFile(state.doc);
+}
+
+function initSourceTabs() {
+  document.querySelectorAll('.dual-tab').forEach((btn) => {
+    btn.addEventListener('click', () => setSourceTab(btn.dataset.sourceTab));
+  });
 }
 
 function clearMarks() {
@@ -452,6 +512,7 @@ function locateItem(item) {
     $('dual-active').textContent = '请先选择文档';
     return;
   }
+  setSourceTab('text');
   const resolved = resolveSpan(item);
   if (!resolved) {
     $('dual-active').textContent = '该条结果没有可定位的原文';
@@ -1906,6 +1967,11 @@ async function previewDoc(doc) {
   const title = $('doc-preview-title');
   const meta = $('doc-preview-meta');
   if (!modal || !body || !doc) return;
+  state.previewReview = null;
+  const originalBtn = $('btn-preview-original');
+  if (originalBtn) originalBtn.hidden = true;
+  const panel = modal.querySelector('.preview-panel');
+  if (panel) panel.classList.remove('is-compare');
   const ext = String(doc.ext || (doc.file_name || '').split('.').pop() || '').replace(/^\./, '').toLowerCase();
   title.textContent = doc.file_name || '文档预览';
   meta.textContent = `${doc.doc_id || '—'} · ${doc.page_count || '—'} 页 · ${ext ? ext.toUpperCase() : '文件'} · 原文预览`;
@@ -1978,6 +2044,14 @@ async function previewReport(review) {
   const title = $('doc-preview-title');
   const meta = $('doc-preview-meta');
   if (!modal || !body || !review) return;
+  state.previewReview = review;
+  const originalBtn = $('btn-preview-original');
+  if (originalBtn) {
+    originalBtn.hidden = false;
+    originalBtn.textContent = '查看原件';
+  }
+  const panel = modal.querySelector('.preview-panel');
+  if (panel) panel.classList.remove('is-compare');
   title.textContent = `评审预览：${review.file_name || review.review_id}`;
   meta.textContent = `${review.review_id || '—'} · ${review.profile || '—'} · ${fmtScore(review.total)}`;
   setPreviewSave(`/api/report/${encodeURIComponent(review.review_id)}?format=pdf`, `${review.review_id}.pdf`, '保存 PDF');
@@ -1991,11 +2065,31 @@ async function previewReport(review) {
   summary.append(el('p', 'preview-loading', '正在读取评审摘要…'));
   body.append(summary);
 
+  const stage = el('div', 'preview-report-stage');
+  stage.id = 'preview-report-stage';
+  const originalPane = el('div', 'preview-original-pane');
+  originalPane.id = 'preview-original-pane';
+  const originalHead = el('div', 'preview-pane-head');
+  originalHead.append(el('strong', '', '原件'));
+  const originalSave = el('a', 'locator', '保存原件');
+  originalSave.href = `/api/doc/${encodeURIComponent(review.doc_id)}/raw`;
+  originalSave.download = review.file_name || '';
+  originalHead.append(originalSave);
+  const originalBody = el('div', 'preview-original-content');
+  originalBody.append(el('p', 'preview-loading', '点「查看原件」后加载'));
+  originalPane.append(originalHead, originalBody);
+
+  const reportPane = el('div', 'preview-report-pane');
+  reportPane.id = 'preview-report-pane';
+  const reportHead = el('div', 'preview-pane-head');
+  reportHead.append(el('strong', '', '报告 PDF'));
   const frame = document.createElement('iframe');
   frame.className = 'preview-frame preview-report-frame';
   frame.title = `报告 PDF：${review.review_id}`;
   frame.src = `/api/report/${encodeURIComponent(review.review_id)}?format=pdf&inline=1`;
-  body.append(frame);
+  reportPane.append(reportHead, frame);
+  stage.append(originalPane, reportPane);
+  body.append(stage);
 
   try {
     const data = await api(`/api/review/${encodeURIComponent(review.review_id)}`, { timeout: 15000 });
@@ -2030,6 +2124,71 @@ async function previewReport(review) {
   }
 }
 
+async function loadOriginalPane(review) {
+  const content = document.querySelector('#preview-original-pane .preview-original-content');
+  if (!content || content.dataset.loaded === '1') return;
+  const doc = state.docs.find((item) => item.doc_id === review.doc_id);
+  const ext = String((doc && doc.ext) || (review.file_name || '').split('.').pop() || '').replace(/^\./, '').toLowerCase();
+  content.textContent = '';
+  content.append(el('p', 'preview-loading', '正在加载原件…'));
+  if (ext === 'pdf') {
+    const frame = document.createElement('iframe');
+    frame.className = 'preview-frame';
+    frame.title = `原件 PDF：${review.file_name || review.doc_id}`;
+    frame.src = `/api/doc/${encodeURIComponent(review.doc_id)}/raw?inline=1`;
+    content.textContent = '';
+    content.append(frame);
+    content.dataset.loaded = '1';
+    return;
+  }
+  try {
+    let data;
+    try {
+      data = await api(`/api/doc/${encodeURIComponent(review.doc_id)}`, { timeout: 15000 });
+    } catch (firstError) {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      data = await api(`/api/doc/${encodeURIComponent(review.doc_id)}`, { timeout: 15000 });
+    }
+    content.textContent = '';
+    if (ext === 'docx') {
+      content.append(el('p', 'preview-note', 'docx 显示解析文本，原版式请保存原件。'));
+    }
+    const pages = Array.isArray(data.pages) ? data.pages : [];
+    if (!pages.length) {
+      content.append(el('pre', '', data.full_text || '没有可预览的文本，请保存原件查看。'));
+    } else {
+      const list = el('div', 'preview-pages');
+      for (const page of pages) {
+        const article = el('article', 'preview-page');
+        const head = el('h4', '', `第 ${page.page || '—'} 页`);
+        article.append(head);
+        const text = typeof page.start === 'number' && typeof page.end === 'number' && data.full_text
+          ? data.full_text.slice(page.start, page.end)
+          : (page.text || '');
+        article.append(el('pre', '', text || '（本页无文本）'));
+        list.append(article);
+      }
+      content.append(list);
+    }
+    content.dataset.loaded = '1';
+  } catch (err) {
+    content.textContent = '';
+    content.append(el('p', 'preview-loading', describeError(err, '读取原件')));
+  }
+}
+
+async function togglePreviewOriginal() {
+  const review = state.previewReview;
+  const stage = $('preview-report-stage');
+  if (!review || !stage) return;
+  const open = stage.classList.toggle('is-compare');
+  const panel = $('doc-preview') && $('doc-preview').querySelector('.preview-panel');
+  if (panel) panel.classList.toggle('is-compare', open);
+  const button = $('btn-preview-original');
+  if (button) button.textContent = open ? '收起原件' : '查看原件';
+  if (open) await loadOriginalPane(review);
+}
+
 function setPreviewSave(href, fileName, label) {
   const save = $('doc-preview-save');
   if (!save) return;
@@ -2044,6 +2203,14 @@ function closePreview() {
   if (!modal || modal.hidden) return;
   modal.hidden = true;
   document.body.classList.remove('has-preview');
+  state.previewReview = null;
+  const panel = modal.querySelector('.preview-panel');
+  if (panel) panel.classList.remove('is-compare');
+  const originalBtn = $('btn-preview-original');
+  if (originalBtn) {
+    originalBtn.hidden = true;
+    originalBtn.textContent = '查看原件';
+  }
   if (body) {
     body.textContent = '';
     body.classList.remove('preview-report-body');
@@ -2355,6 +2522,7 @@ function initGlobalActions() {
   $('btn-batch-delete-docs').addEventListener('click', () => adminBatchDelete('doc'));
   $('btn-batch-delete-reviews').addEventListener('click', () => adminBatchDelete('review'));
   $('btn-preview-close').addEventListener('click', closePreview);
+  $('btn-preview-original').addEventListener('click', togglePreviewOriginal);
   document.querySelectorAll('[data-close-preview]').forEach((node) => node.addEventListener('click', closePreview));
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closePreview();
@@ -2374,6 +2542,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initReview();
   initReports();
   initEvidenceTabs();
+  initSourceTabs();
   initGlobalActions();
 
   const initial = (location.hash || '').replace(/^#/, '') || 'review';
