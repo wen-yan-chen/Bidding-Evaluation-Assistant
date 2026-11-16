@@ -32,6 +32,8 @@
 `check_report.py --all` **50/50**。证据见 [`docs/D9-自测记录.md`](docs/D9-自测记录.md)，
 交接见 [`docs/D9-交接文档.md`](docs/D9-交接文档.md)，六条标准见 [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md)，
 状态页截图见 [`docs/screenshots/D9-技能挂载.png`](docs/screenshots/D9-技能挂载.png)。
+面向评标专家/采购经办人的图文版使用说明：[docs/使用说明.md](docs/使用说明.md) /
+[docs/使用说明.docx](docs/使用说明.docx)。
 
 > 第 2 条「专家评分 ±5 分」没有人类专家双盲；已补 **AI 双盲参考评分**：
 > 严格按细则 **15/15**、专业裁量 **0/15**（暴露 T2/B2/B3 的 presence 档过粗），
@@ -247,7 +249,7 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | 3 | 知识库资产 | `knowledge/` | 🟡 D4 已导出并导入（40 块，指纹一致） |
 | 4 | 模拟数据 | `data/samples/` | 🟡 已有 25 份（20 文本层 + 5 扫描件）+ 15 份植入风险 + 3 份边界 + 标注（见 `docs/数据说明.md`） |
 | 5 | 部署文档 | `DEPLOY.md` `docker-compose.yml` | ✅ D1 已可部署，D8 镜像 v0.8.0 |
-| 6 | 使用文档 | `USAGE.md` | ✅ D9 |
+| 6 | 使用文档 | `USAGE.md`、`docs/使用说明.md` / `.docx` | ✅ D9 |
 | 7 | 演示视频 | `docs/video/` | ⬜ D10 |
 | 8 | 测试报告 | `docs/TEST_REPORT.md` | ✅ D9 |
 
