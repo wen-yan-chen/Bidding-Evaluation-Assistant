@@ -11,7 +11,7 @@ services:
       args:
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
         BASE_IMAGE: ${BASE_IMAGE:-python:3.11-slim}
-    image: bid-review:${APP_TAG:-0.7.0}
+    image: bid-review:${APP_TAG:-0.8.0}
     container_name: bid-review
     ports:
       # 宿主端口可覆盖：HOST_PORT=18080 docker compose up -d
@@ -45,7 +45,7 @@ services:
       args:
         PIP_INDEX_URL: ${PIP_INDEX_URL:-https://pypi.tuna.tsinghua.edu.cn/simple}
         BASE_IMAGE: ${BASE_IMAGE:-python:3.11-slim}
-    image: bid-review:${APP_TAG:-0.7.0}
+    image: bid-review:${APP_TAG:-0.8.0}
     container_name: bid-review-mcp
     command: ["python", "-m", "mcps.bid_review_mcp"]
     ports:

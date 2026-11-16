@@ -1,8 +1,9 @@
 # 招投标评审助手
 
 > 魔擎开发者激励 1 期 · 课题 8 · 政企采购 · 中级（¥6,000）
-> 当前版本 **v0.7.0（D7）**：知识库切成 40 分片、提示词 v3；MCP 扩到 **8 个工具**（含聊天附件解析
-> `parse_attachment` 与报告导出 `export_report`）；**docx/pdf 报告可一键下载**，报告数值与评审 JSON 逐项一致。
+> 当前版本 **v0.8.0（D8）**：前端**评审看板**上线——上传/选文档 → 选评分细则 → 评审 → 总分卡 +
+> 资格性/分项/风险三张结果表；**双栏对照**点击结果定位原文并高亮；**报告中心**支持 docx/pdf 下载、
+> 文件大小与数值摘要。后端沿用 D7 能力（解析含 OCR、40 条规则、两套细则、风险扫描、报告导出）。
 > 样本 25 份（20 文本层 + 5 扫描件），解析 25/25、字段 146/146；风险检出 100%、误报 0%。
 
 面向政企采购场景的招投标文件辅助评审系统：解析招标/投标文件并**溯源到页码**，按招标文件的评分细则**逐项算分**，按 40 条规则库核验**资格性与合规风险**，输出可**点击跳回原文**的风险清单与可下载的审核报告。
@@ -15,11 +16,28 @@
 
 ## 一、当前进度
 
+### D8 评审看板 + 双栏对照 + 报告中心（v0.8.0）
+
+| D8 任务 | 交付物 | 状态 | 验证方式 |
+| --- | --- | :-: | --- |
+| 评审页 | 上传/选文档 → 选 `profile-a`/`profile-b` → 评审 → 总分卡 + 三张结果表 | ✅ | 浏览器实测 68.0 / 62.0 |
+| 双栏对照 | 左栏按 `pages[]` 渲染原文，右栏结果；点击定位并 `<mark>` 高亮 `quote` | ✅ | 点击「报价」字段跳到第 1 页高亮 |
+| 报告中心 | `GET /api/review` 列表 + 行内 docx/pdf 下载 + `/meta` 大小与数值摘要 | ✅ | docx 41.4 KB / pdf 10.6 KB |
+| 换细则入口 | 切换 `profile_id` 重评，分项显示「较上次」差值 | ✅ | P1 40→30、T2 10→12、T5 6→8 |
+| 免责 banner | 顶部常驻、文案逐字一致 | ✅ | DOM 文本比对通过 |
+| 状态与错误 | 上传失败 / 解析 failed / 评审 404 / 报告未生成均有可读提示 | ✅ | Playwright 走查 + 0 控制台错误 |
+
+**D8 验收**：`bid-001.docx` A 套 **68.0/100**、资格性 **4 已提供 / 6 缺失**、风险 **0**；切 `profile-b`
+**62.0/100**，分项 P1 **40→30**、T2 **10→12**、T5 **6→8**；报告中心 docx/pdf 均可下载并打开，页脚含免责声明与页码；
+顶部免责 banner 逐字一致；`pytest` **49 passed**、`smoke_test.py` **10/10**。
+证据见 [`docs/D8-自测记录.md`](docs/D8-自测记录.md)，交接说明见 [`docs/D8-交接文档.md`](docs/D8-交接文档.md)，
+截图见 [`docs/screenshots/`](docs/screenshots/)（`D8-评审看板.png`、`D8-双栏对照.png`、`D8-报告中心.png`）。
+
 ### D7 知识库治理 + 提示词 v3 + 报告导出（v0.7.0）
 
 | D7 任务 | 交付物 | 状态 | 验证方式 |
 | --- | --- | :-: | --- |
-| 知识库切「一文件一规则」 | 索引 `4-5897…`（40 文件 / 40 分片） | ✅ | 平台文档 38/40（待补 R02/R04） |
+| 知识库切「一文件一规则」 | 索引 `4-5897…`（40 文件 / 40 分片） | ✅ | 平台文档 40/40（R02/R04 已补） |
 | 提示词 v3 | `prompt.md`（4268 字） | ✅ | 含 7 个工具调用时机与 D6 能力边界 |
 | 聊天附件打通 | MCP `parse_attachment` + `list_documents` | ✅ | 用真实 S3 路径实测解析成功 |
 | 报告九章装配 | `api/report/builder.py` | ✅ | 双指纹、合同六要素 |
@@ -145,6 +163,8 @@ python tools/smoke_test.py
 ```
 
 端口被占用时换一个：`HOST_PORT=18080 docker compose up -d`。
+> 本机演示端口为 **18080**（8080 被 32 题容器占用）；他人环境按默认 8080 即可。验证时记得
+> `python tools/smoke_test.py --base http://127.0.0.1:18080`。
 构建太慢或走不通网络：`docker compose build --build-arg PIP_INDEX_URL=https://pypi.org/simple`；
 基础镜像拉不动（docker.io 几十 KB/s）时加 `BASE_IMAGE=docker.m.daocloud.io/library/python:3.11-slim`。
 详细部署与排错见 [`DEPLOY.md`](DEPLOY.md)。
@@ -171,7 +191,7 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 │   ├── parsers/             #   docx / pdf / txt / OCR 解析 + 条款切分 + 分发（失败降级）
 │   ├── extract/             #   6 个关键字段抽取（确定性规则 + 溯源三元组）
 │   └── routes/              #   health / meta / docs（上传、查询、取原文）
-├── web/                     # 前端工程：状态页 + D2 解析面板（D8 补齐评审看板）
+├── web/                     # 前端：评审看板 + 双栏对照 + 报告中心 + 系统状态（D8）
 │   ├── index.html  style.css  app.js
 ├── data/                    # 模拟数据与运行时产物
 │   ├── samples/             #   25 份样本（20 文本层 + 5 扫描件）+ boundary + manifest.json
@@ -180,10 +200,10 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 │   ├── risk/                #   10 份植入风险样本 + manifest（dev/holdout）
 │   ├── parsed/              #   解析结果 JSON（运行时生成，不进仓库）
 │   └── meta/milestones.json #   里程碑与阶段交付清单（页面与文档同源）
-├── agent.json               # Nexent 导入配置（草案：MCP 6 工具 + 4 Skill + 知识库检索）
+├── agent.json               # Nexent 导入配置（MCP 8 工具 + 4 Skill + 知识库检索）
 ├── prompt.md                # 系统提示词唯一来源，agent.json.prompt 由脚本同步
 ├── knowledge/               # 知识库资产：rules-full.md（40 块）+ manifest 指纹 ✅
-├── mcps/                    # MCP 工具服务：bid_review_mcp.py（3 个工具）✅
+├── mcps/                    # MCP 工具服务：bid_review_mcp.py（8 个工具）✅
 ├── skills/                  # 4 个自定义 Skill（D5）                          —— 待填充
 ├── docs/                    # 交接文档、自测记录、测试报告、截图、演示视频
 ├── tools/                   # 配置校验 / 冒烟 / 样本生成 / 溯源校验 / 指标复算 / fork 同步
@@ -201,12 +221,12 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 
 | # | 交付物 | 路径 | 状态 |
 | :-: | --- | --- | :-: |
-| 1 | 前端工程 | `web/` | 🟡 D3 状态页 + 解析面板（含 OCR 徽标，D8 补看板） |
-| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 解析 + MCP + 评审逻辑已通，Skill 待 D7 前 |
+| 1 | 前端工程 | `web/` | ✅ D8 评审看板 + 双栏对照 + 报告中心 |
+| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 解析 + MCP + 评审 + 报告已通，Skill 挂载待 D9 |
 | 3 | 知识库资产 | `knowledge/` | 🟡 D4 已导出并导入（40 块，指纹一致） |
 | 4 | 模拟数据 | `data/samples/` | 🟡 已有 25 份（20 文本层 + 5 扫描件）+ 15 份植入风险 + 3 份边界 + 标注（见 `docs/数据说明.md`） |
-| 5 | 部署文档 | `DEPLOY.md` `docker-compose.yml` | 🟡 D1 已可部署 |
-| 6 | 使用文档 | `USAGE.md` | ⬜ D8 |
+| 5 | 部署文档 | `DEPLOY.md` `docker-compose.yml` | ✅ D1 已可部署，D8 镜像 v0.8.0 |
+| 6 | 使用文档 | `USAGE.md` | ⬜ D9 |
 | 7 | 演示视频 | `docs/video/` | ⬜ D10 |
 | 8 | 测试报告 | `docs/TEST_REPORT.md` | ⬜ D9 |
 
@@ -217,8 +237,8 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | 能力 | 落地方式 | 当前状态 | 证据位 |
 | --- | --- | --- | --- |
 | 智能体编排 | `max_steps=15`；4 个 Skill 分阶段；步骤/终局校验开启 | 草案 | `agent.json` |
-| 工具调用 | MCP 已实现 3 个（`parse_tender` / `scan_risks` / `locate_span`），D5–D7 补 `check_qualification` / `score_item` / `export_report` | 服务已上线（8765），平台登记待导入 | `mcps/`、`agent.json` → `mcp_info` |
-| 知识库挂载 | 40 条规则一块一条，`bge-m3` 1024 维，`hybrid` + `top_k=3` | 已导入（索引 `2-c6515a…`） | `agent.json` → `index_names` |
+| 工具调用 | MCP 已实现 8 个（解析 / 核验 / 评分 / 扫描 / 定位 / 导出 / 文档列表 / 聊天附件），D4–D7 渐进补齐 | 服务已上线（8765），平台登记待导入 | `mcps/`、`agent.json` → `mcp_info` |
+| 知识库挂载 | 40 条规则一块一条，`bge-m3` 1024 维，`hybrid` + `top_k=3` | 已导入（索引 `4-5897…`） | `agent.json` → `index_names` |
 | 自定义 Skill | `bid-rule-cards` / `missing-qualification` / `risk-selfcheck` / `summary-compiler` | 已登记未上传（D5） | `skills/` |
 
 > 页面「平台能力接入」卡片直接读 `agent.json` 判断状态：**登记 ≠ 可用**，未落地一律显示"待接入"。
@@ -231,7 +251,7 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | 方法 | 路径 | 说明 | 状态 |
 | --- | --- | :-: | --- |
 | GET | `/health` | 容器探针，最小返回体 | ✅ D1 |
-| GET | `/api/health` | 运行时长、9 项能力开关（D2 起 `parse` / `clause_split` 为 true） | ✅ D2 |
+| GET | `/api/health` | 运行时长、10 项能力开关（D2 起 `parse` / `clause_split` 为 true） | ✅ D2 |
 | GET | `/api/info` | 智能体配置摘要 + 里程碑 + 免责声明 | ✅ D1 |
 | GET | `/api/rules` | 规则库（40 条 + 统计 + 指纹） | ✅ D4 |
 | GET | `/api/rules/{rule_id}` | 单条规则（含依据三态解析） | ✅ D4 |
@@ -246,8 +266,6 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | GET | `/api/documents` | 已解析文档列表 | ✅ D2 |
 | GET | `/api/doc/{doc_id}` | 解析全文（含 `full_text`、页码表、条款、字段） | ✅ D2 |
 | GET | `/api/doc/{doc_id}/raw` | 取原始文件（双栏对照用） | ✅ D2 |
-
-| POST | `/api/report` | 导出 docx/pdf | ⬜ D7 |
 
 ---
 
@@ -314,4 +332,7 @@ powershell -File tools/sync_to_agentshub.ps1
 - 风险扫描已含关键词 + 计算型规则（18 + 12 条自动判），但 **R25/R32/R33/R34/R36/R38/R39 仍未实现**（需多投标人比价或表格解析）；
 - **检出 100% / 误报 0% 是在自造合成样本上得到的**，与开发集同分布，不代表真实业务泛化能力；
 - 文档未载明最高投标限价时，R12/R13/R31 不参与判定（`scan_notes` 会说明，避免拿别的项目限价硬比）；
-- 前端尚未展示评审结果（当前只有接口与落盘 JSON），D8 补看板。
+- **双栏对照渲染的是解析后的纯文本**，不渲染原 PDF/docx 的版式与表格线；docx 无分页符时页码为估算，
+  跳转允许偏 1 页，页面与报告均标注「估算」；
+- **报告中心默认隐藏文档已不存在的历史评审**（右上角可切换显示），避免用户点到必然 404 的下载；
+- 前端为单机演示：没有登录/权限/多用户隔离，上传件与评审结果落盘在 `data/`（已 gitignore）。

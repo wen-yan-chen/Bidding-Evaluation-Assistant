@@ -1,6 +1,6 @@
 {
-  "updated": "2026-11-15",
-  "current": "D7",
+  "updated": "2026-11-16",
+  "current": "D8",
   "note": "页面与文档同源：改这里不用改前端。status 取 done / doing / planned。",
   "items": [
     {
@@ -42,8 +42,8 @@
       "id": "M5",
       "name": "前端看板",
       "day": "D8",
-      "status": "planned",
-      "target": "双栏对照、点击跳原文、换细则入口、报告中心、无占位按钮"
+      "status": "done",
+      "target": "评审看板（上传→选细则→评审→总分卡+三表）、双栏对照（点击定位并高亮）、报告中心（docx/pdf+大小+数值摘要）、换细则 68→62 可见、免责 banner 逐字、错误态可读、无占位按钮"
     },
     {
       "id": "M6",
@@ -54,41 +54,41 @@
     }
   ],
   "stage": {
-    "label": "D7 交付物",
+    "label": "D8 交付物",
     "items": [
       {
-        "item": "知识库切 40 分片（一文件一规则）",
-        "path": "knowledge/rules/",
+        "item": "评审看板（总分卡 + 三张结果表）",
+        "path": "web/index.html",
         "status": "done"
       },
       {
-        "item": "提示词 v3（7 工具 + 能力边界）",
-        "path": "prompt.md",
+        "item": "双栏对照与原文高亮",
+        "path": "web/app.js",
         "status": "done"
       },
       {
-        "item": "聊天附件解析（S3）",
-        "path": "api/s3fetch.py",
+        "item": "报告中心（下载 + 大小 + 数值摘要）",
+        "path": "web/app.js",
         "status": "done"
       },
       {
-        "item": "MCP 8 工具",
-        "path": "mcps/bid_review_mcp.py",
+        "item": "换细则重评与分项差值",
+        "path": "web/app.js",
         "status": "done"
       },
       {
-        "item": "报告九章装配",
-        "path": "api/report/builder.py",
+        "item": "前端样式与打印/响应式",
+        "path": "web/style.css",
         "status": "done"
       },
       {
-        "item": "docx / pdf 导出",
-        "path": "api/report/",
+        "item": "D8 三张页面截图",
+        "path": "docs/screenshots/",
         "status": "done"
       },
       {
-        "item": "报告数值一致性校验",
-        "path": "tools/check_report.py",
+        "item": "前端静态约束测试（三视图/免责/无 CDN）",
+        "path": "tests/test_web.py",
         "status": "done"
       }
     ]
