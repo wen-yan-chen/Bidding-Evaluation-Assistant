@@ -246,7 +246,7 @@
     <div class="view-head">
       <div>
         <h1 id="h-reports">报告中心</h1>
-        <p>最近评审与报告文件。下载走 <code>GET /api/report/{review_id}?format=docx|pdf</code>，文件大小与数值摘要来自 <code>/meta</code>。管理员可在「系统状态 → 数据管理」删除文档/报告。</p>
+        <p>最近评审与报告文件。下载走 <code>GET /api/report/{review_id}?format=docx|pdf</code>，文件大小与数值摘要来自 <code>/meta</code>。管理员登录后可在下方「数据管理」删除文档/报告。</p>
       </div>
       <div class="view-head-meta">
         <button class="btn" id="btn-toggle-stale" type="button" hidden>显示不可用记录</button>
@@ -291,6 +291,45 @@
         <code>python tools/check_report.py --all</code> 复核）。报告未生成时点下载会即时生成。
       </p>
     </section>
+
+    <div class="notice notice-info" id="admin-data-locked" role="status">
+      数据管理仅管理员可用。请先到 <a href="#status">系统状态</a> 登录管理员。
+    </div>
+
+      <section class="card card-wide" id="admin-data-card" hidden aria-labelledby="h-admin-data">
+        <div class="card-head">
+          <h2 id="h-admin-data">数据管理</h2>
+          <span class="card-hint" id="admin-summary">—</span>
+        </div>
+        <div class="admin-toolbar">
+          <input class="select admin-filter" id="admin-doc-filter" type="search" placeholder="筛选文件名 / doc_id">
+          <button class="btn btn-sm" id="btn-admin-refresh" type="button">刷新</button>
+          <button class="btn btn-sm btn-danger" id="btn-clean-duplicates" type="button">清理重复文档</button>
+          <button class="btn btn-sm btn-danger" id="btn-clean-orphans" type="button">清理无文档评审</button>
+        </div>
+        <div class="notice" id="admin-action-status" role="status" hidden></div>
+        <div class="admin-columns">
+          <div class="admin-col">
+            <h3>文档 <span class="muted" id="admin-doc-count"></span></h3>
+            <div class="table-wrap admin-scroll">
+              <table class="table admin-table">
+                <thead><tr><th>文件</th><th>doc_id</th><th>页数</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody id="admin-doc-body"><tr><td colspan="5" class="empty">登录后加载…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="admin-col">
+            <h3>评审与报告 <span class="muted" id="admin-review-count"></span></h3>
+            <div class="table-wrap admin-scroll">
+              <table class="table admin-table">
+                <thead><tr><th>评审</th><th>文件</th><th>总分</th><th>报告</th><th>操作</th></tr></thead>
+                <tbody id="admin-review-body"><tr><td colspan="5" class="empty">登录后加载…</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <p class="card-foot">删除不可恢复：删除文档会级联删除其评审与报告；删除报告只删 docx/pdf，保留评审可重新生成。批量清理前请确认。</p>
+      </section>
 
     <div class="notice notice-info" id="report-status" role="status" hidden></div>
   </section>
@@ -418,40 +457,6 @@
         <ul class="deliver-list" id="deliver-list"><li class="empty">加载中…</li></ul>
       </section>
 
-      <section class="card card-wide" id="admin-data-card" hidden aria-labelledby="h-admin-data">
-        <div class="card-head">
-          <h2 id="h-admin-data">数据管理</h2>
-          <span class="card-hint" id="admin-summary">—</span>
-        </div>
-        <div class="admin-toolbar">
-          <input class="select admin-filter" id="admin-doc-filter" type="search" placeholder="筛选文件名 / doc_id">
-          <button class="btn btn-sm" id="btn-admin-refresh" type="button">刷新</button>
-          <button class="btn btn-sm btn-danger" id="btn-clean-duplicates" type="button">清理重复文档</button>
-          <button class="btn btn-sm btn-danger" id="btn-clean-orphans" type="button">清理无文档评审</button>
-        </div>
-        <div class="notice" id="admin-action-status" role="status" hidden></div>
-        <div class="admin-columns">
-          <div class="admin-col">
-            <h3>文档 <span class="muted" id="admin-doc-count"></span></h3>
-            <div class="table-wrap admin-scroll">
-              <table class="table admin-table">
-                <thead><tr><th>文件</th><th>doc_id</th><th>页数</th><th>状态</th><th>操作</th></tr></thead>
-                <tbody id="admin-doc-body"><tr><td colspan="5" class="empty">登录后加载…</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-          <div class="admin-col">
-            <h3>评审与报告 <span class="muted" id="admin-review-count"></span></h3>
-            <div class="table-wrap admin-scroll">
-              <table class="table admin-table">
-                <thead><tr><th>评审</th><th>文件</th><th>总分</th><th>报告</th><th>操作</th></tr></thead>
-                <tbody id="admin-review-body"><tr><td colspan="5" class="empty">登录后加载…</td></tr></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        <p class="card-foot">删除不可恢复：删除文档会级联删除其评审与报告；删除报告只删 docx/pdf，保留评审可重新生成。批量清理前请确认。</p>
-      </section>
     </div>
   </section>
 
@@ -459,7 +464,7 @@
 
 <footer class="pagefoot">
   <p>
-    D8–D9 已上线：<strong>评审看板 / 双栏对照 / 报告中心 / Skill 挂载</strong>。所有数字来自接口，未完成的按钮不做占位，能力边界在「系统状态」如实标注。
+    本工具用于投标文件解析、资格性核验、分项评分与风险扫描；页面数字均来自接口，结果仅供评标参考。
   </p>
   <p class="pagefoot-sub">
     课题 8 · 招投标评审助手 ｜ 魔擎开发者激励 1 期 ｜ 模拟数据，不含任何真实招投标信息 ｜ MIT

@@ -203,6 +203,7 @@ function setView(name, opts = {}) {
     if (!state.reportsLoaded) loadReports();
     else hydrateReportMeta(state.reviews.slice(0, MAX_REPORT_ROWS));
   }
+  if (view === 'reports') enterReportsAdmin();
   if (view === 'status') enterStatusView();
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
@@ -1540,6 +1541,7 @@ function showAdminLock(message = '') {
   $('status-lock').hidden = false;
   $('status-content').hidden = true;
   $('admin-data-card').hidden = true;
+  if ($('admin-data-locked')) $('admin-data-locked').hidden = false;
   $('btn-admin-logout').hidden = true;
   $('btn-refresh').hidden = true;
   if (message) setNotice('admin-status', 'warn', message);
@@ -1550,8 +1552,29 @@ function showAdminContent() {
   $('status-lock').hidden = true;
   $('status-content').hidden = false;
   $('admin-data-card').hidden = false;
+  if ($('admin-data-locked')) $('admin-data-locked').hidden = true;
   $('btn-admin-logout').hidden = false;
   $('btn-refresh').hidden = false;
+}
+
+async function enterReportsAdmin() {
+  if (!state.adminAuthenticated) {
+    const session = await safe(api('/api/admin/session', { timeout: 6000 }));
+    if (session.ok && session.data && session.data.authenticated) {
+      state.adminAuthenticated = true;
+      state.adminUser = session.data.user || 'admin';
+    }
+  }
+  const lock = $('admin-data-locked');
+  const card = $('admin-data-card');
+  if (state.adminAuthenticated) {
+    if (lock) lock.hidden = true;
+    if (card) card.hidden = false;
+    await loadAdminData();
+  } else {
+    if (lock) lock.hidden = false;
+    if (card) card.hidden = true;
+  }
 }
 
 async function enterStatusView() {
