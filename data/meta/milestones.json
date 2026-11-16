@@ -1,6 +1,6 @@
 {
   "updated": "2026-11-16",
-  "current": "D8",
+  "current": "D9",
   "note": "页面与文档同源：改这里不用改前端。status 取 done / doing / planned。",
   "items": [
     {
@@ -49,46 +49,46 @@
       "id": "M6",
       "name": "评测与交付",
       "day": "D9–D10",
-      "status": "planned",
-      "target": "25 份样本 + 15 份植入风险样本 + 标注；六条验收标准逐项有数字；干净环境 docker compose up 一次成功"
+      "status": "doing",
+      "target": "D9：4 Skill 挂载、scan_risks 23 口径、测试报告/留出集/USAGE；D10：专家双盲、演示视频、PR"
     }
   ],
   "stage": {
-    "label": "D8 交付物",
+    "label": "D9 交付物",
     "items": [
       {
-        "item": "评审看板（总分卡 + 三张结果表）",
-        "path": "web/index.html",
+        "item": "4 个 Skill 上传并随 agent v5 发布",
+        "path": "skills/",
         "status": "done"
       },
       {
-        "item": "双栏对照与原文高亮",
-        "path": "web/app.js",
+        "item": "scan_risks 口径修正（18→23）",
+        "path": "mcps/bid_review_mcp.py",
         "status": "done"
       },
       {
-        "item": "报告中心（下载 + 大小 + 数值摘要）",
-        "path": "web/app.js",
+        "item": "六条验收测试报告",
+        "path": "docs/TEST_REPORT.md",
         "status": "done"
       },
       {
-        "item": "换细则重评与分项差值",
-        "path": "web/app.js",
+        "item": "留出集单独成绩",
+        "path": "docs/留出集单独成绩.md",
         "status": "done"
       },
       {
-        "item": "前端样式与打印/响应式",
-        "path": "web/style.css",
+        "item": "使用文档",
+        "path": "USAGE.md",
         "status": "done"
       },
       {
-        "item": "D8 三张页面截图",
-        "path": "docs/screenshots/",
+        "item": "D9 自测与交接",
+        "path": "docs/D9-交接文档.docx",
         "status": "done"
       },
       {
-        "item": "前端静态约束测试（三视图/免责/无 CDN）",
-        "path": "tests/test_web.py",
+        "item": "版本 v0.9.0",
+        "path": "VERSION",
         "status": "done"
       }
     ]

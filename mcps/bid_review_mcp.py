@@ -26,6 +26,7 @@ if str(ROOT) not in sys.path:
 
 from mcp.server.fastmcp import FastMCP  # noqa: E402
 
+from api import checks as checks_api  # noqa: E402
 from api import rules as rules_api  # noqa: E402
 from api import store  # noqa: E402
 
@@ -102,6 +103,10 @@ def scan_risks(doc_id: str, rule_ids: list[str] | None = None) -> dict[str, Any]
     `rule_ids` 为空时扫描全部可自动检测的规则；每条命中返回
     `rule_id / level / page / char_start / char_end / quote / legal_basis / basis_status`。
     只做字面量匹配，不做语义推理；`basis_status=pending` 时 legal_basis 为「未检索到权威依据」。
+
+    计数口径：`scanned_rules = 关键词规则 + 已实现的计算型规则`（默认 18 + 5 = 23）；
+    另返回 `scanned_pattern_rules` / `scanned_price_rules` / `manual_rule_ids` /
+    `unimplemented_rule_ids` / `scan_notes`，避免模型把「只扫了 18 条关键词」误报成总数。
     """
     doc, err = _load(doc_id)
     if err:
@@ -118,11 +123,23 @@ def scan_risks(doc_id: str, rule_ids: list[str] | None = None) -> dict[str, Any]
 
     hits = rules_api.scan_doc(doc, selected)
     hits.sort(key=lambda h: ({"高": 0, "中": 1, "低": 2}.get(h["level"], 3), h["page"], h["char_start"]))
+
+    # scanned_rules 必须等于「实际执行的自动规则」：关键词规则 + 已实现的计算型规则。
+    # 只数 pattern 会漏掉 R12/R13/R17/R31/R37 这 5 条计算型，模型会误说“只扫了 18 条”。
+    pattern_rules = [r for r in selected if r.detect == "pattern"]
+    price_rules = [r for r in selected if r.detect == "price" and r.id in checks_api.CHECKS]
+    unimplemented = [r.id for r in selected if r.detect == "price" and r.id not in checks_api.CHECKS]
+    manual_ids = [r.id for r in selected if r.detect == "manual"]
     return {
         "doc_id": doc.doc_id,
         "rule_digest": rules_api.rules_digest(),
         "rule_total": len(all_rules),
-        "scanned_rules": len([r for r in selected if r.detect == "pattern"]),
+        "scanned_rules": len(pattern_rules) + len(price_rules),
+        "scanned_pattern_rules": len(pattern_rules),
+        "scanned_price_rules": len(price_rules),
+        "manual_rule_ids": manual_ids,
+        "unimplemented_rule_ids": unimplemented,
+        "scan_notes": rules_api.scan_notes(doc, selected),
         "hit_count": len(hits),
         "hits": hits,
         "missing_rule_ids": missing,

@@ -113,6 +113,14 @@ def test_mcp_tools_direct_call():
     scanned = mcp_tools.scan_risks(doc.doc_id)
     assert scanned["hit_count"] == len(scanned["hits"])
     assert scanned["rule_digest"] == rules_api.rules_digest()
+    # 自动规则 = 18 条关键词 + 5 条已实现计算型（R12/R13/R17/R31/R37）
+    assert scanned["scanned_rules"] == 23
+    assert scanned["scanned_pattern_rules"] == 18
+    assert scanned["scanned_price_rules"] == 5
+    assert len(scanned["manual_rule_ids"]) == 10
+    assert len(scanned["unimplemented_rule_ids"]) == 7
+    assert scanned["scan_notes"]
+    assert scanned["scanned_rules"] + len(scanned["manual_rule_ids"]) + len(scanned["unimplemented_rule_ids"]) == 40
 
     quote = doc.fields[0].quote
     located = mcp_tools.locate_span(doc.doc_id, quote)

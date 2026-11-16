@@ -2,6 +2,48 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与语义化版本。
 
+## [0.9.0] — 2026-11-16（D9 Skill 挂载 + 评测交付）
+
+### Added
+
+- `skills/`：4 个可上传 Skill 包（`bid-rule-cards` / `missing-qualification` /
+  `bid-risk-selfcheck` / `summary-compiler`），每个 zip 根目录一个 `SKILL.md`，含 YAML frontmatter
+  （`name` / `description` / `allowed-tools`）与四段正文（When to use / Inputs / Outputs / Hard rules）。
+- 平台侧：4 个 Skill 已上传；Nexent agent v5「招投标评审助手-2611161002」于 2026-11-16 10:02 发布；
+  平台文件与本地 `SKILL.md` SHA256 逐字节一致。
+- `docs/TEST_REPORT.md`：六条验收标准逐项数字、证据、差距（专家双盲项如实标遗留）。
+- `docs/留出集单独成绩.md`：dev / holdout 单独成绩（检出 100%、误报 0%）。
+- `USAGE.md`：页面 / API / MCP / 报告 / 排错。
+- `docs/D9-自测记录.md`、`docs/D9-交接文档.md` / `.docx`。
+
+### Fixed
+
+- `mcps/bid_review_mcp.py`：`scan_risks.scanned_rules` 旧实现只统计关键词规则（18），
+  漏掉 5 条已实现的计算型规则（R12/R13/R17/R31/R37）。现改为 **23**，并新增
+  `scanned_pattern_rules` / `scanned_price_rules` / `manual_rule_ids` /
+  `unimplemented_rule_ids` / `scan_notes`；平台输出不再出现 18 + 10 + 7 ≠ 40。
+- `tests/test_rules.py`：锁定 23 + 10 + 7 = 40；`tests/test_health.py`：锁定 `skills=true`。
+
+### Changed
+
+- `agent.json`：第四个 Skill 由 `risk-selfcheck` 改为唯一名 `bid-risk-selfcheck`
+  （平台已有 32 题 contract-review 的同名技能，不能覆盖）。
+- `api/routes/health.py`：`skills` 能力开关置 `true`。
+- 前端状态页：Skill 卡片显示「已挂载 4 个」；能力边界把“Skill 待 D9”改为已上线。
+- `VERSION` / `docker-compose.yml`：`0.9.0`；默认 `APP_TAG=0.9.0`。
+- README / milestones / docs README 同步到 D9。
+
+### Verified
+
+- Skill：4 个平台文件与本地 SHA256 一致；`agent_update` / `agent_version_publish` 审计成功；
+  平台对话输出「扫描 23 条（18+5），命中 0」。
+- 解析：25/25 = 100%；字段 146/146 = 100%；
+- 风险：15/15 = 100%；误报 0/20 = 0%（dev 10/10、holdout 5/5）；
+- 溯源：`validate_quotes.py` 0 处不一致；
+- 报告：`check_report.py --all` 50/50；
+- `pytest` **49 passed**；`smoke_test.py` **10/10**；`agent_config.py check` OK 11 / WARN 0 / ERROR 0。
+- 已知缺口：真实专家双盲评分缺失，`TEST_REPORT.md` 第 2 条标为遗留。
+
 ## [0.8.0] — 2026-11-16（D8 评审看板 + 双栏对照 + 报告中心）
 
 ### Added

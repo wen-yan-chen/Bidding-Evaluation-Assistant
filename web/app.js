@@ -1580,7 +1580,7 @@ async function refreshStatus(opts = {}) {
 
   renderChecks(rows);
   renderRuntime(bodyAh, app);
-  renderPlatform(bodyInfo.agent || {});
+  renderPlatform(bodyInfo.agent || {}, (bodyAh.capabilities) || {});
   renderMilestones(bodyInfo.milestones || null);
   $('check-stamp').textContent = rows.every((row) => row.ok)
     ? `最近检测 ${fmtDateTime(new Date().toISOString())} · 每 15 秒自动复检`
@@ -1617,7 +1617,7 @@ function fmtUptime(sec) {
   return `${h} 小时 ${m % 60} 分`;
 }
 
-function renderPlatform(agent) {
+function renderPlatform(agent, caps = {}) {
   if (!agent || !agent.configured) {
     $('k-mcp-tools').textContent = '0';
     $('k-skill').textContent = '0';
@@ -1629,7 +1629,14 @@ function renderPlatform(agent) {
   $('badge-mcp').textContent = tools.length ? '已登记 · 待挂载' : '待接入';
   const skills = agent.skills || [];
   $('k-skill').textContent = String(skills.length);
-  $('badge-skill').textContent = skills.length ? '已登记 · 待挂载' : '待接入';
+  $('skill-value-label').textContent = caps.skills ? '个已挂载' : '个已登记';
+  if (caps.skills) {
+    $('badge-skill').textContent = `已挂载 ${skills.length} 个`;
+    $('badge-skill').className = 'badge badge-done';
+  } else {
+    $('badge-skill').textContent = skills.length ? '已登记 · 待挂载' : '待接入';
+    $('badge-skill').className = 'badge badge-todo';
+  }
   if (agent.kb_index_ready) {
     $('k-kb').textContent = `索引已配置（${agent.kb_index_count} 个）`;
     $('badge-kb').textContent = '已就绪';

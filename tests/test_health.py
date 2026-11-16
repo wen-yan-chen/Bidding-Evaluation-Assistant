@@ -30,8 +30,8 @@ def test_api_health_has_capability_switches():
     resp = client.get("/api/health")
     assert resp.status_code == 200
     caps = resp.json()["capabilities"]
-    assert set(caps) >= {"parse", "qualification", "scoring", "risk_scan", "report_export"}
-    # D2–D7 已上线的能力为 true，没做的能力不能提前标 true
+    assert set(caps) >= {"parse", "qualification", "scoring", "risk_scan", "report_export", "skills"}
+    # D2–D9 已上线的能力为 true，没做的能力不能提前标 true
     assert caps["parse"] is True
     assert caps["clause_split"] is True
     assert caps["ocr"] is True
@@ -39,6 +39,7 @@ def test_api_health_has_capability_switches():
     assert caps["scoring"] is True
     assert caps["risk_scan"] is True
     assert caps["report_export"] is True
+    assert caps["skills"] is True
 
 
 def test_version_comes_from_version_file():

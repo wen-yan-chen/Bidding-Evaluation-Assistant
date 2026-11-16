@@ -1,10 +1,9 @@
 # 招投标评审助手
 
 > 魔擎开发者激励 1 期 · 课题 8 · 政企采购 · 中级（¥6,000）
-> 当前版本 **v0.8.0（D8）**：前端**评审看板**上线——上传/选文档 → 选评分细则 → 评审 → 总分卡 +
-> 资格性/分项/风险三张结果表；**双栏对照**点击结果定位原文并高亮；**报告中心**支持 docx/pdf 下载、
-> 文件大小与数值摘要。后端沿用 D7 能力（解析含 OCR、40 条规则、两套细则、风险扫描、报告导出）。
-> 样本 25 份（20 文本层 + 5 扫描件），解析 25/25、字段 146/146；风险检出 100%、误报 0%。
+> 当前版本 **v0.9.0（D9）**：4 个自定义 Skill 已上传并随 Nexent agent v5 发布；`scan_risks` 口径修正为
+> **23 条**（18 关键词 + 5 计算型）；补齐 **测试报告 / 留出集单独成绩 / USAGE**。D8 的评审看板、
+> 双栏对照、报告中心继续可用；样本 25 份，解析 25/25、字段 146/146；风险检出 100%、误报 0%。
 
 面向政企采购场景的招投标文件辅助评审系统：解析招标/投标文件并**溯源到页码**，按招标文件的评分细则**逐项算分**，按 40 条规则库核验**资格性与合规风险**，输出可**点击跳回原文**的风险清单与可下载的审核报告。
 
@@ -15,6 +14,26 @@
 ---
 
 ## 一、当前进度
+
+### D9 评测与交付（v0.9.0）
+
+| D9 任务 | 交付物 | 状态 | 验证方式 |
+| --- | --- | :-: | --- |
+| 4 个 Skill 上传 | `bid-rule-cards` / `missing-qualification` / `bid-risk-selfcheck` / `summary-compiler` | ✅ | 平台文件与本地 SHA256 一致；10:02:48 agent v5 发布 |
+| 平台同名冲突 | 第四个 Skill 用唯一名 `bid-risk-selfcheck` | ✅ | 未覆盖 32 题 contract-review 的 `risk-selfcheck` |
+| `scan_risks` 口径 | `scanned_rules` 18 → **23**（+5 计算型）+ breakdown / scan_notes | ✅ | MCP 直调 23/18/5/0；回归断言 23+10+7=40 |
+| 测试报告 | `docs/TEST_REPORT.md` | ✅ | 六条标准逐项数字；专家双盲缺口如实标注 |
+| 留出集成绩 | `docs/留出集单独成绩.md` | ✅ | dev 10/10、holdout 5/5、误报 0/20 |
+| 使用文档 | `USAGE.md` | ✅ | 页面 / API / MCP / 排错 |
+| 回归 | smoke / pytest / check_report | ✅ | 10/10、49 passed、50/50 |
+
+**D9 验收**：4 个 Skill 已挂载（`/api/health` 的 `skills=true`）；平台对话显示「扫描 23 条（18+5），命中 0」；
+`bid-001` 仍为 **68.0 / 资格性 4/6 / 风险 0**；`pytest` **49 passed**、`smoke_test.py` **10/10**；
+`check_report.py --all` **50/50**。证据见 [`docs/D9-自测记录.md`](docs/D9-自测记录.md)，
+交接见 [`docs/D9-交接文档.md`](docs/D9-交接文档.md)，六条标准见 [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md)，
+状态页截图见 [`docs/screenshots/D9-技能挂载.png`](docs/screenshots/D9-技能挂载.png)。
+
+> 第 2 条「专家评分 ±5 分」没有真实专家双盲数据：不伪造，`TEST_REPORT.md` 标为遗留，D10 前补 10–15 份专家评分。
 
 ### D8 评审看板 + 双栏对照 + 报告中心（v0.8.0）
 
@@ -204,7 +223,7 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 ├── prompt.md                # 系统提示词唯一来源，agent.json.prompt 由脚本同步
 ├── knowledge/               # 知识库资产：rules-full.md（40 块）+ manifest 指纹 ✅
 ├── mcps/                    # MCP 工具服务：bid_review_mcp.py（8 个工具）✅
-├── skills/                  # 4 个自定义 Skill（D5）                          —— 待填充
+├── skills/                  # 4 个自定义 Skill（zip + SKILL.md，D9 已上传）
 ├── docs/                    # 交接文档、自测记录、测试报告、截图、演示视频
 ├── tools/                   # 配置校验 / 冒烟 / 样本生成 / 溯源校验 / 指标复算 / fork 同步
 ├── tests/                   # pytest：接口 + 解析链路单测
@@ -222,13 +241,13 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | # | 交付物 | 路径 | 状态 |
 | :-: | --- | --- | :-: |
 | 1 | 前端工程 | `web/` | ✅ D8 评审看板 + 双栏对照 + 报告中心 |
-| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | 🟡 解析 + MCP + 评审 + 报告已通，Skill 挂载待 D9 |
+| 2 | 后端智能体工程 | `agent.json` `prompt.md` `mcps/` `skills/` `api/` | ✅ 解析 + MCP + 评审 + 报告 + 4 Skill 已挂载 |
 | 3 | 知识库资产 | `knowledge/` | 🟡 D4 已导出并导入（40 块，指纹一致） |
 | 4 | 模拟数据 | `data/samples/` | 🟡 已有 25 份（20 文本层 + 5 扫描件）+ 15 份植入风险 + 3 份边界 + 标注（见 `docs/数据说明.md`） |
 | 5 | 部署文档 | `DEPLOY.md` `docker-compose.yml` | ✅ D1 已可部署，D8 镜像 v0.8.0 |
-| 6 | 使用文档 | `USAGE.md` | ⬜ D9 |
+| 6 | 使用文档 | `USAGE.md` | ✅ D9 |
 | 7 | 演示视频 | `docs/video/` | ⬜ D10 |
-| 8 | 测试报告 | `docs/TEST_REPORT.md` | ⬜ D9 |
+| 8 | 测试报告 | `docs/TEST_REPORT.md` | ✅ D9 |
 
 ---
 
@@ -239,7 +258,7 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | 智能体编排 | `max_steps=15`；4 个 Skill 分阶段；步骤/终局校验开启 | 草案 | `agent.json` |
 | 工具调用 | MCP 已实现 8 个（解析 / 核验 / 评分 / 扫描 / 定位 / 导出 / 文档列表 / 聊天附件），D4–D7 渐进补齐 | 服务已上线（8765），平台登记待导入 | `mcps/`、`agent.json` → `mcp_info` |
 | 知识库挂载 | 40 条规则一块一条，`bge-m3` 1024 维，`hybrid` + `top_k=3` | 已导入（索引 `4-5897…`） | `agent.json` → `index_names` |
-| 自定义 Skill | `bid-rule-cards` / `missing-qualification` / `risk-selfcheck` / `summary-compiler` | 已登记未上传（D5） | `skills/` |
+| 自定义 Skill | `bid-rule-cards` / `missing-qualification` / `bid-risk-selfcheck` / `summary-compiler` | 4 个已上传，agent v5 已发布（2026-11-16 10:02） | `skills/` |
 
 > 页面「平台能力接入」卡片直接读 `agent.json` 判断状态：**登记 ≠ 可用**，未落地一律显示"待接入"。
 > ⚠️ 导入到其他环境前必须替换 `index_names`（格式 `<序号>-<hash>`），否则检索被权限过滤，依据会退化成"未检索到权威依据"。
@@ -335,4 +354,8 @@ powershell -File tools/sync_to_agentshub.ps1
 - **双栏对照渲染的是解析后的纯文本**，不渲染原 PDF/docx 的版式与表格线；docx 无分页符时页码为估算，
   跳转允许偏 1 页，页面与报告均标注「估算」；
 - **报告中心默认隐藏文档已不存在的历史评审**（右上角可切换显示），避免用户点到必然 404 的下载；
-- 前端为单机演示：没有登录/权限/多用户隔离，上传件与评审结果落盘在 `data/`（已 gitignore）。
+- 前端为单机演示：没有登录/权限/多用户隔离，上传件与评审结果落盘在 `data/`（已 gitignore）；
+- **专家评分双盲缺失**：没有真实专家对同一批样本的独立评分，`TEST_REPORT.md` 第 2 条标为遗留，
+  不伪造 ±5 分比例；D10 前补 10–15 份专家评分；
+- 平台已有 32 题 contract-review 的同名 `risk-selfcheck`，本项目 Skill 使用唯一名 `bid-risk-selfcheck`，
+  勿混用。

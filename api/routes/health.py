@@ -54,7 +54,7 @@ def health_detail() -> dict[str, Any]:
             "report_export": True,   # D7 docx/pdf 报告导出（九章 + 双指纹）
             "mcp": True,           # D4 MCP 工具服务（compose 内 mcp 服务，8765）
             "knowledge_base": True,   # D4 知识库（平台已导入，检索命中 R12）
-            "skills": False,       # D5 Skill 挂载
+            "skills": True,        # D9 四个 Skill 已上传并随 agent v5 发布
         },
         "disclaimer": config.DISCLAIMER,
     }
