@@ -7,13 +7,27 @@ from pathlib import Path
 from docx import Document
 from fastapi.testclient import TestClient
 from pypdf import PdfReader
+import pytest
 
+from api import store
 from api.main import app
 from api.report import service as report_service
+from api.review import service as review_service
 
 ROOT = Path(__file__).resolve().parent.parent
 SAMPLES = ROOT / "data" / "samples"
 client = TestClient(app)
+CREATED: list[tuple[str, str]] = []
+
+
+@pytest.fixture(autouse=True)
+def _cleanup_created():
+    CREATED.clear()
+    yield
+    for review_id, doc_id in CREATED:
+        report_service.delete_reports(review_id)
+        review_service.delete(review_id)
+        store.delete_doc(doc_id)
 
 
 def _make_review() -> dict:
@@ -26,7 +40,9 @@ def _make_review() -> dict:
     doc_id = upload.json()["doc_id"]
     created = client.post("/api/review", json={"doc_id": doc_id, "profile_id": "profile-a"})
     assert created.status_code == 200
-    return created.json()
+    review = created.json()
+    CREATED.append((review["review_id"], doc_id))
+    return review
 
 
 def _docx_text(path: Path) -> str:

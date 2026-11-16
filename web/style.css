@@ -936,6 +936,67 @@ mark.hit {
 .pagefoot strong { color: var(--ink-2); font-weight: 600; }
 .pagefoot-sub { color: #9aa4b8; }
 
+/* ---------------------------------------------------------------- 管理员入口 / 数据管理 */
+
+.btn-danger { color: var(--danger); background: var(--danger-soft); border-color: #f2c5bf; }
+.btn-danger:hover:not(:disabled) { background: #fbdedb; }
+
+.admin-lock { max-width: 680px; margin: 0 auto 16px; padding: 22px 24px; }
+.admin-lock .card-head { margin-bottom: 14px; }
+.admin-login {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 10px 12px;
+  align-items: end;
+}
+.admin-field { display: grid; gap: 5px; font-size: 12px; color: var(--ink-3); }
+.admin-field input {
+  width: 100%;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  border: 1px solid #d7dfec;
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+}
+.admin-field input:focus { outline: 2px solid var(--brand); outline-offset: 1px; }
+.admin-login .btn { height: 37px; }
+
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 10px;
+}
+.admin-filter { max-width: 320px; flex: 1 1 220px; }
+
+.admin-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 14px;
+}
+.admin-col { min-width: 0; }
+.admin-col h3 {
+  margin: 2px 0 7px;
+  font-size: 13px;
+  color: var(--ink-2);
+  font-weight: 700;
+}
+.admin-scroll { max-height: 360px; overflow: auto; border: 1px solid var(--line); border-radius: 9px; }
+.admin-table { font-size: 12px; min-width: 520px; }
+.admin-table th { position: sticky; top: 0; z-index: 1; }
+.admin-table th, .admin-table td { padding: 6px 8px; }
+.admin-table td:first-child { font-weight: 400; }
+.admin-table .admin-file { color: var(--ink-2); word-break: break-all; }
+.admin-table .admin-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.admin-table .locator { font-size: 10.5px; }
+.admin-summary { font-size: 12px; color: var(--ink-3); }
+.admin-empty { color: var(--ink-3); font-size: 12.5px; }
+
+.cap-list li strong { color: var(--ink); font-weight: 700; margin-right: 2px; }
+
 /* ---------------------------------------------------------------- 响应式 */
 
 @media (max-width: 1500px) {
@@ -955,6 +1016,9 @@ mark.hit {
   .dual { grid-template-columns: 1fr; }
   .dual-pane + .dual-pane { border-left: 0; border-top: 1px solid var(--line); }
   .pages, .evidence-list { max-height: 460px; }
+  .admin-columns { grid-template-columns: 1fr; }
+  .admin-login { grid-template-columns: 1fr 1fr; }
+  .admin-login .btn { grid-column: 1 / -1; width: 100%; }
 }
 
 @media (max-width: 760px) {
@@ -974,6 +1038,10 @@ mark.hit {
   .score-card { padding: 16px; }
   .score-value > span:first-child { font-size: 42px; }
   .result-grid { gap: 10px; }
+  .admin-login { grid-template-columns: 1fr; }
+  .admin-login .btn { width: 100%; }
+  .admin-toolbar .btn { flex: 1 1 auto; }
+  .admin-filter { max-width: none; flex-basis: 100%; }
 }
 
 /* ---------------------------------------------------------------- 打印 */

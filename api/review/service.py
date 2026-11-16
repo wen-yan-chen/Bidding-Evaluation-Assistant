@@ -114,3 +114,29 @@ def list_reviews(limit: int = 50) -> list[dict[str, Any]]:
             }
         )
     return items
+
+
+def list_for_doc(doc_id: str) -> list[dict[str, Any]]:
+    """返回引用某文档的全部评审（管理员级联删除用）。"""
+    if not REVIEWS_DIR.exists():
+        return []
+    items: list[dict[str, Any]] = []
+    for path in REVIEWS_DIR.glob("rv-*.json"):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if data.get("doc_id") == doc_id:
+            items.append(data)
+    return items
+
+
+def delete(review_id: str) -> bool:
+    """删除评审 JSON；文件名只接受 rv- 开头的安全 ID。"""
+    if not review_id or not review_id.startswith("rv-") or "/" in review_id or "\\" in review_id:
+        return False
+    path = REVIEWS_DIR / f"{review_id}.json"
+    if not path.exists():
+        return False
+    path.unlink()
+    return True

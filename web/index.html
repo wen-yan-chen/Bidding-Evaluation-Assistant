@@ -246,7 +246,7 @@
     <div class="view-head">
       <div>
         <h1 id="h-reports">报告中心</h1>
-        <p>最近评审与报告文件。下载走 <code>GET /api/report/{review_id}?format=docx|pdf</code>，文件大小与数值摘要来自 <code>/meta</code>。</p>
+        <p>最近评审与报告文件。下载走 <code>GET /api/report/{review_id}?format=docx|pdf</code>，文件大小与数值摘要来自 <code>/meta</code>。管理员可在「系统状态 → 数据管理」删除文档/报告。</p>
       </div>
       <div class="view-head-meta">
         <button class="btn" id="btn-toggle-stale" type="button" hidden>显示不可用记录</button>
@@ -300,97 +300,159 @@
     <div class="view-head">
       <div>
         <h1 id="h-status">系统状态</h1>
-        <p>服务自检、运行信息、平台能力与里程碑。数据全部来自 <code>/health</code>、<code>/api/health</code>、<code>/api/info</code>。</p>
+        <p>管理员登录后可查看服务自检、平台能力、里程碑与数据管理。数据来自 <code>/health</code>、<code>/api/health</code>、<code>/api/info</code>。</p>
       </div>
       <div class="view-head-meta">
-        <button class="btn" id="btn-refresh" type="button">重新自检</button>
+        <button class="btn" id="btn-admin-logout" type="button" hidden>退出管理员</button>
+        <button class="btn" id="btn-refresh" type="button" hidden>重新自检</button>
       </div>
     </div>
 
-    <div class="status-grid">
-      <section class="card card-selfcheck" aria-labelledby="h-selfcheck">
+    <section class="card admin-lock" id="status-lock" aria-labelledby="h-admin-login">
+      <div class="card-head">
+        <h2 id="h-admin-login">管理员登录</h2>
+        <span class="card-hint">系统状态与数据管理仅管理员可见</span>
+      </div>
+      <form id="admin-login-form" class="admin-login" autocomplete="on">
+        <label class="admin-field">
+          <span>管理员账号</span>
+          <input id="admin-user" name="username" autocomplete="username" required placeholder="请输入账号">
+        </label>
+        <label class="admin-field">
+          <span>密码</span>
+          <input id="admin-pass" name="password" type="password" autocomplete="current-password" required placeholder="请输入密码">
+        </label>
+        <button class="btn btn-primary" id="btn-admin-login" type="submit">登录</button>
+      </form>
+      <div class="notice" id="admin-status" role="status" hidden></div>
+      <p class="hint">账号由 <code>.env</code> 的 <code>ADMIN_USER</code> / <code>ADMIN_PASSWORD</code> 配置；未配置时登录不可用。登录后 8 小时内有效，可随时退出。</p>
+    </section>
+
+    <div id="status-content" hidden>
+      <div class="status-grid">
+        <section class="card card-selfcheck" aria-labelledby="h-selfcheck">
+          <div class="card-head">
+            <h2 id="h-selfcheck">服务自检</h2>
+            <span class="card-hint" id="check-stamp">尚未检测</span>
+          </div>
+          <ul class="check-list" id="check-list" aria-live="polite">
+            <li class="check-row is-pending"><span class="dot"></span><span class="check-name">等待首次检测…</span></li>
+          </ul>
+          <p class="card-foot">页面每 15 秒自动复检一次；数据全部来自接口，无写死的状态。</p>
+        </section>
+
+        <section class="card" aria-labelledby="h-runtime">
+          <div class="card-head"><h2 id="h-runtime">运行信息</h2></div>
+          <dl class="kv">
+            <dt>服务名</dt><dd id="k-service">—</dd>
+            <dt>版本</dt><dd id="k-version">—</dd>
+            <dt>环境</dt><dd id="k-env">—</dd>
+            <dt>启动时间</dt><dd id="k-started">—</dd>
+            <dt>已运行</dt><dd id="k-uptime">—</dd>
+            <dt>容器内运行</dt><dd id="k-container">—</dd>
+          </dl>
+        </section>
+
+        <section class="card" aria-labelledby="h-platform">
+          <div class="card-head">
+            <h2 id="h-platform">平台能力接入</h2>
+            <span class="card-hint" id="platform-hint">校验中</span>
+          </div>
+          <div class="plat-grid">
+            <div class="plat">
+              <div class="plat-head"><span class="plat-name">MCP 工具</span><span class="badge badge-todo" id="badge-mcp">待接入</span></div>
+              <p class="plat-value"><span id="k-mcp-tools">—</span> <span id="mcp-value-label">个已登记</span></p>
+              <p class="plat-note">解析 / 核验 / 评分 / 扫描 / 定位 / 导出 / 文档列表 / 聊天附件（8 个）</p>
+            </div>
+            <div class="plat">
+              <div class="plat-head"><span class="plat-name">知识库</span><span class="badge badge-todo" id="badge-kb">待接入</span></div>
+              <p class="plat-value"><span id="k-kb">—</span></p>
+              <p class="plat-note">40 条规则按节切分，索引 <code>4-5897…</code></p>
+            </div>
+            <div class="plat">
+              <div class="plat-head"><span class="plat-name">自定义 Skill</span><span class="badge badge-todo" id="badge-skill">待接入</span></div>
+              <p class="plat-value"><span id="k-skill">—</span> <span id="skill-value-label">个已登记</span></p>
+              <p class="plat-note">规则卡 / 缺项判定 / 输出自检 / 摘要成文（4 个）</p>
+            </div>
+          </div>
+          <p class="card-foot">MCP 由本机 <code>8765</code> 提供，平台登记为 <code>host.docker.internal:8765/sse</code>；登记与运行状态分开显示。</p>
+        </section>
+      </div>
+
+      <section class="card card-wide" aria-labelledby="h-frontend">
         <div class="card-head">
-          <h2 id="h-selfcheck">服务自检</h2>
-          <span class="card-hint" id="check-stamp">尚未检测</span>
+          <h2 id="h-frontend">项目能力总览（D1–D9）</h2>
+          <span class="card-hint">全部已上线</span>
         </div>
-        <ul class="check-list" id="check-list" aria-live="polite">
-          <li class="check-row is-pending"><span class="dot"></span><span class="check-name">等待首次检测…</span></li>
+        <ul class="cap-list">
+          <li><span class="badge badge-done">D1</span><strong>骨架与部署</strong>：compose 单容器起服务、<code>/health</code> 探针、状态页</li>
+          <li><span class="badge badge-done">D2</span><strong>解析与溯源</strong>：25 份样本、146 字段、页码 + 字符偏移 + quote</li>
+          <li><span class="badge badge-done">D3</span><strong>扫描件 OCR</strong>：5 份扫描件、空白页/低分辨率/旋转边界</li>
+          <li><span class="badge badge-done">D4</span><strong>规则库与知识库</strong>：40 条规则、依据三态、40 分片、MCP 工具</li>
+          <li><span class="badge badge-done">D5</span><strong>资格性与评分</strong>：R01–R10 三态、两套细则 68/62、分项溯源</li>
+          <li><span class="badge badge-done">D6</span><strong>风险扫描</strong>：15/15 检出、0/20 误报、dev/holdout 分档</li>
+          <li><span class="badge badge-done">D7</span><strong>报告与附件</strong>：docx/pdf 九章、双指纹、8 个 MCP 工具、聊天附件</li>
+          <li><span class="badge badge-done">D8</span><strong>前端看板</strong>：评审看板、双栏对照、报告中心、换细则对比</li>
+          <li><span class="badge badge-done">D9</span><strong>Skill 与评测</strong>：4 个 Skill、23 条自动规则、TEST_REPORT/USAGE、AI 双盲代理</li>
         </ul>
-        <p class="card-foot">页面每 15 秒自动复检一次；数据全部来自接口，无写死的状态。</p>
       </section>
 
-      <section class="card" aria-labelledby="h-runtime">
-        <div class="card-head"><h2 id="h-runtime">运行信息</h2></div>
-        <dl class="kv">
-          <dt>服务名</dt><dd id="k-service">—</dd>
-          <dt>版本</dt><dd id="k-version">—</dd>
-          <dt>环境</dt><dd id="k-env">—</dd>
-          <dt>启动时间</dt><dd id="k-started">—</dd>
-          <dt>已运行</dt><dd id="k-uptime">—</dd>
-          <dt>容器内运行</dt><dd id="k-container">—</dd>
-        </dl>
-      </section>
-
-      <section class="card" aria-labelledby="h-platform">
+      <section class="card card-wide" aria-labelledby="h-milestone">
         <div class="card-head">
-          <h2 id="h-platform">平台能力接入</h2>
-          <span class="card-hint">登记 ≠ 可用</span>
+          <h2 id="h-milestone">里程碑进度</h2>
+          <span class="card-hint" id="ms-hint">—</span>
         </div>
-        <div class="plat-grid">
-          <div class="plat">
-            <div class="plat-head"><span class="plat-name">MCP 工具</span><span class="badge badge-todo" id="badge-mcp">待接入</span></div>
-            <p class="plat-value"><span id="k-mcp-tools">—</span> 个已登记</p>
-            <p class="plat-note">解析 / 核验 / 评分 / 扫描 / 定位 / 导出</p>
+        <div class="table-wrap">
+          <table class="table">
+            <thead><tr><th>编号</th><th>里程碑</th><th>计划</th><th>状态</th><th>验收口径</th></tr></thead>
+            <tbody id="ms-body"><tr><td colspan="5" class="empty">加载中…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card card-wide" aria-labelledby="h-deliver">
+        <div class="card-head">
+          <h2 id="h-deliver">本阶段交付物</h2>
+          <span class="card-hint" id="stage-label">D9 交付物</span>
+        </div>
+        <ul class="deliver-list" id="deliver-list"><li class="empty">加载中…</li></ul>
+      </section>
+
+      <section class="card card-wide" id="admin-data-card" hidden aria-labelledby="h-admin-data">
+        <div class="card-head">
+          <h2 id="h-admin-data">数据管理</h2>
+          <span class="card-hint" id="admin-summary">—</span>
+        </div>
+        <div class="admin-toolbar">
+          <input class="select admin-filter" id="admin-doc-filter" type="search" placeholder="筛选文件名 / doc_id">
+          <button class="btn btn-sm" id="btn-admin-refresh" type="button">刷新</button>
+          <button class="btn btn-sm btn-danger" id="btn-clean-duplicates" type="button">清理重复文档</button>
+          <button class="btn btn-sm btn-danger" id="btn-clean-orphans" type="button">清理无文档评审</button>
+        </div>
+        <div class="notice" id="admin-action-status" role="status" hidden></div>
+        <div class="admin-columns">
+          <div class="admin-col">
+            <h3>文档 <span class="muted" id="admin-doc-count"></span></h3>
+            <div class="table-wrap admin-scroll">
+              <table class="table admin-table">
+                <thead><tr><th>文件</th><th>doc_id</th><th>页数</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody id="admin-doc-body"><tr><td colspan="5" class="empty">登录后加载…</td></tr></tbody>
+              </table>
+            </div>
           </div>
-          <div class="plat">
-            <div class="plat-head"><span class="plat-name">知识库</span><span class="badge badge-todo" id="badge-kb">待接入</span></div>
-            <p class="plat-value"><span id="k-kb">—</span></p>
-            <p class="plat-note">40 条规则按节切分，导入后需替换索引名</p>
-          </div>
-          <div class="plat">
-            <div class="plat-head"><span class="plat-name">自定义 Skill</span><span class="badge badge-todo" id="badge-skill">待接入</span></div>
-            <p class="plat-value"><span id="k-skill">—</span> <span id="skill-value-label">个已登记</span></p>
-            <p class="plat-note">规则卡 / 缺项判定 / 输出自检 / 摘要成文（已挂载 4 个）</p>
+          <div class="admin-col">
+            <h3>评审与报告 <span class="muted" id="admin-review-count"></span></h3>
+            <div class="table-wrap admin-scroll">
+              <table class="table admin-table">
+                <thead><tr><th>评审</th><th>文件</th><th>总分</th><th>报告</th><th>操作</th></tr></thead>
+                <tbody id="admin-review-body"><tr><td colspan="5" class="empty">登录后加载…</td></tr></tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <p class="card-foot">三件套落地口径见 <code>agent.json</code>；未落地能力如实显示「待接入」。</p>
+        <p class="card-foot">删除不可恢复：删除文档会级联删除其评审与报告；删除报告只删 docx/pdf，保留评审可重新生成。批量清理前请确认。</p>
       </section>
     </div>
-
-    <section class="card card-wide" aria-labelledby="h-frontend">
-      <div class="card-head">
-        <h2 id="h-frontend">D8 前端能力与边界</h2>
-        <span class="card-hint">不新增后端业务逻辑</span>
-      </div>
-      <ul class="cap-list">
-        <li><span class="badge badge-done">已上线</span> 评审看板：上传/选文档 → 选细则 → 评审 → 总分卡 + 三张结果表</li>
-        <li><span class="badge badge-done">已上线</span> 双栏对照：按 <code>pages[]</code> 渲染原文，点击结果定位并高亮 <code>quote</code></li>
-        <li><span class="badge badge-done">已上线</span> 报告中心：最近评审、docx/pdf 下载、大小与数值摘要</li>
-        <li><span class="badge badge-done">已上线</span> Skill 挂载：4 个自定义 Skill 已上传并随 agent v5 发布</li>
-        <li><span class="badge badge-todo">待 D9</span> 批量导出、报告自动失效、<code>USAGE.md</code> / <code>TEST_REPORT.md</code></li>
-      </ul>
-    </section>
-
-    <section class="card card-wide" aria-labelledby="h-milestone">
-      <div class="card-head">
-        <h2 id="h-milestone">里程碑进度</h2>
-        <span class="card-hint" id="ms-hint">—</span>
-      </div>
-      <div class="table-wrap">
-        <table class="table">
-          <thead><tr><th>编号</th><th>里程碑</th><th>计划</th><th>状态</th><th>验收口径</th></tr></thead>
-          <tbody id="ms-body"><tr><td colspan="5" class="empty">加载中…</td></tr></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="card card-wide" aria-labelledby="h-deliver">
-      <div class="card-head">
-        <h2 id="h-deliver">本阶段交付物</h2>
-        <span class="card-hint" id="stage-label">D8 交付物</span>
-      </div>
-      <ul class="deliver-list" id="deliver-list"><li class="empty">加载中…</li></ul>
-    </section>
   </section>
 
 </main>

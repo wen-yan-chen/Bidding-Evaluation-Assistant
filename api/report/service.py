@@ -84,3 +84,27 @@ def summary(review_id: str, fmt: str = "docx") -> dict[str, Any]:
             "rule_digest": data["basis"]["rule_digest"],
         },
     }
+
+
+def delete_reports(review_id: str) -> list[str]:
+    """删除某次评审的 docx/pdf 文件（保留评审 JSON，可重新生成）。"""
+    if not review_id or not review_id.startswith("rv-") or "/" in review_id or "\\" in review_id:
+        return []
+    deleted: list[str] = []
+    for fmt in FORMATS:
+        path = report_path(review_id, fmt)
+        if path.exists():
+            path.unlink()
+            deleted.append(path.name)
+    return deleted
+
+
+def report_sizes(review_id: str) -> dict[str, dict[str, Any]]:
+    files: dict[str, dict[str, Any]] = {}
+    for fmt in FORMATS:
+        path = report_path(review_id, fmt)
+        files[fmt] = {
+            "exists": path.exists(),
+            "size": path.stat().st_size if path.exists() else 0,
+        }
+    return files

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
-from api import scoring
+from api import scoring, store
 from api.extract import extract_fields
 from api.main import app
 from api.parsers.dispatch import parse_file
@@ -91,6 +91,10 @@ def test_review_is_deterministic_and_profile_switch_changes_score():
     assert items_a != items_b, "换细则后分项得分必须变化"
     assert first["profile"]["digest"] != third["profile"]["digest"]
 
+    # 清理测试写入的评审文件，避免 pytest 污染 check_report 的最近 50 份
+    for item in (first, second, third):
+        service.delete(item["review_id"])
+
 
 def test_review_api_roundtrip():
     blob = (SAMPLES / "bid-001.docx").read_bytes()
@@ -122,3 +126,7 @@ def test_review_api_roundtrip():
 
     missing = client.get("/api/review/rv-not-exist")
     assert missing.status_code == 404
+
+    # 清理本次上传与评审，避免污染运行时数据
+    service.delete(review["review_id"])
+    store.delete_doc(doc_id)

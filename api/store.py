@@ -95,3 +95,23 @@ def list_docs(limit: int = 200) -> list[dict]:
             }
         )
     return items
+
+
+def delete_doc(doc_id: str) -> dict:
+    """删除解析 JSON 与上传原件；返回删掉的文件名。
+
+    调用方负责先把引用该文档的评审/报告级联清理掉（见 api/routes/admin.py）。
+    """
+    if not valid_doc_id(doc_id):
+        return {"doc_id": doc_id, "deleted": False, "files": []}
+    files: list[str] = []
+    path = parsed_path(doc_id)
+    if path.exists():
+        path.unlink()
+        files.append(path.name)
+    if config.UPLOAD_DIR.exists():
+        for upload in sorted(config.UPLOAD_DIR.glob(f"{doc_id}.*")):
+            if upload.is_file():
+                upload.unlink()
+                files.append(upload.name)
+    return {"doc_id": doc_id, "deleted": bool(files), "files": files}

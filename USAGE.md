@@ -34,15 +34,18 @@ docker compose ps          # bid-review / bid-review-mcp 均 healthy
 HOST_PORT=18080
 MCP_PORT=8765
 APP_TAG=0.9.0
+ADMIN_USER=admin
+ADMIN_PASSWORD=见本机 .env（不提交）
+ADMIN_SESSION_SECRET=见本机 .env（不提交）
 ```
 
-> `.env` 含 S3 凭据，已被 gitignore，**不要提交**。换机器时从 `.env.example` 复制并填写。
+> `.env` 含 S3 凭据与管理员密码，已被 gitignore，**不要提交**。换机器时从 `.env.example` 复制并填写。
 
 ### 1.3 打开页面
 
 - 评审看板：<http://127.0.0.1:18080/#review>
 - 报告中心：<http://127.0.0.1:18080/#reports>
-- 系统状态：<http://127.0.0.1:18080/#status>
+- 系统状态：<http://127.0.0.1:18080/#status>（先管理员登录）
 - OpenAPI：<http://127.0.0.1:18080/api/docs>
 
 ### 1.4 冒烟
@@ -87,11 +90,39 @@ python tools/smoke_test.py --base http://127.0.0.1:18080
 - 文档已不存在的历史评审默认隐藏，右上角可切换显示；
 - 同一 `review_id` 重复导出返回同一文件（幂等）。
 
-### 2.3 系统状态
+### 2.3 系统状态（管理员）
 
-- 服务自检 6 项（含免责声明逐字比对）；
-- 运行信息、平台能力接入（MCP / 知识库 / Skill）、里程碑、D8–D9 交付物；
-- Skill 卡片在 D9 后显示「已挂载 4 个」。
+- 点「系统状态」先显示管理员登录；账号密码来自 `.env` 的 `ADMIN_USER` / `ADMIN_PASSWORD`，未配置时登录返回 503；
+- 登录成功后才显示服务自检 6 项、运行信息、平台能力（MCP 已接入 8 个工具 / 知识库 / Skill 已挂载 4 个）、
+  项目能力总览（D1–D9）、里程碑与交付物；
+- 右上角「退出管理员」；会话默认 8 小时；
+- 管理员接口统一在 `/api/admin/*`，健康检查与 `/api/info` 仍公开。
+
+### 2.4 数据管理（删除文件 / 报告）
+
+登录「系统状态」后，页面底部「数据管理」：
+
+- 筛选：按文件名 / `doc_id` / 评审号过滤；
+- 文档「删除」：删解析 JSON + 上传原件，并级联删其评审/报告；
+- 评审「删报告」：只删 docx/pdf，保留评审；
+- 评审「删评审」：删评审 JSON + 报告；
+- 「清理重复文档」：按文件名每组保留最新 1 份，删除其余；
+- 「清理无文档评审」：清理文档已不存在的历史评审。
+
+对应接口：
+
+```bash
+POST   /api/admin/login       {"username":"...","password":"..."}
+GET    /api/admin/session
+POST   /api/admin/logout
+GET    /api/admin/overview
+DELETE /api/admin/doc/{doc_id}
+DELETE /api/admin/review/{review_id}
+DELETE /api/admin/report/{review_id}
+POST   /api/admin/cleanup     {"mode":"duplicates"|"orphan_reviews"}
+```
+
+> 删除不可恢复；管理接口需要管理员 Cookie，未登录返回 401。
 
 ---
 
@@ -255,9 +286,10 @@ docker compose run --rm --no-deps -v "%CD%\tools:/app/tools" app \
 2. 双栏对照渲染解析后的纯文本，不还原原 PDF/docx 版式；
 3. 表格单元格里的字段仍可能抽不到（D9 未增强解析层）；
 4. 报告幂等但没有自动失效，改数据需换新 `review_id`；
-5. 没有真实专家双盲评分，`docs/TEST_REPORT.md` 第 2 条如实标注为遗留；
+5. 没有人类专家双盲评分；AI 双盲代理（严格细则 15/15、专业裁量 0/15）见 `docs/TEST_REPORT.md` §4.3；
 6. 合成样本与开发集同分布，100%/0% 不代表真实业务泛化；
-7. 前端为单机演示，无登录/权限/多用户隔离。
+7. 主页面为单机演示；系统状态/数据管理有管理员密码门禁（演示级，不是多用户权限系统），
+   `/api/health` 与 `/api/info` 仍公开，删除类接口才要求管理员 Cookie。
 
 ---
 

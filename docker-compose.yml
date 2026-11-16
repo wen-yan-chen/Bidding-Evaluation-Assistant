@@ -20,6 +20,11 @@ services:
       APP_ENV: ${APP_ENV:-docker}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-50}
+      # D9 管理员入口：未配置密码时登录返回 503，页面显示配置提示
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      ADMIN_SESSION_SECRET: ${ADMIN_SESSION_SECRET:-}
+      ADMIN_SESSION_TTL: ${ADMIN_SESSION_TTL:-28800}
       # D4 起 MCP 与 API 同栈：容器内用服务名互访
       MCP_URL: ${MCP_URL:-http://mcp:8765/sse}
       NEXENT_BASE: ${NEXENT_BASE:-}

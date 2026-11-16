@@ -31,6 +31,11 @@ const state = {
   reviewing: false,
   reportsLoaded: false,
   showStale: false,
+  adminAuthenticated: false,
+  adminUser: null,
+  adminData: null,
+  adminFilter: '',
+  adminLoadSeq: 0,
 };
 
 /* ============================================================ 基础工具 */
@@ -198,7 +203,7 @@ function setView(name, opts = {}) {
     if (!state.reportsLoaded) loadReports();
     else hydrateReportMeta(state.reviews.slice(0, MAX_REPORT_ROWS));
   }
-  if (view === 'status') refreshStatus({ silent: true });
+  if (view === 'status') enterStatusView();
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
@@ -1510,6 +1515,277 @@ async function openReview(reviewId) {
   }
 }
 
+/* ============================================================ 管理员入口 / 数据管理 */
+
+async function refreshTopbar() {
+  const chip = $('chip-health');
+  const health = await safe(api('/api/health', { timeout: 6000 }));
+  if (!chip) return;
+  if (health.ok && health.data) {
+    chip.classList.remove('is-fail');
+    chip.classList.add('is-ok');
+    chip.textContent = '';
+    chip.append(el('span', 'live-dot'), document.createTextNode('服务正常'));
+    $('chip-version').textContent = `v${health.data.version || '—'}`;
+    $('chip-env').textContent = `env:${health.data.env || '—'}`;
+  } else {
+    chip.classList.remove('is-ok');
+    chip.classList.add('is-fail');
+    chip.textContent = '';
+    chip.append(el('span', 'live-dot'), document.createTextNode('服务不可用'));
+  }
+}
+
+function showAdminLock(message = '') {
+  $('status-lock').hidden = false;
+  $('status-content').hidden = true;
+  $('admin-data-card').hidden = true;
+  $('btn-admin-logout').hidden = true;
+  $('btn-refresh').hidden = true;
+  if (message) setNotice('admin-status', 'warn', message);
+  else setNotice('admin-status', '', '');
+}
+
+function showAdminContent() {
+  $('status-lock').hidden = true;
+  $('status-content').hidden = false;
+  $('admin-data-card').hidden = false;
+  $('btn-admin-logout').hidden = false;
+  $('btn-refresh').hidden = false;
+}
+
+async function enterStatusView() {
+  if (state.adminAuthenticated) {
+    showAdminContent();
+    await refreshStatus({ silent: true });
+    await loadAdminData();
+    return;
+  }
+  const session = await safe(api('/api/admin/session', { timeout: 6000 }));
+  if (session.ok && session.data && session.data.authenticated) {
+    state.adminAuthenticated = true;
+    state.adminUser = session.data.user || 'admin';
+    showAdminContent();
+    await refreshStatus({ silent: true });
+    await loadAdminData();
+    return;
+  }
+  showAdminLock(session.ok ? '' : `读取管理员会话失败：${session.error.message}`);
+}
+
+async function adminLogin(event) {
+  event.preventDefault();
+  const user = ($('admin-user').value || '').trim();
+  const password = $('admin-pass').value || '';
+  const btn = $('btn-admin-login');
+  if (!user || !password) {
+    setNotice('admin-status', 'error', '请输入管理员账号和密码。');
+    return;
+  }
+  btn.disabled = true;
+  setNotice('admin-status', 'info loading', '正在验证管理员账号…');
+  try {
+    const data = await api('/api/admin/login', {
+      method: 'POST',
+      body: { username: user, password },
+      timeout: 10000,
+    });
+    state.adminAuthenticated = true;
+    state.adminUser = data.user || user;
+    $('admin-pass').value = '';
+    showAdminContent();
+    setNotice('admin-action-status', 'success', `管理员 ${state.adminUser} 已登录。`);
+    await refreshStatus({ silent: true });
+    await loadAdminData();
+  } catch (err) {
+    if (err.status === 401) setNotice('admin-status', 'error', '账号或密码错误。');
+    else if (err.status === 503) setNotice('admin-status', 'warn', err.message);
+    else setNotice('admin-status', 'error', describeError(err, '管理员登录'));
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+async function adminLogout() {
+  await safe(api('/api/admin/logout', { method: 'POST', timeout: 6000 }));
+  state.adminAuthenticated = false;
+  state.adminUser = null;
+  state.adminData = null;
+  state.adminLoadSeq += 1;
+  $('admin-pass').value = '';
+  showAdminLock('已退出管理员。');
+}
+
+async function loadAdminData() {
+  if (!state.adminAuthenticated) return;
+  const seq = ++state.adminLoadSeq;
+  try {
+    const data = await api('/api/admin/overview', { timeout: 20000 });
+    if (seq !== state.adminLoadSeq || !state.adminAuthenticated) return;
+    state.adminData = data;
+    renderAdminData();
+  } catch (err) {
+    if (seq !== state.adminLoadSeq) return;
+    if (err.status === 401) {
+      state.adminAuthenticated = false;
+      showAdminLock('管理员会话已过期，请重新登录。');
+      return;
+    }
+    setNotice('admin-action-status', 'error', describeError(err, '读取数据管理概览'));
+  }
+}
+
+function parseStatePill(status) {
+  if (status === 'ok') return el('span', 'pill pill-ok', '正常');
+  if (status === 'degraded') return el('span', 'pill pill-warn', '降级');
+  if (status === 'failed') return el('span', 'pill pill-danger', '失败');
+  return el('span', 'pill pill-neutral', status || '—');
+}
+
+function renderAdminData() {
+  const data = state.adminData;
+  if (!data) return;
+  const counts = data.counts || {};
+  $('admin-summary').textContent =
+    `文档 ${counts.docs || 0} · 评审 ${counts.reviews || 0} · 报告 ${counts.reports || 0} 个 / ${fmtSize(counts.report_bytes || 0)} · 上传文件 ${counts.uploads || 0}`;
+  const filter = (state.adminFilter || '').trim().toLowerCase();
+  const docs = (data.docs || []).filter((doc) =>
+    !filter || `${doc.file_name || ''} ${doc.doc_id || ''}`.toLowerCase().includes(filter));
+  const reviews = (data.reviews || []).filter((review) =>
+    !filter || `${review.review_id || ''} ${review.file_name || ''} ${review.doc_id || ''}`.toLowerCase().includes(filter));
+
+  const docBody = $('admin-doc-body');
+  docBody.textContent = '';
+  $('admin-doc-count').textContent = `共 ${docs.length} 份`;
+  if (!docs.length) {
+    const tr = el('tr');
+    const td = el('td', 'admin-empty', filter ? '没有匹配的文档' : '暂无文档');
+    td.colSpan = 5;
+    tr.append(td);
+    docBody.append(tr);
+  }
+  for (const doc of docs) {
+    const tr = el('tr');
+    tr.append(el('td', 'admin-file', doc.file_name || '—'));
+    tr.append(el('td', '', doc.doc_id || '—'));
+    tr.append(el('td', '', `${doc.page_count || '—'} 页`));
+    const tdState = el('td');
+    tdState.append(parseStatePill(doc.parse_status));
+    tr.append(tdState);
+    const tdAction = el('td');
+    const del = el('button', 'btn btn-sm btn-danger', '删除');
+    del.type = 'button';
+    del.title = `删除文档 ${doc.file_name || doc.doc_id} 及其评审/报告`;
+    del.addEventListener('click', () => adminDeleteDoc(doc));
+    tdAction.append(del);
+    tr.append(tdAction);
+    docBody.append(tr);
+  }
+
+  const reviewBody = $('admin-review-body');
+  reviewBody.textContent = '';
+  $('admin-review-count').textContent = `共 ${reviews.length} 份`;
+  if (!reviews.length) {
+    const tr = el('tr');
+    const td = el('td', 'admin-empty', filter ? '没有匹配的评审' : '暂无评审');
+    td.colSpan = 5;
+    tr.append(td);
+    reviewBody.append(tr);
+  }
+  for (const review of reviews) {
+    const tr = el('tr');
+    const tdId = el('td');
+    tdId.append(el('code', 'report-id', review.review_id || '—'));
+    tdId.append(el('span', 'cell-sub', fmtDateTime(review.created_at)));
+    tr.append(tdId);
+    tr.append(el('td', 'admin-file', review.file_name || '—'));
+    tr.append(el('td', '', fmtScore(review.total)));
+    const tdFiles = el('td');
+    const reports = review.reports || {};
+    const docx = reports.docx || { exists: false, size: 0 };
+    const pdf = reports.pdf || { exists: false, size: 0 };
+    tdFiles.append(el('div', `report-file ${docx.exists ? 'file-ok' : 'file-none'}`, `DOCX ${docx.exists ? fmtSize(docx.size) : '未生成'}`));
+    tdFiles.append(el('div', `report-file ${pdf.exists ? 'file-ok' : 'file-none'}`, `PDF ${pdf.exists ? fmtSize(pdf.size) : '未生成'}`));
+    tr.append(tdFiles);
+    const tdActions = el('td');
+    const actions = el('div', 'admin-actions');
+    if (docx.exists || pdf.exists) {
+      const delReport = el('button', 'btn btn-sm btn-danger', '删报告');
+      delReport.type = 'button';
+      delReport.title = '只删 docx/pdf，保留评审，可重新生成';
+      delReport.addEventListener('click', () => adminDeleteReport(review));
+      actions.append(delReport);
+    }
+    const delReview = el('button', 'btn btn-sm btn-danger', '删评审');
+    delReview.type = 'button';
+    delReview.title = '删除评审 JSON 及其报告，不可恢复';
+    delReview.addEventListener('click', () => adminDeleteReview(review));
+    actions.append(delReview);
+    tdActions.append(actions);
+    tr.append(tdActions);
+    reviewBody.append(tr);
+  }
+}
+
+async function adminDeleteDoc(doc) {
+  const label = doc.file_name || doc.doc_id;
+  if (!window.confirm(`删除文档「${label}」（${doc.doc_id}）？\n相关评审与报告会一并删除，不可恢复。`)) return;
+  await runAdminAction(`/api/admin/doc/${encodeURIComponent(doc.doc_id)}`, 'DELETE', `已删除文档 ${label}`, true);
+}
+
+async function adminDeleteReview(review) {
+  const label = review.review_id || '';
+  if (!window.confirm(`删除评审「${label}」及其 docx/pdf 报告？不可恢复。`)) return;
+  await runAdminAction(`/api/admin/review/${encodeURIComponent(label)}`, 'DELETE', `已删除评审 ${label}`, false);
+}
+
+async function adminDeleteReport(review) {
+  const label = review.review_id || '';
+  if (!window.confirm(`只删除「${label}」的 docx/pdf 报告？评审结果保留，可重新生成。`)) return;
+  await runAdminAction(`/api/admin/report/${encodeURIComponent(label)}`, 'DELETE', `已删除报告 ${label}`, false);
+}
+
+async function adminCleanup(mode) {
+  const text = mode === 'duplicates'
+    ? '按文件名分组，每组只保留最新 1 份文档，删除其余文档及其评审/报告。\n该操作不可恢复，确定继续？'
+    : '删除所有「对应文档已不存在」的评审与其报告。\n该操作不可恢复，确定继续？';
+  if (!window.confirm(text)) return;
+  await runAdminAction('/api/admin/cleanup', 'POST', '清理完成', false, { mode });
+}
+
+async function runAdminAction(url, method, successText, refreshDocs, body) {
+  const status = $('admin-action-status');
+  setNotice('admin-action-status', 'info loading', '正在执行管理操作…');
+  try {
+    const data = await api(url, {
+      method,
+      body,
+      timeout: 30000,
+    });
+    const details = [];
+    if (data.deleted_docs !== undefined) details.push(`文档 ${data.deleted_docs}`);
+    if (data.deleted_reviews !== undefined) details.push(`评审 ${data.deleted_reviews}`);
+    if (data.deleted_reports !== undefined) details.push(`报告 ${data.deleted_reports}`);
+    setNotice('admin-action-status', 'info loading', '管理操作完成，正在刷新列表…');
+    if (refreshDocs) await loadDocs();
+    await loadAdminData();
+    await loadReports({ force: true });
+    setNotice('admin-action-status', 'success', `${successText}${details.length ? `（${details.join(' / ')}）` : ''}。`);
+    if (state.review && !state.reviews.some((r) => r.review_id === state.review.review_id)) {
+      // 当前评审被删除时，避免继续展示旧结果
+      const stillExists = await safe(api(`/api/review/${encodeURIComponent(state.review.review_id)}`, { timeout: 8000 }));
+      if (!stillExists.ok) clearReviewDisplay();
+    }
+  } catch (err) {
+    if (err.status === 401) {
+      state.adminAuthenticated = false;
+      showAdminLock('管理员会话已过期，请重新登录。');
+      return;
+    }
+    setNotice('admin-action-status', 'error', describeError(err, '管理操作'));
+  }
+}
+
 /* ============================================================ 系统状态 */
 
 const STATUS_TEXT = { done: '已完成', doing: '进行中', planned: '计划中' };
@@ -1622,11 +1898,25 @@ function renderPlatform(agent, caps = {}) {
     $('k-mcp-tools').textContent = '0';
     $('k-skill').textContent = '0';
     $('k-kb').textContent = 'agent.json 未就绪';
+    $('mcp-value-label').textContent = '个已登记';
+    $('badge-mcp').textContent = '待接入';
+    $('badge-mcp').className = 'badge badge-todo';
+    $('badge-skill').textContent = '待接入';
+    $('badge-skill').className = 'badge badge-todo';
+    $('badge-kb').textContent = '待接入';
+    $('badge-kb').className = 'badge badge-todo';
+    $('platform-hint').textContent = '配置未就绪';
     return;
   }
   const tools = agent.mcp_tools || [];
+  const mcpLive = Boolean(caps.mcp) && tools.length > 0;
   $('k-mcp-tools').textContent = String(tools.length);
-  $('badge-mcp').textContent = tools.length ? '已登记 · 待挂载' : '待接入';
+  $('mcp-value-label').textContent = mcpLive ? '个已接入' : '个已登记';
+  $('badge-mcp').textContent = mcpLive
+    ? `已接入 ${tools.length} 个工具`
+    : (tools.length ? '已登记 · 待挂载' : '待接入');
+  $('badge-mcp').className = mcpLive ? 'badge badge-done' : 'badge badge-todo';
+
   const skills = agent.skills || [];
   $('k-skill').textContent = String(skills.length);
   $('skill-value-label').textContent = caps.skills ? '个已挂载' : '个已登记';
@@ -1644,7 +1934,11 @@ function renderPlatform(agent, caps = {}) {
   } else {
     $('k-kb').textContent = agent.kb_index_count ? `索引名待替换（${agent.kb_index_count} 个占位）` : '索引未配置';
     $('badge-kb').textContent = '待接入';
+    $('badge-kb').className = 'badge badge-todo';
   }
+  $('platform-hint').textContent = mcpLive
+    ? `MCP 已接入 ${tools.length} 个工具${caps.skills ? ` · Skill 已挂载 ${skills.length} 个` : ''}`
+    : '登记 ≠ 可用';
 }
 
 function renderMilestones(ms) {
@@ -1694,8 +1988,19 @@ function renderDeliverables(items) {
 
 function initGlobalActions() {
   $('btn-refresh').addEventListener('click', () => refreshStatus());
+  $('btn-admin-logout').addEventListener('click', adminLogout);
+  $('admin-login-form').addEventListener('submit', adminLogin);
+  $('btn-admin-refresh').addEventListener('click', () => loadAdminData());
+  $('admin-doc-filter').addEventListener('input', (event) => {
+    state.adminFilter = event.target.value || '';
+    renderAdminData();
+  });
+  $('btn-clean-duplicates').addEventListener('click', () => adminCleanup('duplicates'));
+  $('btn-clean-orphans').addEventListener('click', () => adminCleanup('orphan_reviews'));
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && state.view === 'status') refreshStatus({ silent: true });
+    if (!document.hidden && state.view === 'status' && state.adminAuthenticated) {
+      refreshStatus({ silent: true });
+    }
   });
 }
 
@@ -1709,7 +2014,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const initial = (location.hash || '').replace(/^#/, '') || 'review';
   setView(initial, { updateHash: false });
-  refreshStatus({ silent: true }); // 顶栏健康状态先出，不阻塞文档列表
+  refreshTopbar(); // 顶栏健康状态先出，不阻塞文档列表
   (async () => {
     await Promise.all([loadProfiles(), loadDocs()]);
     await loadReports();
@@ -1717,6 +2022,6 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   setInterval(() => {
-    if (state.view === 'status') refreshStatus({ silent: true });
+    if (state.view === 'status' && state.adminAuthenticated) refreshStatus({ silent: true });
   }, 15000);
 });

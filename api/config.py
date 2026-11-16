@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import os
+import secrets
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -31,6 +32,28 @@ VERSION_FILE = ROOT / "VERSION"
 DISCLAIMER = "AI 辅助评审结果，最终以评标委员会评审结论为准"
 
 STARTED_AT = datetime.now(CST)
+
+# 管理员会话密钥：优先环境变量；未配置时每个进程随机生成（重启后旧会话失效，适合本机演示）
+_FALLBACK_ADMIN_SECRET = secrets.token_hex(32)
+
+
+def admin_user() -> str:
+    return (os.getenv("ADMIN_USER", "admin") or "admin").strip()
+
+
+def admin_password() -> str:
+    return os.getenv("ADMIN_PASSWORD", "")
+
+
+def admin_session_secret() -> str:
+    return os.getenv("ADMIN_SESSION_SECRET", "") or _FALLBACK_ADMIN_SECRET
+
+
+def admin_session_ttl() -> int:
+    try:
+        return max(300, int(os.getenv("ADMIN_SESSION_TTL", "28800")))
+    except ValueError:
+        return 28800
 
 
 def read_version() -> str:
