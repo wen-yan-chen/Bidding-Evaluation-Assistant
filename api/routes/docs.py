@@ -13,9 +13,10 @@ import mimetypes
 from typing import Any
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 
 from api import config, ingest, store
+from api import docx_preview
 from api.parsers import ParseError, ext_of
 from api.parsers.dispatch import SUPPORTED_EXTS
 
@@ -57,6 +58,23 @@ def get_document(doc_id: str) -> dict[str, Any]:
     if doc is None:
         raise HTTPException(404, "文档不存在或尚未解析")
     return doc.to_dict(with_text=True)
+
+
+@router.get("/doc/{doc_id}/html", response_class=HTMLResponse, summary="docx 的 Word 渲染预览")
+def get_docx_html(doc_id: str) -> HTMLResponse:
+    if not store.valid_doc_id(doc_id):
+        raise HTTPException(400, "文档 ID 格式不合法")
+    doc = store.load_doc(doc_id)
+    path = store.raw_file(doc_id)
+    if doc is None or path is None:
+        raise HTTPException(404, "文档或原始文件不存在")
+    if path.suffix.lower() != ".docx":
+        raise HTTPException(415, "只有 docx 支持 Word 渲染预览")
+    try:
+        html = docx_preview.render_docx_html(path, doc.file_name, doc_id)
+    except Exception as exc:  # noqa: BLE001 - 文件损坏时返回可读错误
+        raise HTTPException(422, f"Word 渲染失败：{exc}") from exc
+    return HTMLResponse(html)
 
 
 @router.get("/doc/{doc_id}/raw", summary="取上传的原始文件（双栏对照 / 预览）")

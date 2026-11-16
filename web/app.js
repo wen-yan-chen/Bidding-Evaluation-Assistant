@@ -399,9 +399,17 @@ function renderSourceFile(doc) {
     wrap.append(frame);
     return;
   }
+  if (ext === 'docx') {
+    const frame = document.createElement('iframe');
+    frame.className = 'preview-frame';
+    frame.title = `Word 渲染预览：${doc.file_name || doc.doc_id}`;
+    frame.src = `/api/doc/${encodeURIComponent(doc.doc_id)}/html`;
+    wrap.append(frame);
+    return;
+  }
   const card = el('div', 'source-file-card');
   card.append(el('h3', '', doc.file_name || doc.doc_id));
-  card.append(el('p', '', '浏览器不能直接渲染 Word 原版式。可保存原件用 Word 打开，或切到「解析文本」查看内容。'));
+  card.append(el('p', '', '该文件类型暂不支持内嵌预览，请保存原件查看，或切到「解析文本」。'));
   const actions = el('div', 'source-file-actions');
   const save = el('a', 'btn btn-sm', '保存原件');
   save.href = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw`;
@@ -1990,6 +1998,14 @@ async function previewDoc(doc) {
     body.append(frame);
     return;
   }
+  if (ext === 'docx') {
+    const frame = document.createElement('iframe');
+    frame.className = 'preview-frame';
+    frame.title = `Word 渲染预览：${doc.file_name || doc.doc_id}`;
+    frame.src = `/api/doc/${encodeURIComponent(doc.doc_id)}/html`;
+    body.append(frame);
+    return;
+  }
 
   body.append(el('p', 'preview-loading', '正在读取解析文本…'));
   try {
@@ -2001,9 +2017,6 @@ async function previewDoc(doc) {
       data = await api(`/api/doc/${encodeURIComponent(doc.doc_id)}`, { timeout: 15000 });
     }
     body.textContent = '';
-    if (ext === 'docx') {
-      body.append(el('p', 'preview-note', 'docx 版式不还原，这里显示解析文本；点「保存原件」可查看原版式。'));
-    }
     const pages = Array.isArray(data.pages) ? data.pages : [];
     if (!pages.length) {
       if (data.full_text) {
@@ -2141,6 +2154,16 @@ async function loadOriginalPane(review) {
     content.dataset.loaded = '1';
     return;
   }
+  if (ext === 'docx') {
+    const frame = document.createElement('iframe');
+    frame.className = 'preview-frame';
+    frame.title = `原件 Word 渲染：${review.file_name || review.doc_id}`;
+    frame.src = `/api/doc/${encodeURIComponent(review.doc_id)}/html`;
+    content.textContent = '';
+    content.append(frame);
+    content.dataset.loaded = '1';
+    return;
+  }
   try {
     let data;
     try {
@@ -2150,9 +2173,6 @@ async function loadOriginalPane(review) {
       data = await api(`/api/doc/${encodeURIComponent(review.doc_id)}`, { timeout: 15000 });
     }
     content.textContent = '';
-    if (ext === 'docx') {
-      content.append(el('p', 'preview-note', 'docx 显示解析文本，原版式请保存原件。'));
-    }
     const pages = Array.isArray(data.pages) ? data.pages : [];
     if (!pages.length) {
       content.append(el('pre', '', data.full_text || '没有可预览的文本，请保存原件查看。'));
