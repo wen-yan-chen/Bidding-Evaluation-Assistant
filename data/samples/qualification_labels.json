@@ -1,0 +1,407 @@
+{
+  "version": "v1",
+  "generated_at": "2026-11-16T20:03:47",
+  "note": "人工标注员 A/B 独立标注 + 第三人裁决的终稿；不是评标专家结论；无法判断项已排除。",
+  "items": [
+    {
+      "file": "bid-001.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-002.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-003.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-004.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-005.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-006.txt",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "missing",
+        "R05": "missing",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-007.txt",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "missing",
+        "R05": "missing",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-008.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-009.txt",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "missing",
+        "R05": "missing",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-010.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-011.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-012.txt",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "missing",
+        "R05": "missing",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-013.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-014.txt",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "missing",
+        "R05": "missing",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-015.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-016.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-017.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-018.txt",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "missing",
+        "R05": "missing",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-019.docx",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "bid-020.txt",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "missing",
+        "R05": "missing",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "scan-001.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "scan-002.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "scan-003.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "scan-004.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    },
+    {
+      "file": "scan-005.pdf",
+      "source": "人工标注员 A/B 终稿（非专家）",
+      "expect": {
+        "R01": "provided",
+        "R02": "missing",
+        "R03": "missing",
+        "R04": "provided",
+        "R05": "provided",
+        "R06": "missing",
+        "R07": "provided",
+        "R08": "missing",
+        "R09": "missing",
+        "R10": "missing"
+      }
+    }
+  ]
+}

@@ -88,7 +88,13 @@
           <p class="empty-inline">正在读取评分细则…</p>
         </div>
         <div class="notice notice-info" id="profile-hint" role="status" hidden></div>
-        <p class="hint">切换细则后重新评审，分项得分会随权重变化；页面会保留上一份结果并标出每一项的差值。</p>
+        <label class="field-label" for="project-type">项目类型（法规门控）</label>
+        <select id="project-type" class="select">
+          <option value="unknown">未指定（通用口径，不硬套法律体系）</option>
+          <option value="engineering">工程类（招标投标法体系）</option>
+          <option value="goods_services">货物/服务类（政府采购体系）</option>
+        </select>
+        <p class="hint">工程类启用施工类规则；货物/服务类启用政府采购规则；未指定时门控规则不硬判。</p>
       </section>
 
       <section class="card step-card step-action" aria-labelledby="h-step3">
@@ -101,6 +107,7 @@
         <dl class="mini-kv">
           <dt>当前文档</dt><dd id="sel-doc">未选择</dd>
           <dt>当前细则</dt><dd id="sel-profile">—</dd>
+          <dt>项目类型</dt><dd id="sel-project-type">未指定</dd>
           <dt>口径</dt><dd>确定性代码算分，模型不参与判定</dd>
         </dl>
         <p class="hint">评审接口：<code>POST /api/review</code>。资格性、分项、风险三类结果都会带页码与原文片段。</p>

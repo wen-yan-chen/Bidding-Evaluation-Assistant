@@ -81,9 +81,14 @@ def list_docs(limit: int = 200) -> list[dict]:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
             continue
+        doc_id = str(data.get("doc_id") or "")
+        # 过滤历史测试产物（如 doc_id=eval）：列表里出现了、详情接口却按非法 ID 拒绝，
+        # 会让前端下拉框出现不可用项。非法 ID 不进列表；文件仍保留，供人工排查。
+        if not valid_doc_id(doc_id):
+            continue
         items.append(
             {
-                "doc_id": data.get("doc_id"),
+                "doc_id": doc_id,
                 "file_name": data.get("file_name"),
                 "ext": data.get("ext"),
                 "page_count": data.get("page_count"),

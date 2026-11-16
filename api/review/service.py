@@ -24,15 +24,15 @@ def _review_id() -> str:
     return f"rv-{datetime.now(config.CST):%Y%m%d-%H%M%S}-{uuid4().hex[:6]}"
 
 
-def run(doc, profile_id: str = "profile-a") -> dict[str, Any]:  # noqa: ANN001
+def run(doc, profile_id: str = "profile-a", project_type: str = "unknown") -> dict[str, Any]:  # noqa: ANN001
     from api.review import qualification
 
-    qualification_result = qualification.check(doc)
+    qualification_result = qualification.check(doc, project_type=project_type)
     scoring_result = scoring.score_doc(doc, profile_id)
     if "error" in scoring_result:
         return scoring_result
 
-    risks = rules_api.scan_doc(doc)
+    risks = rules_api.scan_doc(doc, context={"project_type": project_type})
     risks.sort(key=lambda h: ({"高": 0, "中": 1, "低": 2}.get(h["level"], 3), h["page"]))
 
     high = [r for r in risks if r["level"] == "高"]
@@ -42,6 +42,7 @@ def run(doc, profile_id: str = "profile-a") -> dict[str, Any]:  # noqa: ANN001
         "file_name": doc.file_name,
         "created_at": config.iso(config.now()),
         "profile": scoring_result["profile"],
+        "project_type": project_type,
         "rule_digest": rules_api.rules_digest(),
         "qualification": qualification_result,
         "scoring": {

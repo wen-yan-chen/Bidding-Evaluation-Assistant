@@ -103,6 +103,7 @@ def build(review: dict[str, Any], doc) -> dict[str, Any]:  # noqa: ANN001
             "created_at": review.get("created_at"),
             "doc_id": review.get("doc_id"),
             "file_name": review.get("file_name"),
+            "project_type": review.get("project_type", "unknown"),
             "pages": len(doc.pages),
             "page_source": doc.page_source,
             "parse_status": doc.parse_status,
@@ -119,7 +120,7 @@ def build(review: dict[str, Any], doc) -> dict[str, Any]:  # noqa: ANN001
         },
         "project": {
             "fields": [
-                {"name": f.name, "value": f.value, "page": f.page, "quote": f.quote}
+                {"name": f.name, "value": f.value, "page": f.page, "quote": f.quote, "items": f.items}
                 for f in doc.fields
             ]
         },

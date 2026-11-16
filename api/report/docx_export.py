@@ -133,6 +133,8 @@ def render(data: dict[str, Any], out_path: Path) -> Path:
     _para(doc, "招投标评审报告", 22, True, INK, WD_ALIGN_PARAGRAPH.CENTER, 6)
     _para(doc, meta["file_name"], 12, False, MUTED, WD_ALIGN_PARAGRAPH.CENTER, 16)
 
+    # 一、封面与文档信息（封面也纳入九章编号，避免正文从“二、”开始）
+    _heading(doc, "一、封面与文档信息")
     _table(
         doc,
         ["报告信息", "内容"],
@@ -140,6 +142,7 @@ def render(data: dict[str, Any], out_path: Path) -> Path:
             ["评审编号", meta["review_id"]],
             ["生成时间", meta["created_at"]],
             ["文档", f"{meta['file_name']}（{meta['doc_id']}）"],
+            ["项目类型", {"engineering": "工程类（招标投标法体系）", "goods_services": "货物/服务类（政府采购体系）"}.get(meta.get("project_type"), "未指定（通用口径）")],
             ["页数 / 解析状态", f"{meta['pages']} 页 / {meta['parse_status']}"],
             ["页码来源", "估算（docx 无分页符）" if meta["page_source"] == "estimated" else "精确（PDF/分页符）"],
             ["说明", "；".join(meta.get("degraded") or []) or "无"],
@@ -184,7 +187,7 @@ def render(data: dict[str, Any], out_path: Path) -> Path:
             [
                 i["rule_id"],
                 i.get("item", ""),
-                state_label.get(i["state"], i["state"]),
+                state_label.get(i["state"], i["state"]) + ("（不适用）" if i.get("applicable") is False else ""),
                 f"第 {i['page']} 页" if i.get("page") else "-",
                 i.get("quote") or "-",
                 i.get("legal_basis") or "未检索到权威依据",

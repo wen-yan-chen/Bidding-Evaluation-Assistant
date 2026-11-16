@@ -73,6 +73,7 @@ def summary(doc) -> dict[str, Any]:  # noqa: ANN001
                 "char_start": f.char_start,
                 "char_end": f.char_end,
                 "quote": f.quote,
+                "items": f.items,
             }
             for f in doc.fields
         ],

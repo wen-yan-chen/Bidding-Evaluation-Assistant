@@ -7,6 +7,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from api import scoring, store
+from api.docmodel import Doc, PageSpan
 from api.extract import extract_fields
 from api.main import app
 from api.parsers.dispatch import parse_file
@@ -15,6 +16,18 @@ from api.review import qualification, service
 ROOT = Path(__file__).resolve().parent.parent
 SAMPLES = ROOT / "data" / "samples"
 client = TestClient(app)
+
+
+def text_doc(text: str) -> Doc:
+    return Doc(
+        doc_id="20260101-aaaaaaaa",
+        file_name="semantic.txt",
+        ext=".txt",
+        sha256="0" * 64,
+        page_source="single",
+        full_text=text,
+        pages=[PageSpan(page=1, start=0, end=len(text))],
+    )
 
 
 def parse_sample(name: str, doc_id: str = "eval"):
@@ -77,6 +90,56 @@ def test_qualification_three_states():
     assert result["counts"]["provided"] + result["counts"]["missing"] + result["counts"]["insufficient"] == 10
 
 
+def test_qualification_compliant_negation_is_provided():
+    """“无重大违法记录”是合规声明，不能把相邻的已提供材料一起判成效力不足。"""
+    text = (
+        "投标人：示例公司\n"
+        "营业执照：已提供。\n"
+        "社会保险：已缴纳社会保险。\n"
+        "我方近三年内无重大违法记录，亦无行贿犯罪记录。\n"
+        "中小企业声明函：已提供。\n"
+        "项目负责人：项目经理 1 名。\n"
+        "联合体协议：本项目不接受联合体投标，无需提供联合体协议。\n"
+    )
+    result = qualification.check(text_doc(text))
+    states = {i["rule_id"]: i["state"] for i in result["items"]}
+    assert result["counts"]["insufficient"] == 0
+    assert states["R01"] == "provided"
+    assert states["R06"] == "provided"
+    assert states["R07"] == "provided"
+    assert states["R08"] == "provided"
+    assert states["R10"] == "missing"  # 只有“项目经理 1 名”，没有证书/注册/职称材料
+    # “无需提供”不塞进 insufficient，标记为不适用，但仍计入 missing
+    assert states["R09"] == "missing"
+    r09 = next(i for i in result["items"] if i["rule_id"] == "R09")
+    assert r09["applicable"] is False
+    assert "无需提供" in r09["note"]
+
+
+def test_qualification_r10_requires_certificate_evidence():
+    """R10 只认强资格证据：有注册建造师/职称/证书才判已提供。"""
+    text = "投标人：示例公司\n项目负责人：项目经理 1 名，持二级注册建造师证书。\n"
+    result = qualification.check(text_doc(text))
+    states = {i["rule_id"]: i["state"] for i in result["items"]}
+    assert states["R10"] == "provided"
+
+
+def test_qualification_explicit_missing_is_missing_not_insufficient():
+    result = qualification.check(text_doc("投标人：示例公司\n未提供营业执照。\n未提供财务报告。\n"))
+    states = {i["rule_id"]: i["state"] for i in result["items"]}
+    assert states["R01"] == "missing"
+    assert states["R05"] == "missing"
+    assert result["counts"]["insufficient"] == 0
+
+
+def test_qualification_invalid_is_insufficient():
+    result = qualification.check(text_doc("投标人：示例公司\n营业执照：已过期。\n"))
+    states = {i["rule_id"]: i["state"] for i in result["items"]}
+    assert states["R01"] == "insufficient"
+    r01 = next(i for i in result["items"] if i["rule_id"] == "R01")
+    assert "过期" in r01["signals"]
+
+
 def test_review_is_deterministic_and_profile_switch_changes_score():
     doc = parse_sample("bid-001.docx", doc_id="20261115-abcdef02")
     first = service.run(doc, "profile-a")
@@ -130,3 +193,9 @@ def test_review_api_roundtrip():
     # 清理本次上传与评审，避免污染运行时数据
     service.delete(review["review_id"])
     store.delete_doc(doc_id)
+
+
+def test_document_list_hides_invalid_doc_ids():
+    """列表里不能出现详情接口会按“ID 格式不合法”拒绝的记录（如历史 eval.json）。"""
+    for item in store.list_docs(limit=1000):
+        assert store.valid_doc_id(item["doc_id"]), item

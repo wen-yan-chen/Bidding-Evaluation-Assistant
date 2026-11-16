@@ -29,6 +29,28 @@ def test_clean_sample_has_no_hits():
     assert scan(SAMPLES / "bid-001.docx") == set()
 
 
+def test_extension_quote_table_rules():
+    path = SAMPLES / "extension" / "ext-quote-table.md"
+    hits = scan(path)
+    assert {"R34", "R36", "R38", "R39"} <= hits
+
+
+def test_project_type_gate_applies_to_tender_only_rules():
+    path = SAMPLES / "extension" / "ext-quote-table.md"
+    engineering = {h["rule_id"] for h in rules.scan_doc(load(path), context={"project_type": "engineering"})}
+    goods = {h["rule_id"] for h in rules.scan_doc(load(path), context={"project_type": "goods_services"})}
+    assert "R36" in engineering
+    assert "R36" not in goods
+
+
+def test_qualification_project_type_gate():
+    doc = load(SAMPLES / "bid-001.docx")
+    goods = qualification.check(doc, project_type="goods_services")
+    engineering = qualification.check(doc, project_type="engineering")
+    assert "R03" in goods["not_applicable_rule_ids"]
+    assert "R03" not in engineering["not_applicable_rule_ids"]
+
+
 def test_implanted_rules_are_detected():
     assert "R12" in scan(SAMPLES / "risk" / "risk-001.docx")
     assert "R13" in scan(SAMPLES / "risk" / "risk-002.docx")
@@ -80,3 +102,9 @@ def test_scan_is_deterministic():
     first = [(h["rule_id"], h["char_start"]) for h in rules.scan_doc(load(path), context=CONTEXT)]
     second = [(h["rule_id"], h["char_start"]) for h in rules.scan_doc(load(path), context=CONTEXT)]
     assert first == second
+
+
+def test_same_rule_is_not_counted_twice_in_one_document():
+    # risk-015 正文两处“美元”，同一 R35 只应保留一条证据，避免风险数虚高
+    hits = rules.scan_doc(load(SAMPLES / "risk" / "risk-015.docx"), context=CONTEXT)
+    assert [h["rule_id"] for h in hits].count("R35") == 1

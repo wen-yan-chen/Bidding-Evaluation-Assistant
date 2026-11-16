@@ -100,6 +100,9 @@ def test_rules_api_endpoints():
 
 
 def test_mcp_tools_direct_call():
+    import pytest
+
+    pytest.importorskip("mcp.server.fastmcp")
     from api import store
     from mcps import bid_review_mcp as mcp_tools
 
@@ -113,12 +116,12 @@ def test_mcp_tools_direct_call():
     scanned = mcp_tools.scan_risks(doc.doc_id)
     assert scanned["hit_count"] == len(scanned["hits"])
     assert scanned["rule_digest"] == rules_api.rules_digest()
-    # 自动规则 = 18 条关键词 + 5 条已实现计算型（R12/R13/R17/R31/R37）
-    assert scanned["scanned_rules"] == 23
+    # 自动规则 = 18 条关键词 + 9 条已实现计算型（R12/R13/R17/R31/R34/R36/R37/R38/R39）
+    assert scanned["scanned_rules"] == 27
     assert scanned["scanned_pattern_rules"] == 18
-    assert scanned["scanned_price_rules"] == 5
+    assert scanned["scanned_price_rules"] == 9
     assert len(scanned["manual_rule_ids"]) == 10
-    assert len(scanned["unimplemented_rule_ids"]) == 7
+    assert len(scanned["unimplemented_rule_ids"]) == 3
     assert scanned["scan_notes"]
     assert scanned["scanned_rules"] + len(scanned["manual_rule_ids"]) + len(scanned["unimplemented_rule_ids"]) == 40
 

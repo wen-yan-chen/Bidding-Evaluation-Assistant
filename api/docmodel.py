@@ -44,7 +44,10 @@ class Clause:
 
 @dataclass(slots=True)
 class SourceField:
-    """结构化字段 + 溯源三元组。`quote` 必须是 `full_text[char_start:char_end]`。"""
+    """结构化字段 + 溯源三元组。`quote` 必须是 `full_text[char_start:char_end]`。
+
+    `items` 只给“资质清单/业绩清单”这类结构化列表字段使用；普通字段为空列表。
+    """
 
     name: str
     value: str
@@ -52,6 +55,7 @@ class SourceField:
     char_start: int
     char_end: int
     quote: str
+    items: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass

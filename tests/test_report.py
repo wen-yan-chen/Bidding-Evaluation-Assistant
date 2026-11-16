@@ -67,6 +67,8 @@ def test_generate_docx_and_pdf_with_consistent_numbers():
     assert total in text
     assert data["basis"]["profile_digest"] in text
     assert data["basis"]["rule_digest"] in text
+    assert "一、封面与文档信息" in text
+    assert "九、免责声明" in text
 
     pdf_path, _ = report_service.generate(review_id, "pdf")
     assert pdf_path.exists() and pdf_path.stat().st_size > 2000
@@ -74,6 +76,7 @@ def test_generate_docx_and_pdf_with_consistent_numbers():
     pdf_text = "\n".join((p.extract_text() or "") for p in PdfReader(str(pdf_path)).pages)
     assert total in pdf_text.replace(" ", "")
     assert "免责" in pdf_text or "辅助评审结果" in pdf_text
+    assert "一、封面与文档信息" in pdf_text
 
 
 def test_generate_is_idempotent():

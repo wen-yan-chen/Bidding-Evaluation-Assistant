@@ -82,6 +82,22 @@ def test_boundary_currency_symbol_and_month_duration():
     assert_quotes_consistent(doc)
 
 
+def test_extension_structured_qualification_and_performance_lists():
+    path = SAMPLES / "extension" / "ext-qual-list.md"
+    doc = parse_file(path.read_bytes(), path.name, "eval", "eval")
+    doc.fields = extract_fields(doc)
+    by_name = {f.name: f for f in doc.fields}
+    assert len(by_name["资质清单"].items) == 4
+    assert by_name["资质清单"].items[0]["name"] == "营业执照"
+    assert by_name["资质清单"].items[0]["quote"].startswith("1. 营业执照")
+    assert len(by_name["业绩清单"].items) == 3
+    assert by_name["业绩清单"].items[0]["project_name"] == "示例市政务云平台一期"
+    for field in doc.fields:
+        assert doc.full_text[field.char_start : field.char_end] == field.quote
+        for item in field.items:
+            assert doc.full_text[item["char_start"] : item["char_end"]] == item["quote"]
+
+
 def test_clauses_split():
     doc = parse_sample("bid-010.docx")
     assert len(doc.clauses) >= 5

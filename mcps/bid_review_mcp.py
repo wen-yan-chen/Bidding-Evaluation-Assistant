@@ -104,7 +104,7 @@ def scan_risks(doc_id: str, rule_ids: list[str] | None = None) -> dict[str, Any]
     `rule_id / level / page / char_start / char_end / quote / legal_basis / basis_status`。
     只做字面量匹配，不做语义推理；`basis_status=pending` 时 legal_basis 为「未检索到权威依据」。
 
-    计数口径：`scanned_rules = 关键词规则 + 已实现的计算型规则`（默认 18 + 5 = 23）；
+    计数口径：`scanned_rules = 关键词规则 + 已实现的计算型规则`（阶段 2 为 18 + 9 = 27）；
     另返回 `scanned_pattern_rules` / `scanned_price_rules` / `manual_rule_ids` /
     `unimplemented_rule_ids` / `scan_notes`，避免模型把「只扫了 18 条关键词」误报成总数。
     """

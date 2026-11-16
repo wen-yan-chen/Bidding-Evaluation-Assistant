@@ -4,6 +4,11 @@
 > 当前版本 **v0.9.0（D9）**：4 个自定义 Skill 已上传并随 Nexent agent v5 发布；`scan_risks` 口径修正为
 > **23 条**（18 关键词 + 5 计算型）；补齐 **测试报告 / 留出集单独成绩 / USAGE**。D8 的评审看板、
 > 双栏对照、报告中心继续可用；样本 25 份，解析 25/25、字段 146/146；风险检出 100%、误报 0%。
+>
+> **阶段 2（未发布，2026-11-16）**：规则依据 **30 verified / 6 pending / 4 na**；R07/R10 语义修正，
+> 25 份人工标注 **250/250 = 100%**；新增资质清单/业绩清单结构化字段（8 字段）；
+> R34/R36/R38/R39 四条表格规则落地，规则覆盖 **40 = 27 自动 + 10 人工 + 3 未实现**
+> （R25/R32/R33 需多家比价，单份不可判定）；评审入口支持工程/货物服务项目类型门控。
 
 面向政企采购场景的招投标文件辅助评审系统：解析招标/投标文件并**溯源到页码**，按招标文件的评分细则**逐项算分**，按 40 条规则库核验**资格性与合规风险**，输出可**点击跳回原文**的风险清单与可下载的审核报告。
 
@@ -309,6 +314,9 @@ python tools/agent_config.py sync     # prompt.md → agent.json.prompt（唯一
 python tools/agent_config.py check    # 配置校验：temperature、Skill/MCP 数量、占位符、免责声明
 python tools/smoke_test.py            # 服务起来后的 10 项验收（含扫描件 OCR）
 python tools/validate_rules.py        # 规则库门禁：条数/分类/依据三态/知识库指纹
+python tools/eval_rule_coverage.py --strict  # 40=27 自动+10 人工+3 未实现
+python tools/eval_qualification.py --strict   # 资格性三态 vs 人工标注 + P1 语义回归
+python tools/eval_scoring.py          # 评分 vs 专家标注（无专家时明确“无法计算”）
 python tools/export_kb.py --check     # 校验知识库导出是否与 YAML 一致
 python tools/make_samples.py          # 重新生成 10 份样本 + 标准答案（--no-pdf 跳过 pdf）
 python tools/eval_parse.py --strict   # 复算指标（需 OCR 依赖，建议在容器里跑，见 D3 自测记录 §3）

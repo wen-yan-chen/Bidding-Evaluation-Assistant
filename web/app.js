@@ -17,6 +17,7 @@ const state = {
   profiles: [],
   selectedDocId: null,
   selectedProfileId: null,
+  projectType: 'unknown',
   doc: null,
   review: null,
   compare: null,
@@ -286,7 +287,7 @@ function renderDocMeta(doc) {
   appendChip(box, '页数', `${doc.page_count}${doc.page_source === 'estimated' ? '（估算）' : ''}`);
   appendChip(box, '字符', doc.char_count);
   appendChip(box, '条款', `${(doc.clauses || []).length} 条`);
-  appendChip(box, '字段', `${(doc.fields || []).length} / 6`);
+  appendChip(box, '字段', `${(doc.fields || []).length} / 8`);
   if (doc.sha256) appendChip(box, 'SHA256', shortHash(doc.sha256));
 
   // 评审看板不展示「降级」提示；OCR/页码口径在报告中心与报告中说明
@@ -300,7 +301,7 @@ function renderDocMeta(doc) {
 async function loadDocs(selectId) {
   let data;
   try {
-    data = await api('/api/documents', { timeout: 10000 });
+    data = await api('/api/documents?limit=1000', { timeout: 10000 });
   } catch (err) {
     state.docs = [];
     state.docsReady = true;
@@ -847,6 +848,23 @@ function updateProfileHint() {
 
 function initReview() {
   $('btn-review').addEventListener('click', runReview);
+  const projectType = $('project-type');
+  if (projectType) {
+    projectType.value = state.projectType || 'unknown';
+    const syncProjectType = () => {
+      state.projectType = projectType.value || 'unknown';
+      const label = $('sel-project-type');
+      if (label) {
+        label.textContent = {
+          engineering: '工程类（招标投标法体系）',
+          goods_services: '货物/服务类（政府采购体系）',
+          unknown: '未指定（通用口径）',
+        }[state.projectType] || '未指定';
+      }
+    };
+    projectType.addEventListener('change', syncProjectType);
+    syncProjectType();
+  }
   $('btn-export-docx').addEventListener('click', () => exportCurrent('docx'));
   $('btn-export-pdf').addEventListener('click', () => exportCurrent('pdf'));
 }
@@ -915,7 +933,7 @@ async function runReview() {
   try {
     const data = await api('/api/review', {
       method: 'POST',
-      body: { doc_id: doc.doc_id, profile_id: profile.id },
+      body: { doc_id: doc.doc_id, profile_id: profile.id, project_type: state.projectType || 'unknown' },
       timeout: 30000,
     });
     const history = state.reviewsByDoc[data.doc_id] || [];

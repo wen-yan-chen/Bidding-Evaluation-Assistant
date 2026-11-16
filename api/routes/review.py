@@ -8,7 +8,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
@@ -23,6 +23,9 @@ router = APIRouter(prefix="/api", tags=["review"])
 class ReviewRequest(BaseModel):
     doc_id: str = Field(..., description="已解析文档 ID")
     profile_id: str = Field("profile-a", description="评分细则 ID")
+    project_type: Literal["engineering", "goods_services", "unknown"] = Field(
+        "unknown", description="项目类型：engineering / goods_services / unknown"
+    )
 
 
 @router.get("/scoring/profiles", summary="可用评分细则（含指纹与权重摘要）")
@@ -36,7 +39,7 @@ def create_review(payload: ReviewRequest) -> dict[str, Any]:
     doc = store.load_doc(payload.doc_id)
     if doc is None:
         raise HTTPException(404, f"文档不存在：{payload.doc_id}")
-    result = review_service.run(doc, payload.profile_id)
+    result = review_service.run(doc, payload.profile_id, project_type=payload.project_type)
     if "error" in result:
         raise HTTPException(400, result["error"])
     return result

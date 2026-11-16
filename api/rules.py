@@ -40,6 +40,9 @@ class Rule:
     basis: str = ""
     basis_note: str = ""
     compliant: tuple[str, ...] = field(default_factory=tuple)
+    project_types: tuple[str, ...] = ()
+    legal_system: str = "both"
+    requires_tender: bool = False
 
     @property
     def legal_basis(self) -> str:
@@ -54,6 +57,7 @@ class Rule:
         data = asdict(self)
         data["patterns"] = list(self.patterns)
         data["compliant"] = list(self.compliant)
+        data["project_types"] = list(self.project_types)
         data["legal_basis"] = self.legal_basis
         data["detect_label"] = DETECT_LABEL.get(self.detect, self.detect)
         return data
@@ -82,6 +86,9 @@ def _build(raw: dict[str, Any]) -> list[Rule]:
                 basis=str(item.get("basis") or ""),
                 basis_note=str(item.get("basis_note") or ""),
                 compliant=tuple(str(c) for c in item.get("compliant") or []),
+                project_types=tuple(str(t) for t in item.get("project_types") or []),
+                legal_system=str(item.get("legal_system") or "both"),
+                requires_tender=bool(item.get("requires_tender") or False),
             )
         )
     return rules
@@ -147,6 +154,17 @@ def _has_negative_context(text: str, start: int, end: int, window: int = 18) -> 
     return any(word in context for word in NEGATIVE_CONTEXT)
 
 
+def rule_applies(rule: Rule, project_type: str | None) -> bool:
+    """项目类型门控：未指定/unknown 时不硬判；工程类只匹配“工程”，货物服务匹配“货物/服务”。"""
+    if not rule.project_types or not project_type or project_type == "unknown":
+        return True
+    if project_type == "engineering":
+        return "工程" in rule.project_types
+    if project_type == "goods_services":
+        return bool({"货物", "服务"} & set(rule.project_types))
+    return True
+
+
 def scan_doc(
     doc: Any,
     rules: tuple[Rule, ...] | None = None,
@@ -167,6 +185,8 @@ def scan_doc(
     for rule in rules:
         # 资质门槛由 qualification.py 按三态核验，这里不重复扫描（否则"授权书"这类章节标题会被误报）
         if rule.category == "资质门槛":
+            continue
+        if not rule_applies(rule, context.get("project_type")):
             continue
         if rule.detect == "pattern" and rule.patterns:
             found = 0
@@ -226,7 +246,12 @@ def scan_doc(
                         "needs_review": True,
                     }
                 )
-    return hits
+    # 同一规则在单份文档里只保留第一条证据：同一问题多处出现时，避免风险数被重复计高。
+    # 需要展示多处证据时，由 UI/报告按 rule_id 聚合，而不是把同一规则计成多条风险。
+    deduped: dict[str, dict[str, Any]] = {}
+    for hit in hits:
+        deduped.setdefault(str(hit["rule_id"]), hit)
+    return list(deduped.values())
 
 
 def scan_notes(doc: Any, rules: tuple[Rule, ...] | None = None) -> list[str]:

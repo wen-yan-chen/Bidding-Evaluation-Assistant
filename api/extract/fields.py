@@ -77,7 +77,23 @@ FIELD_SPECS: tuple[FieldSpec, ...] = (
         ),
         "duration",
     ),
+    FieldSpec(
+        "资质清单",
+        (r"(?m)^[ \t]*(?:#{1,6}[ \t]*)?(?:资质清单|资格清单|资格证明材料清单)[ \t]*[:：]?[ \t]*$",),
+        "qual_list",
+    ),
+    FieldSpec(
+        "业绩清单",
+        (r"(?m)^[ \t]*(?:#{1,6}[ \t]*)?(?:业绩清单|类似项目业绩清单|业绩一览表)[ \t]*[:：]?[ \t]*$",),
+        "perf_list",
+    ),
 )
+
+LIST_END_RE = re.compile(
+    r"\n\s*(?:#{1,6}\s*)?(?:第[一二三四五六七八九十]+[章节]|报价明细|商务|技术|其他资料|附件|"
+    r"业绩清单|资质清单|资格清单)\b"
+)
+LIST_LINE_RE = re.compile(r"^\s*(?:\d+[.、]|[-*])\s*(.+)$")
 
 
 def _line_end(text: str, start: int, cap: int = 200) -> int:
@@ -152,11 +168,93 @@ def _extract_one(doc: Doc, spec: FieldSpec) -> SourceField | None:
     return None
 
 
+def _extract_list(doc: Doc, spec: FieldSpec) -> SourceField | None:
+    """从显式“资质清单/业绩清单”段落抽结构化条目。
+
+    只认显式清单标题，避免把普通“资格证明文件”章节硬塞成清单；
+    抽不到条目就返回 None（按缺失处理），不编造。
+    """
+    text = doc.full_text
+    for pattern in spec.patterns:
+        heading = re.search(pattern, text, re.M)
+        if not heading:
+            continue
+        body_start = heading.end()
+        end_match = LIST_END_RE.search(text, body_start)
+        body_end = end_match.start() if end_match else min(len(text), body_start + 2000)
+        items: list[dict[str, object]] = []
+        first_line_end = body_start
+        for line_match in re.finditer(r"[^\n]+", text[body_start:body_end]):
+            raw = line_match.group(0)
+            line_start = body_start + line_match.start()
+            stripped = raw.strip()
+            if not stripped or set(stripped) <= {"-", "|", " ", "\t"}:
+                continue
+            line = stripped
+            bullet = LIST_LINE_RE.match(line)
+            if bullet:
+                line = bullet.group(1).strip()
+            if "|" not in line and not bullet:
+                continue
+            cells = [c.strip() for c in line.strip("|").split("|")] if "|" in line else [line]
+            cells = [c for c in cells if c]
+            if not cells:
+                continue
+            if spec.kind == "qual_list":
+                name = cells[0]
+                if name in {"资质名称", "材料名称", "序号"}:
+                    continue
+                item = {
+                    "name": name,
+                    "issuer": cells[1] if len(cells) > 1 else "",
+                    "number": cells[2] if len(cells) > 2 else "",
+                    "valid_until": cells[3] if len(cells) > 3 else "",
+                }
+            else:
+                name = cells[0]
+                if name in {"项目名称", "业绩名称", "序号"}:
+                    continue
+                item = {
+                    "project_name": name,
+                    "amount": cells[1] if len(cells) > 1 else "",
+                    "owner": cells[2] if len(cells) > 2 else "",
+                    "date": cells[3] if len(cells) > 3 else "",
+                }
+            if not name:
+                continue
+            lead = len(raw) - len(raw.lstrip())
+            start = line_start + lead
+            quote = doc.slice_text(start, start + len(stripped))
+            if not quote:
+                continue
+            item.update({"page": doc.page_of(start), "char_start": start, "char_end": start + len(quote), "quote": quote})
+            items.append(item)
+            if first_line_end == body_start:
+                first_line_end = start + len(quote)
+        if not items:
+            continue
+        names = [str(i.get("name") or i.get("project_name") or "") for i in items]
+        value = f"{len(items)} 项：" + "、".join(names)
+        if len(value) > 100:
+            value = value[:100] + "…"
+        quote = doc.slice_text(heading.start(), first_line_end)
+        return SourceField(
+            name=spec.name,
+            value=value,
+            page=doc.page_of(heading.start()),
+            char_start=heading.start(),
+            char_end=first_line_end,
+            quote=quote,
+            items=items,
+        )
+    return None
+
+
 def extract_fields(doc: Doc) -> list[SourceField]:
-    """抽取 6 个关键字段；抽不到就不返回，不猜、不补默认值。"""
+    """抽取关键字段；列表型字段只在显式“资质清单/业绩清单”标题下出现。"""
     fields: list[SourceField] = []
     for spec in FIELD_SPECS:
-        field = _extract_one(doc, spec)
+        field = _extract_list(doc, spec) if spec.kind.endswith("_list") else _extract_one(doc, spec)
         if field is not None:
             fields.append(field)
     return fields

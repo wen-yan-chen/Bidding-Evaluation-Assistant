@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Rule library gate
+        run: python tools/validate_rules.py
+      - name: Rule coverage gate (40 = 27 auto + 10 manual + 3 unimplemented)
+        run: python tools/eval_rule_coverage.py --strict
+      - name: Qualification labels + semantic regression (25 files / 250 items)
+        run: python tools/eval_qualification.py --strict --require-full
+      - name: Risk regression (15 planted + 5 clean)
+        run: python tools/eval_risks.py --strict
+      - name: Unit and API tests
+        run: python -m pytest -q

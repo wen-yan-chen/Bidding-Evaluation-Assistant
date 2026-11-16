@@ -13,9 +13,12 @@
 #   compliant     「合规定式」：出现这些表述时**不要**报风险（写进提示词，不进知识库）
 #
 # 合规红线：basis 只填能确认的条号；不确定就置 pending 并留空，绝不编造。
+#   依据适用范围：政府采购体系依据（实施条例、财政部令第 87 号、财库〔2020〕46 号）适用于
+#   政府采购货物和服务项目；政府采购工程采用招标方式的，按《招标投标法》及其实施条例、
+#   招标文件核对，不得直接套用。
 
 version: 1
-updated: "2026-11-15"
+updated: "2026-11-16"
 categories:
   - name: 资质门槛
     code: qualification
@@ -35,9 +38,9 @@ rules:
     condition: 投标文件中未见营业执照，或未见统一社会信用代码等可核验的登记信息。
     detect: manual
     patterns: ["营业执照", "统一社会信用代码"]
-    basis_status: pending
-    basis: ""
-    basis_note: 依据来自招标文件资格条款，具体条款需按项目核对，不套用统一法条。
+    basis_status: verified
+    basis: 《政府采购法实施条例》第十七条第（一）项
+    basis_note: 营业执照等证明文件属资格材料；不判断证件真伪，具体以招标文件资格条款为准。
 
   - id: R02
     category: 资质门槛
@@ -48,7 +51,8 @@ rules:
     patterns: ["资质证书", "资质等级"]
     basis_status: pending
     basis: ""
-    basis_note: 资质要求逐项目不同，需比对招标文件资格条件原文。
+    basis_note: 未核验：建议以《政府采购法实施条例》第十七条末段（特殊要求）为主、第（五）项并列；资质须由法律、行政法规设定或招标文件明确要求，无招标文件不能判“应当提供而未提供”。
+    requires_tender: true
 
   - id: R03
     category: 资质门槛
@@ -57,9 +61,11 @@ rules:
     condition: 施工类项目要求安全生产许可证，投标文件未提供或已过有效期。
     detect: manual
     patterns: ["安全生产许可证"]
-    basis_status: pending
-    basis: ""
-    basis_note: 由招标文件资格条款约定；许可有效期需核验证件本身。
+    basis_status: verified
+    basis: 《安全生产许可证条例》第二条
+    basis_note: 仅适用于施工类项目（建筑施工企业）；货物、服务类不作门槛；许可证有效期需核验原件。
+    project_types: ["工程"]
+    legal_system: tender
 
   - id: R04
     category: 资质门槛
@@ -79,8 +85,9 @@ rules:
     condition: 招标文件要求近年财务报告或审计报告，投标文件未提供。
     detect: manual
     patterns: ["财务报告", "审计报告", "资产负债表"]
-    basis_status: pending
-    basis: ""
+    basis_status: verified
+    basis: 《政府采购法实施条例》第十七条第（二）项
+    basis_note: 具体年度、是否需审计报告以招标文件为准。
 
   - id: R06
     category: 资质门槛
@@ -89,8 +96,9 @@ rules:
     condition: 招标文件要求依法缴纳税收和社会保障资金的证明，投标文件未提供。
     detect: manual
     patterns: ["社会保险", "纳税证明", "社保缴纳"]
-    basis_status: pending
-    basis: ""
+    basis_status: verified
+    basis: 《政府采购法实施条例》第十七条第（二）项
+    basis_note: 具体月份、险种、纳税期间以招标文件为准。
 
   - id: R07
     category: 资质门槛
@@ -98,9 +106,10 @@ rules:
     title: 无重大违法记录声明缺失
     condition: 未提供参加本次采购活动前三年内无重大违法记录的书面声明。
     detect: manual
-    patterns: ["重大违法记录", "无违法记录声明"]
-    basis_status: pending
-    basis: ""
+    patterns: ["重大违法记录", "无违法记录声明", "不存在被列入失信被执行人", "无行贿犯罪记录", "无重大税收违法"]
+    basis_status: verified
+    basis: 《政府采购法实施条例》第十七条第（四）项、第十九条
+    basis_note: 属书面声明材料，不等于对违法事实的认定；“未提供声明”与“有违法记录”是两件事。
 
   - id: R08
     category: 资质门槛
@@ -109,8 +118,11 @@ rules:
     condition: 招标文件明确面向中小企业或允许价格扣除时，未提供中小企业声明函。
     detect: manual
     patterns: ["中小企业声明函"]
-    basis_status: pending
-    basis: ""
+    basis_status: verified
+    basis: 《政府采购促进中小企业发展管理办法》第十一条（财库〔2020〕46号）
+    basis_note: 未提供声明函不必然废标，后果是不享受中小企业扶持政策；是否作资格条件看招标文件。
+    project_types: ["货物", "服务"]
+    legal_system: govproc
 
   - id: R09
     category: 资质门槛
@@ -129,9 +141,11 @@ rules:
     title: 项目负责人资格不满足
     condition: 拟派项目负责人的执业资格、职称或业绩不满足招标文件要求。
     detect: manual
-    patterns: ["项目负责人", "项目经理", "注册建造师"]
+    patterns: ["注册建造师", "建造师证书", "建造师", "项目经理证书", "职称证书", "执业资格证书", "项目负责人证书"]
     basis_status: pending
     basis: ""
+    basis_note: 未核验：建议以《政府采购法实施条例》第十七条末段为主、第（五）项并列；项目负责人证书、职称、业绩要求须出自招标文件，只看投标文件不能推“资格不满足”。
+    requires_tender: true
 
   # ---------------------------------------------------------------- 废标条款（R11–R20）
   - id: R11
@@ -370,9 +384,9 @@ rules:
     condition: 投标报价低于同包其他有效投标报价平均值 20% 以上。
     detect: price
     patterns: ["明显低于", "低于平均值"]
-    basis_status: pending
-    basis: ""
-    basis_note: 是否构成"低于成本"需结合成本说明判断，见 R13。
+    basis_status: verified
+    basis: 《政府采购货物和服务招标投标管理办法》第六十条（财政部令第87号）
+    basis_note: “低于平均值 20%”是项目经验阈值，不是法条数字；须同时存在影响质量或不能诚信履约的可能，且不能证明合理性才作无效投标。
 
   - id: R33
     category: 报价异常
@@ -392,9 +406,9 @@ rules:
     condition: 报价明细各分项金额合计与投标总价不一致，且差额无法由暂列金额、税金等解释。
     detect: price
     patterns: ["分项合计", "总价不一致"]
-    basis_status: pending
-    basis: ""
-    basis_note: 属算术错误，按招标文件澄清规则处理；无统一法条。
+    basis_status: verified
+    basis: 《政府采购货物和服务招标投标管理办法》第五十九条第（四）项
+    basis_note: 第五十九条是报价修正规则（以单价金额计算结果为准），不直接作无效；修正后报价经投标人确认后生效，不确认的投标无效。
 
   - id: R35
     category: 报价异常
@@ -417,6 +431,8 @@ rules:
     basis_status: pending
     basis: ""
     basis_note: 依据招标文件报价要求，逐项目不同。
+    project_types: ["工程"]
+    legal_system: tender
 
   - id: R37
     category: 报价异常
@@ -425,9 +441,9 @@ rules:
     condition: 投标报价的大写金额与小写金额不一致。
     detect: price
     patterns: ["大写", "小写"]
-    basis_status: pending
-    basis: ""
-    basis_note: 通常以大写为准并要求澄清；无统一法条。
+    basis_status: verified
+    basis: 《政府采购货物和服务招标投标管理办法》第五十九条第（二）项
+    basis_note: 以大写金额为准；修正后报价经投标人确认后生效，不确认的投标无效。
 
   - id: R38
     category: 报价异常
@@ -438,6 +454,7 @@ rules:
     patterns: ["单价", "数量", "合价"]
     basis_status: pending
     basis: ""
+    basis_note: 未核验：单价×数量不符属行内算术错误，不是第五十九条第（四）项的直接对应情形，只能“参照”第 59 条修正顺序与第 51 条澄清补正。
 
   - id: R39
     category: 报价异常

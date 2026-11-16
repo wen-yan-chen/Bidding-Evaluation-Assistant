@@ -2,6 +2,85 @@
 
 本项目遵循 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 与语义化版本。
 
+## [Unreleased] — 阶段 2 改进（2026-11-16）
+
+### Changed
+
+- **规则依据落库 30/6/4**：R01/R03/R05/R06/R07/R08/R32/R34/R37 升 `verified`；
+  R02/R10/R38/R35/R36/R39 维持 `pending`，`basis_note` 写明“需招标文件/参照适用/项目特定”。
+- **R07** 补“不存在被列入失信被执行人”“重大税收违法失信主体”“无行贿犯罪记录”等正向声明，
+  25 份人工标注由 0/25 修正为 25/25 已提供。
+- **R10** 由“项目负责人/项目经理”单句改为必须出现注册建造师/建造师/证书/职称等强证据；
+  25 份人工标注全部判缺失。R07 与 R10 一增一减，bid-001 净计数仍 **4/0/6**
+  （R07 已提供、R10 缺失）。
+- **规则覆盖 27/10/3**：实现 R34/R36/R38/R39 表格/报价规则；R25/R32/R33 保留“需多家比价，
+  单份不可判定”；自动 = 18 关键词 + 9 计算型 = 27。
+- **项目类型门控**：规则增加 `project_types` / `legal_system` / `requires_tender`；
+  `/api/review` 增加 `project_type`（engineering / goods_services / unknown）；未指定时不硬判。
+
+### Added
+
+- 8 字段结构化：新增 `资质清单`、`业绩清单`，每个条目含名称/页码/quote（以及颁发机构/编号/
+  有效期或项目名称/金额/采购人/时间）；只在显式清单标题下抽取，避免污染 25 份 6 字段基线。
+- `data/samples/extension/`：合成扩展样本（资质/业绩清单、报价明细表/暂列金额/必报分项），
+  不纳入 25 份基线。
+- `docs/评审功能测评数据/资格性标注材料/`：A/B 各 250 行、终稿 250 行、一致性报告与分歧清单。
+
+### Verified
+
+- `eval_qualification.py --strict --require-full`：25 份 / 250 项 **100%**，5 个语义用例 0 失败。
+- `eval_parse.py --strict`：25 份基线 25/25、146/146 不变；扩展样本 14/14。
+- `eval_risks.py --strict`：TP=15 / FN=0 / FP=0。
+- `eval_rule_coverage.py --strict`：**40 = 27 + 10 + 3**。
+- `validate_quotes.py`：53 份文档、313 字段、989 条款，0 处不一致。
+- `check_report.py --all`：14 份报告全部一致。
+- 本地 `pytest`：63 passed, 1 skipped（MCP 用例因本地缺 `mcp` 依赖跳过；容器待复跑）。
+
+## [Unreleased] — 阶段 0/1 改进（2026-11-16）
+
+### Changed
+
+- **规则依据核验**：R01/R03/R05/R06/R07/R08/R32/R34/R37 由 `pending` 升为 `verified`，补
+  `basis`（法规名称+条号）与适用条件 `basis_note`（R32 的 20% 是经验阈值、R34/R37 第 59 条末款
+  “不确认即无效”、R08 未提供只影响扶持政策）；R02/R10/R38 复核后**仍留 pending**（依据层级停在
+  “第十七条末段/第（五）项”“参照第 59 条”，都需招标文件），`basis_note` 写明未核验原因；
+  R35/R36/R39 维持 pending，R30/R31/R33/R40 维持 na。
+  依据三态：**21 verified / 15 pending / 4 na → 30 / 6 / 4**（30+6+4=40）。
+- `rules.yaml` 头部补“适用范围”说明：实施条例、87号令、财库 46 号只管政府采购货物和服务；
+  政府采购工程采用招标方式的按《招标投标法》及其实施条例、招标文件核对。
+- 知识库随规则库重新导出（`export_kb.py` + `split_kb.py`），指纹 `ebd3bf91242911ba`。
+
+### Added
+
+- `tools/eval_qualification.py`：对已人工标注的资格性样本计算三态一致率，并内置
+  “合规否定式 / 明说未提供 / 过期失效 / 无需提供”四类 P1 语义回归用例。
+- `tools/eval_scoring.py`：读取 `data/samples/expert_scores.json`，计算评分与专家分
+  的 ±5 内比例、平均/最大偏差；无专家标注时明确输出“无法计算”，不用 AI 双评替代。
+- `tools/eval_rule_coverage.py`：40 条规则逐条标注自动/人工/未实现，锁定
+  `40 = 23 自动（18 关键词 + 5 计算）+ 10 人工 + 7 未实现`。
+- `data/samples/qualification_labels.json`：已有可追溯标注（bid-001、risk-005、risk-010）；
+  `data/samples/expert_scores.json`：专家评分标注模板（当前为空，待 Phase 2 人工盲评）。
+- `.github/workflows/ci.yml`：规则门禁、规则覆盖、资格性语义回归、pytest。
+
+### Fixed
+
+- 资格性三态：否定信号从 ±24 字窗口改为**句界**，不再用单字“无”做通用否定；
+  “无重大违法记录/无异议/无需提供”不再误判“效力不足”；“未提供/未附/无××”归
+  `missing`，“过期/失效/无效”归 `insufficient`；`无需提供`标记 `applicable=false`。
+- 风险扫描：同一 `rule_id` 在单份文档中只保留第一条证据，避免 risk-015 的 R35 重复计数。
+- 报告：封面补“一、封面与文档信息”，九章编号连续（不再从“二、”开始）。
+- 文档列表：过滤非法 `doc_id`（如历史 `eval`），前端 `/api/documents` 显式 `limit=1000`，
+  避免 >200 文档时旧记录在 UI 不可见。
+
+### Verified
+
+- `pytest`：**59 passed**（容器内，含 OCR；1 个 Starlette warning）。
+- `eval_qualification.py --strict`：已标注 12/12 一致；4 个语义回归用例 0 失败。
+- `eval_rule_coverage.py --strict`：40 = 23 + 10 + 7；R40 的 manual/CHECKS 不一致仍作为已知告警。
+- `eval_risks.py --strict`：TP=15 / FN=0 / FP=0（dev 10/10、holdout 5/5）。
+- API 抽查：bid-001 仍 68.0 / 4/0/6 / 0 风险；risk-015 风险数 1；报告 docx/pdf 均含
+  “一、封面与文档信息”和“九、免责声明”。
+
 ## [0.9.0] — 2026-11-16（D9 Skill 挂载 + 评测交付）
 
 ### Added

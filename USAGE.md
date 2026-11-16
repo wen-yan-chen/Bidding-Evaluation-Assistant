@@ -217,8 +217,8 @@ curl.exe -s "$BASE/api/report/$($review.review_id)?format=docx" -o report.docx
 }
 ```
 
-- `scanned_rules` = 18 关键词 + 5 已实现计算型（R12/R13/R17/R31/R37）= **23**；
-- 另 10 条 manual、7 条未实现；23 + 10 + 7 = 40。
+- `scanned_rules` = 18 关键词 + 9 已实现计算型（R12/R13/R17/R31/R34/R36/R37/R38/R39）= **27**；
+- 另 10 条 manual、3 条未实现（R25/R32/R33）；27 + 10 + 3 = 40。
 
 ### 4.2 平台侧 Skill（D9 已挂载）
 
