@@ -61,17 +61,12 @@ code {
 .brand { display: flex; align-items: center; gap: 12px; min-width: 260px; }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 38px;
   height: 38px;
   flex: 0 0 auto;
   border-radius: 10px;
-  background: #16307f;
-  color: #fff;
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: 1px;
+  object-fit: contain;
   box-shadow: 0 4px 12px rgba(31, 79, 216, .28);
 }
 

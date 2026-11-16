@@ -431,15 +431,12 @@ function renderSourceFile(doc) {
   }
   const card = el('div', 'source-file-card');
   card.append(el('h3', '', doc.file_name || doc.doc_id));
-  card.append(el('p', '', '该文件类型暂不支持内嵌预览，请保存原件查看，或切到「解析文本」。'));
+  card.append(el('p', '', '该文件类型暂不支持内嵌预览，可切到「解析文本」查看内容。'));
   const actions = el('div', 'source-file-actions');
-  const save = el('a', 'btn btn-sm', '保存原件');
-  save.href = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw`;
-  save.download = doc.file_name || `${doc.doc_id}.${ext || 'bin'}`;
   const text = el('button', 'btn btn-sm', '查看解析文本');
   text.type = 'button';
   text.addEventListener('click', () => setSourceTab('text'));
-  actions.append(save, text);
+  actions.append(text);
   card.append(actions);
   wrap.append(card);
 }
@@ -2008,13 +2005,14 @@ async function previewDoc(doc) {
   title.textContent = doc.file_name || '文档预览';
   meta.textContent = `${doc.doc_id || '—'} · ${doc.page_count || '—'} 页 · ${ext ? ext.toUpperCase() : '文件'} · 原文预览`;
   setPreviewSave(`/api/doc/${encodeURIComponent(doc.doc_id)}/raw`, doc.file_name || `${doc.doc_id}.${ext || 'bin'}`, '保存原件');
+  const save = $('doc-preview-save');
+  if (save) save.hidden = true;
   body.textContent = '';
   body.classList.remove('preview-report-body');
   modal.hidden = false;
   document.body.classList.add('has-preview');
   $('btn-preview-close').focus();
 
-  const save = $('doc-preview-save');
   if (!docHasRaw(doc)) {
     if (save) save.hidden = true;
     const card = el('div', 'source-file-card');
@@ -2023,7 +2021,6 @@ async function previewDoc(doc) {
     body.append(card);
     return;
   }
-  if (save) save.hidden = false;
 
   if (ext === 'pdf') {
     const frame = document.createElement('iframe');
@@ -2121,12 +2118,6 @@ async function previewReport(review) {
   originalPane.id = 'preview-original-pane';
   const originalHead = el('div', 'preview-pane-head');
   originalHead.append(el('strong', '', '原件'));
-  const originalSave = el('a', 'locator', '保存原件');
-  originalSave.href = `/api/doc/${encodeURIComponent(review.doc_id)}/raw`;
-  originalSave.download = review.file_name || '';
-  const sourceDoc = state.docs.find((item) => item.doc_id === review.doc_id);
-  if (!sourceDoc || sourceDoc.has_raw === false) originalSave.hidden = true;
-  originalHead.append(originalSave);
   const originalBody = el('div', 'preview-original-content');
   originalBody.append(el('p', 'preview-loading', '点「查看原件」后加载'));
   originalPane.append(originalHead, originalBody);

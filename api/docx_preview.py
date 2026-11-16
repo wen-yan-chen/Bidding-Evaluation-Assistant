@@ -154,8 +154,7 @@ def render_docx_html(path: Path, file_name: str, doc_id: str) -> str:
 </style>
 </head>
 <body>
-<div class="docx-toolbar"><span>Word 渲染预览 · {safe_name}</span>
-<a href="/api/doc/{html.escape(doc_id)}/raw" download="{safe_name}">保存原件</a></div>
+<div class="docx-toolbar"><span>Word 渲染预览 · {safe_name}</span></div>
 <main class="docx-preview">{content}</main>
 </body>
 </html>"""
