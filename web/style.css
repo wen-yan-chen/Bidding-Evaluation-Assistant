@@ -67,7 +67,7 @@ code {
   height: 38px;
   flex: 0 0 auto;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2b5cf0, #16307f);
+  background: #16307f;
   color: #fff;
   font-weight: 700;
   font-size: 18px;
@@ -292,9 +292,9 @@ code {
   inset: 0 0 auto;
   height: 3px;
   border-radius: 12px 12px 0 0;
-  background: linear-gradient(90deg, var(--brand), #7aa0ff);
+  background: var(--brand);
 }
-.step-action::before { background: linear-gradient(90deg, #1f4fd8, #7aa0ff); }
+.step-action::before { background: var(--brand); }
 
 .step-no {
   display: inline-grid;
@@ -370,7 +370,7 @@ code {
 .progress-bar {
   width: 0;
   height: 100%;
-  background: linear-gradient(90deg, #1f4fd8, #5b8bff);
+  background: var(--brand);
   border-radius: inherit;
   transition: width .18s ease;
 }
@@ -479,9 +479,7 @@ code {
   padding: 20px 24px 16px;
   border-radius: 14px;
   color: #fff;
-  background:
-    radial-gradient(1200px 260px at 8% -10%, rgba(103, 149, 255, .55), transparent 60%),
-    linear-gradient(135deg, #132a63, #1f4fd8 72%, #2b5cf0);
+  background: #16307f;
   box-shadow: 0 12px 28px rgba(22, 48, 127, .24);
 }
 
