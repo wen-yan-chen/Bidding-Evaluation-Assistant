@@ -17,7 +17,7 @@
 - `USAGE.md`：页面 / API / MCP / 报告 / 排错。
 - `docs/使用说明.md` / `.docx`：面向评标专家/采购经办人的图文操作说明（对象、需求、步骤、结果、限制）。
 - 管理员入口：系统状态需 `ADMIN_USER` / `ADMIN_PASSWORD` 登录；MCP 显示「已接入 8 个工具」；
-  新增文档/评审/报告的删除与重复文档清理（`/api/admin/*`）。
+  新增文档/评审/报告的删除、批量删除与重复文档清理（`/api/admin/*`）。
 - `docs/D9-自测记录.md`、`docs/D9-交接文档.md` / `.docx`。
 
 ### Fixed
@@ -45,7 +45,7 @@
 - 风险：15/15 = 100%；误报 0/20 = 0%（dev 10/10、holdout 5/5）；
 - 溯源：`validate_quotes.py` 0 处不一致；
 - 报告：`check_report.py --all` 50/50；
-- `pytest` **53 passed**；`smoke_test.py` **10/10**；`agent_config.py check` OK 11 / WARN 0 / ERROR 0。
+- `pytest` **54 passed**；`smoke_test.py` **10/10**；`agent_config.py check` OK 11 / WARN 0 / ERROR 0。
 - 已知缺口：人类专家双盲评分缺失；AI 双盲严格细则 15/15、专业裁量 0/15，
   `TEST_REPORT.md` 第 2 条标代理，D10 前补真人专家。
 

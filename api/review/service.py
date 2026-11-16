@@ -86,7 +86,7 @@ def save(review: dict[str, Any]) -> None:
 
 
 def load(review_id: str) -> dict[str, Any] | None:
-    if not review_id.startswith("rv-"):
+    if not review_id or not review_id.startswith("rv-") or "/" in review_id or "\\" in review_id:
         return None
     path = REVIEWS_DIR / f"{review_id}.json"
     if not path.exists():

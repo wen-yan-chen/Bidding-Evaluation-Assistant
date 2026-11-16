@@ -25,11 +25,11 @@
 | 测试报告 | `docs/TEST_REPORT.md` | ✅ | 六条标准逐项数字；AI 双盲严格 15/15、专业裁量 0/15，专家项标代理 |
 | 留出集成绩 | `docs/留出集单独成绩.md` | ✅ | dev 10/10、holdout 5/5、误报 0/20 |
 | 使用文档 | `USAGE.md`、`docs/使用说明.md` / `.docx` | ✅ | 页面 / API / MCP / 排错 + 评委图文版 |
-| 管理入口 | 管理员登录 + 数据管理 | ✅ | 系统状态需登录；报告中心底部可删文档/评审/报告、清理重复；53 passed |
-| 回归 | smoke / pytest / check_report | ✅ | 10/10、53 passed、50/50 |
+| 管理入口 | 管理员登录 + 数据管理 | ✅ | 系统状态需登录；报告中心底部可单删/批量删文档、评审、报告，清理重复；54 passed |
+| 回归 | smoke / pytest / check_report | ✅ | 10/10、54 passed、50/50 |
 
 **D9 验收**：4 个 Skill 已挂载（`/api/health` 的 `skills=true`）；平台对话显示「扫描 23 条（18+5），命中 0」；
-`bid-001` 仍为 **68.0 / 资格性 4/6 / 风险 0**；`pytest` **53 passed**、`smoke_test.py` **10/10**；
+`bid-001` 仍为 **68.0 / 资格性 4/6 / 风险 0**；`pytest` **54 passed**、`smoke_test.py` **10/10**；
 `check_report.py --all` **50/50**。系统状态已加管理员登录：登录后 MCP 显示「已接入 8 个工具」，
 并可删除文档/评审/报告、清理重复文档。证据见 [`docs/D9-自测记录.md`](docs/D9-自测记录.md)，
 交接见 [`docs/D9-交接文档.md`](docs/D9-交接文档.md)，六条标准见 [`docs/TEST_REPORT.md`](docs/TEST_REPORT.md)，
@@ -297,6 +297,7 @@ python tools/smoke_test.py --base http://127.0.0.1:8000
 | DELETE | `/api/admin/doc/{doc_id}` | 删除文档并级联评审/报告（需登录） | ✅ D9 补丁 |
 | DELETE | `/api/admin/review/{review_id}` | 删除评审及报告（需登录） | ✅ D9 补丁 |
 | DELETE | `/api/admin/report/{review_id}` | 只删报告（需登录） | ✅ D9 补丁 |
+| POST | `/api/admin/batch-delete` | 批量删除所选文档/评审（需登录） | ✅ D9 补丁 |
 | POST | `/api/admin/cleanup` | 清理重复文档 / 无文档评审（需登录） | ✅ D9 补丁 |
 
 ---

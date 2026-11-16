@@ -304,6 +304,8 @@
         <div class="admin-toolbar">
           <input class="select admin-filter" id="admin-doc-filter" type="search" placeholder="筛选文件名 / doc_id">
           <button class="btn btn-sm" id="btn-admin-refresh" type="button">刷新</button>
+          <button class="btn btn-sm btn-danger" id="btn-batch-delete-docs" type="button" disabled>删除所选文档 (0)</button>
+          <button class="btn btn-sm btn-danger" id="btn-batch-delete-reviews" type="button" disabled>删除所选评审 (0)</button>
           <button class="btn btn-sm btn-danger" id="btn-clean-duplicates" type="button">清理重复文档</button>
           <button class="btn btn-sm btn-danger" id="btn-clean-orphans" type="button">清理无文档评审</button>
         </div>
@@ -313,8 +315,8 @@
             <h3>文档 <span class="muted" id="admin-doc-count"></span></h3>
             <div class="table-wrap admin-scroll">
               <table class="table admin-table">
-                <thead><tr><th>文件</th><th>doc_id</th><th>页数</th><th>状态</th><th>操作</th></tr></thead>
-                <tbody id="admin-doc-body"><tr><td colspan="5" class="empty">登录后加载…</td></tr></tbody>
+                <thead><tr><th class="check-cell"><input type="checkbox" id="admin-doc-select-all" aria-label="全选文档"></th><th>文件</th><th>doc_id</th><th>页数</th><th>状态</th><th>操作</th></tr></thead>
+                <tbody id="admin-doc-body"><tr><td colspan="6" class="empty">登录后加载…</td></tr></tbody>
               </table>
             </div>
           </div>
@@ -322,8 +324,8 @@
             <h3>评审与报告 <span class="muted" id="admin-review-count"></span></h3>
             <div class="table-wrap admin-scroll">
               <table class="table admin-table">
-                <thead><tr><th>评审</th><th>文件</th><th>总分</th><th>报告</th><th>操作</th></tr></thead>
-                <tbody id="admin-review-body"><tr><td colspan="5" class="empty">登录后加载…</td></tr></tbody>
+                <thead><tr><th class="check-cell"><input type="checkbox" id="admin-review-select-all" aria-label="全选评审"></th><th>评审</th><th>文件</th><th>总分</th><th>报告</th><th>操作</th></tr></thead>
+                <tbody id="admin-review-body"><tr><td colspan="6" class="empty">登录后加载…</td></tr></tbody>
               </table>
             </div>
           </div>

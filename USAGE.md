@@ -103,6 +103,7 @@ python tools/smoke_test.py --base http://127.0.0.1:18080
 登录后进入「报告中心」，页面底部「数据管理」：
 
 - 筛选：按文件名 / `doc_id` / 评审号过滤；
+- 勾选文档或评审（支持表头全选）→「删除所选文档 / 删除所选评审」批量删除；
 - 文档「删除」：删解析 JSON + 上传原件，并级联删其评审/报告；
 - 评审「删报告」：只删 docx/pdf，保留评审；
 - 评审「删评审」：删评审 JSON + 报告；
@@ -119,6 +120,7 @@ GET    /api/admin/overview
 DELETE /api/admin/doc/{doc_id}
 DELETE /api/admin/review/{review_id}
 DELETE /api/admin/report/{review_id}
+POST   /api/admin/batch-delete {"doc_ids":["..."],"review_ids":["..."]}
 POST   /api/admin/cleanup     {"mode":"duplicates"|"orphan_reviews"}
 ```
 

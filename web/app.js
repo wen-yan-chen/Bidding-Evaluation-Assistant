@@ -36,6 +36,8 @@ const state = {
   adminData: null,
   adminFilter: '',
   adminLoadSeq: 0,
+  adminSelectedDocs: new Set(),
+  adminSelectedReviews: new Set(),
 };
 
 /* ============================================================ 基础工具 */
@@ -1646,6 +1648,8 @@ async function loadAdminData() {
     const data = await api('/api/admin/overview', { timeout: 20000 });
     if (seq !== state.adminLoadSeq || !state.adminAuthenticated) return;
     state.adminData = data;
+    state.adminSelectedDocs.clear();
+    state.adminSelectedReviews.clear();
     renderAdminData();
   } catch (err) {
     if (seq !== state.adminLoadSeq) return;
@@ -1665,30 +1669,92 @@ function parseStatePill(status) {
   return el('span', 'pill pill-neutral', status || '—');
 }
 
+function adminVisibleDocs() {
+  const filter = (state.adminFilter || '').trim().toLowerCase();
+  return (state.adminData?.docs || []).filter((doc) =>
+    !filter || `${doc.file_name || ''} ${doc.doc_id || ''}`.toLowerCase().includes(filter));
+}
+
+function adminVisibleReviews() {
+  const filter = (state.adminFilter || '').trim().toLowerCase();
+  return (state.adminData?.reviews || []).filter((review) =>
+    !filter || `${review.review_id || ''} ${review.file_name || ''} ${review.doc_id || ''}`.toLowerCase().includes(filter));
+}
+
+function makeAdminCheckbox(checked, onChange, label) {
+  const cb = document.createElement('input');
+  cb.type = 'checkbox';
+  cb.checked = checked;
+  cb.setAttribute('aria-label', label);
+  cb.addEventListener('change', onChange);
+  return cb;
+}
+
+function updateAdminSelection() {
+  const docCount = state.adminSelectedDocs.size;
+  const reviewCount = state.adminSelectedReviews.size;
+  const docBtn = $('btn-batch-delete-docs');
+  const reviewBtn = $('btn-batch-delete-reviews');
+  if (docBtn) {
+    docBtn.textContent = `删除所选文档 (${docCount})`;
+    docBtn.disabled = docCount === 0;
+  }
+  if (reviewBtn) {
+    reviewBtn.textContent = `删除所选评审 (${reviewCount})`;
+    reviewBtn.disabled = reviewCount === 0;
+  }
+  const docs = adminVisibleDocs();
+  const reviews = adminVisibleReviews();
+  const docAll = $('admin-doc-select-all');
+  const reviewAll = $('admin-review-select-all');
+  if (docAll) {
+    const picked = docs.filter((doc) => state.adminSelectedDocs.has(doc.doc_id));
+    docAll.disabled = docs.length === 0;
+    docAll.checked = docs.length > 0 && picked.length === docs.length;
+    docAll.indeterminate = picked.length > 0 && picked.length < docs.length;
+  }
+  if (reviewAll) {
+    const picked = reviews.filter((review) => state.adminSelectedReviews.has(review.review_id));
+    reviewAll.disabled = reviews.length === 0;
+    reviewAll.checked = reviews.length > 0 && picked.length === reviews.length;
+    reviewAll.indeterminate = picked.length > 0 && picked.length < reviews.length;
+  }
+}
+
 function renderAdminData() {
   const data = state.adminData;
   if (!data) return;
   const counts = data.counts || {};
   $('admin-summary').textContent =
     `文档 ${counts.docs || 0} · 评审 ${counts.reviews || 0} · 报告 ${counts.reports || 0} 个 / ${fmtSize(counts.report_bytes || 0)} · 上传文件 ${counts.uploads || 0}`;
-  const filter = (state.adminFilter || '').trim().toLowerCase();
-  const docs = (data.docs || []).filter((doc) =>
-    !filter || `${doc.file_name || ''} ${doc.doc_id || ''}`.toLowerCase().includes(filter));
-  const reviews = (data.reviews || []).filter((review) =>
-    !filter || `${review.review_id || ''} ${review.file_name || ''} ${review.doc_id || ''}`.toLowerCase().includes(filter));
 
+  const docIds = new Set((data.docs || []).map((doc) => doc.doc_id));
+  const reviewIds = new Set((data.reviews || []).map((review) => review.review_id));
+  state.adminSelectedDocs = new Set([...state.adminSelectedDocs].filter((id) => docIds.has(id)));
+  state.adminSelectedReviews = new Set([...state.adminSelectedReviews].filter((id) => reviewIds.has(id)));
+
+  const docs = adminVisibleDocs();
   const docBody = $('admin-doc-body');
   docBody.textContent = '';
   $('admin-doc-count').textContent = `共 ${docs.length} 份`;
   if (!docs.length) {
     const tr = el('tr');
-    const td = el('td', 'admin-empty', filter ? '没有匹配的文档' : '暂无文档');
-    td.colSpan = 5;
+    const td = el('td', 'admin-empty', (state.adminFilter || '').trim() ? '没有匹配的文档' : '暂无文档');
+    td.colSpan = 6;
     tr.append(td);
     docBody.append(tr);
   }
   for (const doc of docs) {
     const tr = el('tr');
+    const selected = state.adminSelectedDocs.has(doc.doc_id);
+    if (selected) tr.classList.add('is-selected');
+    const tdCheck = el('td', 'check-cell');
+    tdCheck.append(makeAdminCheckbox(selected, (event) => {
+      if (event.target.checked) state.adminSelectedDocs.add(doc.doc_id);
+      else state.adminSelectedDocs.delete(doc.doc_id);
+      renderAdminData();
+    }, `选择文档 ${doc.file_name || doc.doc_id}`));
+    tr.append(tdCheck);
     tr.append(el('td', 'admin-file', doc.file_name || '—'));
     tr.append(el('td', '', doc.doc_id || '—'));
     tr.append(el('td', '', `${doc.page_count || '—'} 页`));
@@ -1705,18 +1771,28 @@ function renderAdminData() {
     docBody.append(tr);
   }
 
+  const reviews = adminVisibleReviews();
   const reviewBody = $('admin-review-body');
   reviewBody.textContent = '';
   $('admin-review-count').textContent = `共 ${reviews.length} 份`;
   if (!reviews.length) {
     const tr = el('tr');
-    const td = el('td', 'admin-empty', filter ? '没有匹配的评审' : '暂无评审');
-    td.colSpan = 5;
+    const td = el('td', 'admin-empty', (state.adminFilter || '').trim() ? '没有匹配的评审' : '暂无评审');
+    td.colSpan = 6;
     tr.append(td);
     reviewBody.append(tr);
   }
   for (const review of reviews) {
     const tr = el('tr');
+    const selected = state.adminSelectedReviews.has(review.review_id);
+    if (selected) tr.classList.add('is-selected');
+    const tdCheck = el('td', 'check-cell');
+    tdCheck.append(makeAdminCheckbox(selected, (event) => {
+      if (event.target.checked) state.adminSelectedReviews.add(review.review_id);
+      else state.adminSelectedReviews.delete(review.review_id);
+      renderAdminData();
+    }, `选择评审 ${review.review_id}`));
+    tr.append(tdCheck);
     const tdId = el('td');
     tdId.append(el('code', 'report-id', review.review_id || '—'));
     tdId.append(el('span', 'cell-sub', fmtDateTime(review.created_at)));
@@ -1748,6 +1824,8 @@ function renderAdminData() {
     tr.append(tdActions);
     reviewBody.append(tr);
   }
+
+  updateAdminSelection();
 }
 
 async function adminDeleteDoc(doc) {
@@ -1766,6 +1844,25 @@ async function adminDeleteReport(review) {
   const label = review.review_id || '';
   if (!window.confirm(`只删除「${label}」的 docx/pdf 报告？评审结果保留，可重新生成。`)) return;
   await runAdminAction(`/api/admin/report/${encodeURIComponent(label)}`, 'DELETE', `已删除报告 ${label}`, false);
+}
+
+async function adminBatchDelete(kind) {
+  const ids = kind === 'doc'
+    ? [...state.adminSelectedDocs]
+    : [...state.adminSelectedReviews];
+  if (!ids.length) return;
+  const label = kind === 'doc' ? `所选 ${ids.length} 份文档` : `所选 ${ids.length} 份评审`;
+  const extra = kind === 'doc'
+    ? '\n文档的评审与报告会一并删除，不可恢复。'
+    : '\n评审的 docx/pdf 报告会一并删除，不可恢复。';
+  if (!window.confirm(`批量删除${label}？${extra}`)) return;
+  await runAdminAction(
+    '/api/admin/batch-delete',
+    'POST',
+    `已批量删除${label}`,
+    kind === 'doc',
+    kind === 'doc' ? { doc_ids: ids } : { review_ids: ids },
+  );
 }
 
 async function adminCleanup(mode) {
@@ -2016,8 +2113,24 @@ function initGlobalActions() {
   $('btn-admin-refresh').addEventListener('click', () => loadAdminData());
   $('admin-doc-filter').addEventListener('input', (event) => {
     state.adminFilter = event.target.value || '';
+    state.adminSelectedDocs.clear();
+    state.adminSelectedReviews.clear();
     renderAdminData();
   });
+  $('admin-doc-select-all').addEventListener('change', (event) => {
+    const docs = adminVisibleDocs();
+    if (event.target.checked) docs.forEach((doc) => state.adminSelectedDocs.add(doc.doc_id));
+    else docs.forEach((doc) => state.adminSelectedDocs.delete(doc.doc_id));
+    renderAdminData();
+  });
+  $('admin-review-select-all').addEventListener('change', (event) => {
+    const reviews = adminVisibleReviews();
+    if (event.target.checked) reviews.forEach((review) => state.adminSelectedReviews.add(review.review_id));
+    else reviews.forEach((review) => state.adminSelectedReviews.delete(review.review_id));
+    renderAdminData();
+  });
+  $('btn-batch-delete-docs').addEventListener('click', () => adminBatchDelete('doc'));
+  $('btn-batch-delete-reviews').addEventListener('click', () => adminBatchDelete('review'));
   $('btn-clean-duplicates').addEventListener('click', () => adminCleanup('duplicates'));
   $('btn-clean-orphans').addEventListener('click', () => adminCleanup('orphan_reviews'));
   document.addEventListener('visibilitychange', () => {

@@ -30,6 +30,11 @@ class CleanupRequest(BaseModel):
     mode: str = Field(..., description="duplicates / orphan_reviews")
 
 
+class BatchDeleteRequest(BaseModel):
+    doc_ids: list[str] = Field(default_factory=list)
+    review_ids: list[str] = Field(default_factory=list)
+
+
 def _cascade_delete_doc(doc_id: str) -> dict[str, Any]:
     reviews = review_service.list_for_doc(doc_id)
     deleted_reports: list[str] = []
@@ -150,6 +155,49 @@ def delete_report(review_id: str, _: str = Depends(admin.require_admin)) -> dict
     if not deleted:
         raise HTTPException(404, "该评审还没有生成报告文件")
     return {"review_id": review_id, "deleted_reports": len(deleted), "files": deleted}
+
+
+@router.post("/batch-delete", summary="批量删除文档 / 评审（含报告）")
+def batch_delete(payload: BatchDeleteRequest, _: str = Depends(admin.require_admin)) -> dict[str, Any]:
+    doc_ids = list(dict.fromkeys(payload.doc_ids or []))[:200]
+    review_ids = list(dict.fromkeys(payload.review_ids or []))[:200]
+    if not doc_ids and not review_ids:
+        raise HTTPException(400, "没有选择要删除的文档或评审")
+
+    deleted_docs = 0
+    deleted_reviews = 0
+    deleted_reports = 0
+    missing_docs = 0
+    missing_reviews = 0
+
+    for doc_id in doc_ids:
+        if not store.valid_doc_id(doc_id) or store.load_doc(doc_id) is None:
+            missing_docs += 1
+            continue
+        result = _cascade_delete_doc(doc_id)
+        deleted_docs += 1
+        deleted_reviews += result["deleted_reviews"]
+        deleted_reports += result["deleted_reports"]
+
+    for review_id in review_ids:
+        if review_service.load(review_id) is None:
+            missing_reviews += 1
+            continue
+        deleted_reports += len(report_service.delete_reports(review_id))
+        if review_service.delete(review_id):
+            deleted_reviews += 1
+        else:
+            missing_reviews += 1
+
+    return {
+        "selected_docs": len(doc_ids),
+        "selected_reviews": len(review_ids),
+        "deleted_docs": deleted_docs,
+        "deleted_reviews": deleted_reviews,
+        "deleted_reports": deleted_reports,
+        "missing_docs": missing_docs,
+        "missing_reviews": missing_reviews,
+    }
 
 
 @router.post("/cleanup", summary="批量清理：重复文档 / 无文档评审")

@@ -64,3 +64,24 @@ def test_admin_can_delete_uploaded_doc(monkeypatch):
     body = resp.json()
     assert body["deleted_files"]
     assert client.get(f"/api/doc/{doc_id}").status_code == 404
+
+
+def test_admin_batch_delete_docs(monkeypatch):
+    client = _client_with_admin(monkeypatch)
+    assert client.post("/api/admin/login", json={"username": "tester", "password": "secret-pass"}).status_code == 200
+
+    doc_ids = []
+    for name in ("batch-a.docx", "batch-b.docx"):
+        upload = client.post(
+            "/api/upload",
+            files={"file": (name, SAMPLE.read_bytes(), "application/vnd.openxmlformats-officedocument.wordprocessingml.document")},
+        )
+        assert upload.status_code == 200, upload.text
+        doc_ids.append(upload.json()["doc_id"])
+
+    resp = client.post("/api/admin/batch-delete", json={"doc_ids": doc_ids})
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["deleted_docs"] == 2
+    for doc_id in doc_ids:
+        assert client.get(f"/api/doc/{doc_id}").status_code == 404
