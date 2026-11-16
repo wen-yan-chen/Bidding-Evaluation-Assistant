@@ -224,7 +224,7 @@ function initNav() {
 
 function parseStatusLabel(status) {
   if (status === 'ok') return '正常';
-  if (status === 'degraded') return '降级';
+  if (status === 'degraded') return '已解析';
   if (status === 'failed') return '失败';
   return status || '—';
 }
@@ -285,20 +285,11 @@ function renderDocMeta(doc) {
   appendChip(box, '字符', doc.char_count);
   appendChip(box, '条款', `${(doc.clauses || []).length} 条`);
   appendChip(box, '字段', `${(doc.fields || []).length} / 6`);
-  appendChip(box, '解析', parseStatusLabel(doc.parse_status),
-    doc.parse_status === 'failed' ? 'is-danger' : doc.parse_status === 'degraded' ? 'is-warn' : '');
-  const ocrPages = (doc.meta && doc.meta.ocr_pages) || [];
-  if (ocrPages.length) appendChip(box, 'OCR', `${ocrPages.length} 页`, 'is-warn');
   if (doc.sha256) appendChip(box, 'SHA256', shortHash(doc.sha256));
 
-  const degraded = [
-    ...(doc.parse_status === 'failed' ? ['解析失败，无法进入评审'] : []),
-    ...(doc.degraded || []),
-  ];
-  if (degraded.length) {
-    setNotice('doc-degraded', doc.parse_status === 'failed' ? 'error' : 'warn', `降级说明：${degraded.join('；')}`);
-  } else if (ocrPages.length) {
-    setNotice('doc-degraded', 'warn', `OCR 页：${ocrPages.join('、')}；相关页文本来自识别，建议人工核对原件。`);
+  // 评审看板不展示「降级」提示；OCR/页码口径在报告中心与报告中说明
+  if (doc.parse_status === 'failed') {
+    setNotice('doc-degraded', 'error', `解析失败：${(doc.degraded || []).join('；') || '无法进入评审'}`);
   } else {
     setNotice('doc-degraded', '', '');
   }
@@ -906,8 +897,6 @@ function renderReview() {
   const badges = $('score-badges');
   badges.textContent = '';
   if (doc) {
-    badges.append(badge(`解析 ${parseStatusLabel(doc.parse_status)}`,
-      doc.parse_status === 'failed' ? 'badge-danger' : doc.parse_status === 'degraded' ? 'badge-warn' : 'badge-done'));
     if (doc.page_source === 'estimated') badges.append(badge('页码估算', 'badge-warn', 'docx 无分页符，页码按行数估算'));
     const ocr = (doc.meta && doc.meta.ocr_pages) || [];
     if (ocr.length) badges.append(badge(`OCR ${ocr.length} 页`, 'badge-info'));
@@ -1344,6 +1333,12 @@ function renderReports() {
     const tdFile = el('td');
     tdFile.append(el('span', 'cell-title', review.file_name || '—'));
     tdFile.append(el('span', 'cell-sub', review.doc_id || '—'));
+    const sourceDoc = state.docs.find((doc) => doc.doc_id === review.doc_id);
+    if (sourceDoc && (sourceDoc.parse_status === 'degraded' || (sourceDoc.degraded || []).length)) {
+      const degradedBadge = el('span', 'pill pill-warn', '降级技术');
+      degradedBadge.title = (sourceDoc.degraded || []).join('；') || 'OCR / 页码估算';
+      tdFile.append(degradedBadge);
+    }
     tr.append(tdFile);
 
     const tdProfile = el('td');
@@ -1826,11 +1821,21 @@ function renderAdminData() {
     tdState.append(parseStatePill(doc.parse_status));
     tr.append(tdState);
     const tdAction = el('td');
+    const actions = el('div', 'admin-actions');
+    const preview = el('button', 'btn btn-sm', '预览');
+    preview.type = 'button';
+    preview.title = `在界面内查看 ${doc.file_name || doc.doc_id}`;
+    preview.addEventListener('click', () => previewDoc(doc));
+    const save = el('a', 'btn btn-sm', '保存');
+    save.href = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw`;
+    save.download = doc.file_name || `${doc.doc_id}.${doc.ext || 'bin'}`;
+    save.title = '保存原始文件到本地';
     const del = el('button', 'btn btn-sm btn-danger', '删除');
     del.type = 'button';
     del.title = `删除文档 ${doc.file_name || doc.doc_id} 及其评审/报告`;
     del.addEventListener('click', () => adminDeleteDoc(doc));
-    tdAction.append(del);
+    actions.append(preview, save, del);
+    tdAction.append(actions);
     tr.append(tdAction);
     docBody.append(tr);
   }
@@ -1890,6 +1895,75 @@ function renderAdminData() {
   }
 
   updateAdminSelection();
+}
+
+async function previewDoc(doc) {
+  const modal = $('doc-preview');
+  const body = $('doc-preview-body');
+  const title = $('doc-preview-title');
+  const meta = $('doc-preview-meta');
+  const save = $('doc-preview-save');
+  if (!modal || !body || !doc) return;
+  const ext = String(doc.ext || (doc.file_name || '').split('.').pop() || '').replace(/^\./, '').toLowerCase();
+  title.textContent = doc.file_name || '文档预览';
+  meta.textContent = `${doc.doc_id || '—'} · ${doc.page_count || '—'} 页 · ${ext ? ext.toUpperCase() : '文件'} · 原文预览`;
+  save.href = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw`;
+  save.download = doc.file_name || `${doc.doc_id}.${ext || 'bin'}`;
+  body.textContent = '';
+  modal.hidden = false;
+  document.body.classList.add('has-preview');
+  $('btn-preview-close').focus();
+
+  if (ext === 'pdf') {
+    const frame = document.createElement('iframe');
+    frame.className = 'preview-frame';
+    frame.title = `PDF 预览：${doc.file_name || doc.doc_id}`;
+    frame.src = `/api/doc/${encodeURIComponent(doc.doc_id)}/raw`;
+    body.append(frame);
+    return;
+  }
+
+  body.append(el('p', 'preview-loading', '正在读取解析文本…'));
+  try {
+    const data = await api(`/api/doc/${encodeURIComponent(doc.doc_id)}`, { timeout: 15000 });
+    body.textContent = '';
+    if (ext === 'docx') {
+      body.append(el('p', 'preview-note', 'docx 版式不还原，这里显示解析文本；点「保存原件」可查看原版式。'));
+    }
+    const pages = Array.isArray(data.pages) ? data.pages : [];
+    if (!pages.length) {
+      body.append(el('p', 'preview-loading', '没有可预览的文本，请保存原件查看。'));
+      return;
+    }
+    const ocrPages = new Set((data.meta && data.meta.ocr_pages) || []);
+    const estimated = data.page_source === 'estimated';
+    const list = el('div', 'preview-pages');
+    for (const page of pages) {
+      const article = el('article', 'preview-page');
+      const head = el('h4', '', `第 ${page.page || '—'} 页`);
+      if (estimated) head.append(el('span', 'pill pill-warn', '估算'));
+      if (ocrPages.has(page.page)) head.append(el('span', 'pill pill-info', 'OCR'));
+      article.append(head);
+      const text = typeof page.start === 'number' && typeof page.end === 'number' && data.full_text
+        ? data.full_text.slice(page.start, page.end)
+        : (page.text || '');
+      article.append(el('pre', '', text || '（本页无文本）'));
+      list.append(article);
+    }
+    body.append(list);
+  } catch (err) {
+    body.textContent = '';
+    body.append(el('p', 'preview-loading', describeError(err, '读取预览')));
+  }
+}
+
+function closePreview() {
+  const modal = $('doc-preview');
+  const body = $('doc-preview-body');
+  if (!modal || modal.hidden) return;
+  modal.hidden = true;
+  document.body.classList.remove('has-preview');
+  if (body) body.textContent = '';
 }
 
 async function adminDeleteDoc(doc) {
@@ -2195,6 +2269,11 @@ function initGlobalActions() {
   });
   $('btn-batch-delete-docs').addEventListener('click', () => adminBatchDelete('doc'));
   $('btn-batch-delete-reviews').addEventListener('click', () => adminBatchDelete('review'));
+  $('btn-preview-close').addEventListener('click', closePreview);
+  document.querySelectorAll('[data-close-preview]').forEach((node) => node.addEventListener('click', closePreview));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closePreview();
+  });
   $('btn-clean-duplicates').addEventListener('click', () => adminCleanup('duplicates'));
   $('btn-clean-orphans').addEventListener('click', () => adminCleanup('orphan_reviews'));
   document.addEventListener('visibilitychange', () => {

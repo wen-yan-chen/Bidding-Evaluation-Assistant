@@ -251,6 +251,10 @@ code {
 .btn {
   font: inherit;
   font-size: 13.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   color: var(--brand);
   background: var(--brand-soft);
   border: 1px solid #cfdcff;
@@ -290,7 +294,7 @@ code {
   border-radius: 12px 12px 0 0;
   background: linear-gradient(90deg, var(--brand), #7aa0ff);
 }
-.step-action::before { background: linear-gradient(90deg, #12805c, #4cc39a); }
+.step-action::before { background: linear-gradient(90deg, #1f4fd8, #7aa0ff); }
 
 .step-no {
   display: inline-grid;
@@ -305,7 +309,7 @@ code {
   font-weight: 700;
   vertical-align: 1px;
 }
-.step-action .step-no { background: var(--ok-soft); color: var(--ok); }
+.step-action .step-no { background: var(--brand-soft); color: var(--brand); }
 
 .field-label { display: block; font-size: 12px; color: var(--ink-3); margin-bottom: 5px; }
 
@@ -366,7 +370,7 @@ code {
 .progress-bar {
   width: 0;
   height: 100%;
-  background: linear-gradient(90deg, #2b5cf0, #4cc39a);
+  background: linear-gradient(90deg, #1f4fd8, #5b8bff);
   border-radius: inherit;
   transition: width .18s ease;
 }
@@ -938,6 +942,46 @@ mark.hit {
 .pagefoot strong { color: var(--ink-2); font-weight: 600; }
 .pagefoot-sub { color: #9aa4b8; }
 
+/* ---------------------------------------------------------------- 文档预览 */
+
+.preview-modal { position: fixed; inset: 0; z-index: 80; display: flex; }
+.preview-modal[hidden] { display: none; }
+.preview-backdrop { position: absolute; inset: 0; background: rgba(9, 18, 35, 0.55); }
+.preview-panel {
+  position: relative;
+  width: min(1120px, 94vw);
+  height: 86vh;
+  margin: auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 24px 70px rgba(20, 38, 70, 0.28);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.preview-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  background: #f8fafd;
+}
+.preview-head h2 { margin: 0; font-size: 16px; }
+.preview-meta { margin: 4px 0 0; font-size: 12px; color: var(--ink-3); }
+.preview-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.preview-actions .btn { text-decoration: none; }
+.preview-body { flex: 1; min-height: 0; overflow: auto; background: #eef2f8; padding: 12px; }
+.preview-frame { width: 100%; height: 100%; min-height: 70vh; border: 0; background: #fff; border-radius: 8px; display: block; }
+.preview-pages { display: grid; gap: 10px; }
+.preview-page { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+.preview-page h4 { margin: 0 0 7px; font-size: 12px; color: var(--ink-3); display: flex; gap: 6px; align-items: center; }
+.preview-page pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 12.5px/1.7 var(--sans); color: var(--ink-2); }
+.preview-note { margin: 0 0 10px; padding: 8px 10px; border-radius: 8px; background: #fff8e8; color: #7a5a16; font-size: 12px; }
+.preview-loading { color: var(--ink-3); font-size: 13px; padding: 20px; text-align: center; }
+body.has-preview { overflow: hidden; }
+
 /* ---------------------------------------------------------------- 管理员入口 / 数据管理 */
 
 .btn-danger { color: var(--danger); background: var(--danger-soft); border-color: #f2c5bf; }
@@ -1057,7 +1101,7 @@ mark.hit {
   body { background: #fff; color: #000; font-size: 10.5pt; }
   .topbar, .mainnav, .topbar-meta, .view-head-meta, .workbench,
   .upload-box, .progress, .notice, .empty-state, .evtabs, .locator,
-  .score-actions, .btn, .pagefoot { display: none !important; }
+  .score-actions, .btn, .pagefoot, .preview-modal { display: none !important; }
 
   .main { max-width: none; padding: 0; }
   .view-head { margin-bottom: 8px; }
