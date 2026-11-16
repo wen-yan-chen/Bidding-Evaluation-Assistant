@@ -353,6 +353,8 @@ code {
 }
 
 .file-name { font-size: 12px; color: var(--ink-3); word-break: break-all; }
+.upload-box.is-dragover { outline: 2px dashed var(--brand); outline-offset: 3px; background: var(--info-soft); border-radius: 8px; }
+.upload-hint { margin-top: 7px; }
 
 .progress {
   height: 6px;

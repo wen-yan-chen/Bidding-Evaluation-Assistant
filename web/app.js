@@ -27,7 +27,7 @@ const state = {
   docsReady: false,
   evidence: [],
   evidenceTab: 'all',
-  uploadFile: null,
+  uploadFiles: [],
   reviewing: false,
   reportsLoaded: false,
   showStale: false,
@@ -489,129 +489,193 @@ function locateItem(item) {
 /* ============================================================ 上传 */
 
 function initUpload() {
-  $('btn-choose').addEventListener('click', () => $('file-input').click());
+  const input = $('file-input');
+  const box = $('upload-box');
+  $('btn-choose').addEventListener('click', () => input.click());
   $('doc-select').addEventListener('change', (event) => {
     if (event.target.value) selectDoc(event.target.value);
   });
-  $('file-input').addEventListener('change', (event) => {
-    const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
-    state.uploadFile = file;
-    const progress = $('upload-progress');
-    if (progress) { progress.hidden = true; $('upload-bar').style.width = '0%'; }
-    if (!file) {
-      $('file-name').textContent = '未选择文件';
-      $('btn-upload').disabled = true;
-      return;
-    }
-    $('file-name').textContent = `${file.name} · ${fmtSize(file.size)}`;
-    const ext = (file.name.split('.').pop() || '').toLowerCase();
-    if (!['docx', 'pdf', 'txt', 'md'].includes(ext)) {
-      $('btn-upload').disabled = true;
-      setNotice('upload-status', 'error', `不支持的文件类型：.${ext || '无扩展名'}（支持 docx / pdf / txt / md）`);
-      return;
-    }
-    if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
-      $('btn-upload').disabled = true;
-      setNotice('upload-status', 'error', `文件 ${fmtSize(file.size)} 超过 ${MAX_UPLOAD_MB} MB 上限，请压缩或拆分后再上传。`);
-      return;
-    }
-    $('btn-upload').disabled = false;
-    setNotice('upload-status', 'info', `已选择 ${file.name}（${fmtSize(file.size)}），点击「上传并解析」。`);
+  input.addEventListener('change', (event) => {
+    setUploadFiles(Array.from(event.target.files || []));
   });
-
+  if (box) {
+    box.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      box.classList.add('is-dragover');
+    });
+    box.addEventListener('dragleave', () => box.classList.remove('is-dragover'));
+    box.addEventListener('drop', (event) => {
+      event.preventDefault();
+      box.classList.remove('is-dragover');
+      const files = Array.from((event.dataTransfer && event.dataTransfer.files) || []);
+      if (files.length) setUploadFiles(files);
+    });
+  }
   $('btn-upload').addEventListener('click', uploadSelected);
 }
 
-function uploadSelected() {
-  const file = state.uploadFile;
-  if (!file) return;
+function setUploadFiles(files) {
+  if ($('btn-choose').disabled) return; // 上传中不接受新的拖拽/选择
+  const allowed = ['docx', 'pdf', 'txt', 'md'];
+  const valid = [];
+  const errors = [];
+  for (const file of files) {
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    if (!allowed.includes(ext)) {
+      errors.push(`${file.name}：不支持 .${ext || '无扩展名'}`);
+      continue;
+    }
+    if (file.size > MAX_UPLOAD_MB * 1024 * 1024) {
+      errors.push(`${file.name}：${fmtSize(file.size)} 超过 ${MAX_UPLOAD_MB} MB`);
+      continue;
+    }
+    valid.push(file);
+  }
+  state.uploadFiles = valid;
+  $('upload-progress').hidden = true;
+  $('upload-bar').style.width = '0%';
+  if (!valid.length) {
+    $('file-name').textContent = files.length ? '没有可上传的文件' : '未选择文件';
+    $('file-name').title = '';
+    $('btn-upload').disabled = true;
+    $('btn-upload').textContent = '上传并解析';
+    if (errors.length) setNotice('upload-status', 'error', errors.join('；'));
+    else setNotice('upload-status', '', '');
+    return;
+  }
+  const names = valid.map((file) => file.name);
+  $('file-name').textContent = valid.length === 1
+    ? `${names[0]} · ${fmtSize(valid[0].size)}`
+    : `已选 ${valid.length} 个：${names.slice(0, 3).join('、')}${names.length > 3 ? '…' : ''}`;
+  $('file-name').title = names.join('\n');
+  $('btn-upload').disabled = false;
+  $('btn-upload').textContent = `上传并解析 (${valid.length})`;
+  if (errors.length) {
+    setNotice('upload-status', 'warn', `已选 ${valid.length} 个可上传文件；${errors.length} 个被跳过：${errors.join('；')}`);
+  } else {
+    setNotice('upload-status', 'info', `已选择 ${valid.length} 个文件，点击「上传并解析」。`);
+  }
+}
+
+async function uploadSelected() {
+  const files = [...(state.uploadFiles || [])];
+  if (!files.length) return;
   const chooseBtn = $('btn-choose');
   const uploadBtn = $('btn-upload');
-  chooseBtn.disabled = true;
-  uploadBtn.disabled = true;
-  uploadBtn.textContent = '解析中…';
   const progress = $('upload-progress');
   const bar = $('upload-bar');
+  chooseBtn.disabled = true;
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = `解析中 0/${files.length}`;
   progress.hidden = false;
   bar.style.width = '0%';
-  const t0 = performance.now();
-  let phase = 'upload';
-  setNotice('upload-status', 'info loading', `正在上传 ${file.name}`);
-  const timer = setInterval(() => {
-    const sec = ((performance.now() - t0) / 1000).toFixed(1);
-    const box = $('upload-status');
-    if (phase === 'parse') {
-      box.textContent = `上传完成，服务端正在解析（扫描件 OCR 约 13–16 秒）…（已用时 ${sec} 秒）`;
-    } else {
-      box.textContent = `正在上传 ${file.name}（已用时 ${sec} 秒）`;
-    }
-  }, 200);
 
-  const xhr = new XMLHttpRequest();
-  xhr.open('POST', '/api/upload');
-  xhr.timeout = 180000;
-  xhr.upload.onprogress = (event) => {
-    if (!event.lengthComputable) return;
-    const pct = Math.max(1, Math.min(100, Math.round((event.loaded / event.total) * 100)));
-    bar.style.width = `${pct}%`;
-    if (pct < 100) {
-      $('upload-status').textContent = `正在上传 ${file.name}：${pct}%（已用时 ${((performance.now() - t0) / 1000).toFixed(1)} 秒）`;
+  let ok = 0;
+  let lastDocId = null;
+  const failed = [];
+  for (let i = 0; i < files.length; i += 1) {
+    const file = files[i];
+    uploadBtn.textContent = `解析中 ${i}/${files.length}`;
+    setNotice('upload-status', 'info loading', `第 ${i + 1}/${files.length} 个：正在上传 ${file.name}`);
+    try {
+      const data = await uploadOne(file, i, files.length, (pct, phase) => {
+        const done = i + (phase === 'parse' ? 1 : pct / 100);
+        bar.style.width = `${Math.max(1, Math.min(100, Math.round((done / files.length) * 100)))}%`;
+        const box = $('upload-status');
+        if (!box) return;
+        if (phase === 'parse') {
+          box.textContent = `第 ${i + 1}/${files.length} 个：${file.name} 服务端解析中（扫描件约 13–16 秒）…`;
+        } else {
+          box.textContent = `第 ${i + 1}/${files.length} 个：正在上传 ${file.name}：${pct}%`;
+        }
+      });
+      if (data.parse_status === 'failed') {
+        failed.push(`${file.name}：解析失败（${(data.degraded || []).join('；') || '原因未给出'}）`);
+      } else {
+        ok += 1;
+        lastDocId = data.doc_id;
+      }
+    } catch (err) {
+      failed.push(`${file.name}：${describeError(err, '上传')}`);
     }
-  };
-  xhr.upload.onload = () => {
-    phase = 'parse';
-    bar.style.width = '100%';
-    $('upload-status').className = 'notice notice-info notice-loading';
-    $('upload-status').textContent = '上传完成，服务端正在解析（扫描件 OCR 约 13–16 秒）…';
-  };
-  xhr.onload = async () => {
-    clearInterval(timer);
-    let data = null;
-    try { data = JSON.parse(xhr.responseText); } catch { data = { detail: xhr.responseText || `HTTP ${xhr.status}` }; }
-    if (xhr.status < 200 || xhr.status >= 300) {
-      const err = new Error(detailText(data && data.detail !== undefined ? data.detail : data) || `HTTP ${xhr.status}`);
-      err.status = xhr.status;
-      setNotice('upload-status', 'error', describeError(err, '上传'));
-      finishUpload();
-      return;
-    }
-    if (data.parse_status === 'failed') {
-      setNotice('upload-status', 'error', `解析失败：${(data.degraded || []).join('；') || '服务端未给出原因'}。该文档不能进入评审。`);
-    } else {
-      const ocr = data.ocr_pages && data.ocr_pages.length ? `，OCR ${data.ocr_pages.length} 页` : '';
-      setNotice('upload-status', 'success',
-        `解析完成：${data.file_name} · ${data.page_count} 页${data.page_source === 'estimated' ? '（估算）' : ''}${ocr} · 字段 ${(data.fields || []).length}/6`);
-    }
-    state.uploadFile = null;
-    $('file-name').textContent = '未选择文件';
-    $('file-input').value = '';
-    await loadDocs(data.doc_id);
-    finishUpload();
-  };
-  xhr.onerror = () => {
-    clearInterval(timer);
-    setNotice('upload-status', 'error', '上传失败：网络错误，无法连接服务。请确认容器 healthy 后重试。');
-    finishUpload();
-  };
-  xhr.ontimeout = () => {
-    clearInterval(timer);
-    setNotice('upload-status', 'error', '上传失败：超过 180 秒未完成。扫描件建议检查 OCR 依赖或稍后重试。');
-    finishUpload();
-  };
-  xhr.onabort = () => {
-    clearInterval(timer);
-    finishUpload();
-  };
+    uploadBtn.textContent = `解析中 ${i + 1}/${files.length}`;
+  }
 
-  const form = new FormData();
-  form.append('file', file, file.name);
-  xhr.send(form);
+  if (lastDocId) await loadDocs(lastDocId);
+  if (failed.length) {
+    setNotice('upload-status', ok ? 'warn' : 'error', `批量解析完成：成功 ${ok}，失败 ${failed.length}。${failed.join('；')}`);
+  } else {
+    setNotice('upload-status', 'success', `批量解析完成：${ok} 个文件全部成功。`);
+  }
+  state.uploadFiles = [];
+  $('file-input').value = '';
+  $('file-name').textContent = '未选择文件';
+  $('file-name').title = '';
+  finishUpload();
+}
+
+function uploadOne(file, index, total, onProgress) {
+  return new Promise((resolve, reject) => {
+    const t0 = performance.now();
+    let phase = 'upload';
+    const timer = setInterval(() => {
+      const box = $('upload-status');
+      if (!box) return;
+      const sec = ((performance.now() - t0) / 1000).toFixed(1);
+      box.textContent = phase === 'parse'
+        ? `第 ${index + 1}/${total} 个：服务端解析中…（已用时 ${sec} 秒）`
+        : `第 ${index + 1}/${total} 个：正在上传 ${file.name}（已用时 ${sec} 秒）`;
+    }, 500);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/upload');
+    xhr.timeout = 180000;
+    xhr.upload.onprogress = (event) => {
+      if (!event.lengthComputable) return;
+      const pct = Math.max(1, Math.min(100, Math.round((event.loaded / event.total) * 100)));
+      onProgress(pct, 'upload');
+    };
+    xhr.upload.onload = () => {
+      phase = 'parse';
+      onProgress(100, 'parse');
+    };
+    xhr.onload = () => {
+      clearInterval(timer);
+      let data = null;
+      try { data = JSON.parse(xhr.responseText); } catch { data = { detail: xhr.responseText || `HTTP ${xhr.status}` }; }
+      if (xhr.status < 200 || xhr.status >= 300) {
+        const err = new Error(detailText(data && data.detail !== undefined ? data.detail : data) || `HTTP ${xhr.status}`);
+        err.status = xhr.status;
+        reject(err);
+        return;
+      }
+      resolve(data);
+    };
+    xhr.onerror = () => {
+      clearInterval(timer);
+      reject(new Error('网络错误，无法连接服务；请确认容器 healthy 后重试'));
+    };
+    xhr.ontimeout = () => {
+      clearInterval(timer);
+      reject(new Error('超过 180 秒未完成；扫描件建议检查 OCR 依赖或稍后重试'));
+    };
+    xhr.onabort = () => {
+      clearInterval(timer);
+      reject(new Error('上传已取消'));
+    };
+
+    const form = new FormData();
+    form.append('file', file, file.name);
+    xhr.send(form);
+  });
 }
 
 function finishUpload() {
   $('btn-choose').disabled = false;
-  $('btn-upload').textContent = '上传并解析';
-  $('btn-upload').disabled = !state.uploadFile;
+  $('btn-upload').textContent = state.uploadFiles.length
+    ? `上传并解析 (${state.uploadFiles.length})`
+    : '上传并解析';
+  $('btn-upload').disabled = !state.uploadFiles.length;
   $('upload-progress').hidden = true;
 }
 

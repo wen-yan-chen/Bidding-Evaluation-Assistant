@@ -54,7 +54,7 @@
       <section class="card step-card" aria-labelledby="h-step1">
         <div class="card-head">
           <h2 id="h-step1"><span class="step-no">1</span>选择文件</h2>
-          <span class="card-hint">docx / pdf / txt / md · ≤ 50 MB</span>
+          <span class="card-hint">docx / pdf / txt / md · 可多选 · 单份 ≤ 50 MB</span>
         </div>
 
         <label class="field-label" for="doc-select">已解析文档</label>
@@ -64,12 +64,13 @@
         <div class="doc-meta" id="doc-meta">正在读取文档列表…</div>
         <div class="notice" id="doc-degraded" role="status" hidden></div>
 
-        <div class="upload-box">
-          <input type="file" id="file-input" accept=".docx,.pdf,.txt,.md" hidden>
-          <button class="btn" id="btn-choose" type="button">选择文件</button>
+        <div class="upload-box" id="upload-box">
+          <input type="file" id="file-input" accept=".docx,.pdf,.txt,.md" multiple hidden>
+          <button class="btn" id="btn-choose" type="button">选择文件（可多选）</button>
           <button class="btn btn-primary" id="btn-upload" type="button" disabled>上传并解析</button>
           <span class="file-name" id="file-name">未选择文件</span>
         </div>
+        <p class="hint upload-hint">可一次选择多个文件，或把选中的多个文件拖到上面；会逐份上传解析，扫描件逐份 OCR。</p>
 
         <div class="progress" id="upload-progress" hidden aria-hidden="true">
           <div class="progress-bar" id="upload-bar"></div>
