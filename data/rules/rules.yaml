@@ -41,6 +41,7 @@ rules:
     basis_status: verified
     basis: 《政府采购法实施条例》第十七条第（一）项
     basis_note: 营业执照等证明文件属资格材料；不判断证件真伪，具体以招标文件资格条款为准。
+    project_types: ["货物", "服务"]
 
   - id: R02
     category: 资质门槛
@@ -53,6 +54,7 @@ rules:
     basis: ""
     basis_note: 未核验：建议以《政府采购法实施条例》第十七条末段（特殊要求）为主、第（五）项并列；资质须由法律、行政法规设定或招标文件明确要求，无招标文件不能判“应当提供而未提供”。
     requires_tender: true
+    project_types: ["货物", "服务"]
 
   - id: R03
     category: 资质门槛
@@ -88,6 +90,7 @@ rules:
     basis_status: verified
     basis: 《政府采购法实施条例》第十七条第（二）项
     basis_note: 具体年度、是否需审计报告以招标文件为准。
+    project_types: ["货物", "服务"]
 
   - id: R06
     category: 资质门槛
@@ -99,6 +102,7 @@ rules:
     basis_status: verified
     basis: 《政府采购法实施条例》第十七条第（二）项
     basis_note: 具体月份、险种、纳税期间以招标文件为准。
+    project_types: ["货物", "服务"]
 
   - id: R07
     category: 资质门槛
@@ -110,6 +114,7 @@ rules:
     basis_status: verified
     basis: 《政府采购法实施条例》第十七条第（四）项、第十九条
     basis_note: 属书面声明材料，不等于对违法事实的认定；“未提供声明”与“有违法记录”是两件事。
+    project_types: ["货物", "服务"]
 
   - id: R08
     category: 资质门槛
@@ -121,7 +126,7 @@ rules:
     basis_status: verified
     basis: 《政府采购促进中小企业发展管理办法》第十一条（财库〔2020〕46号）
     basis_note: 未提供声明函不必然废标，后果是不享受中小企业扶持政策；是否作资格条件看招标文件。
-    project_types: ["货物", "服务"]
+    project_types: ["工程", "货物", "服务"]
     legal_system: govproc
 
   - id: R09
@@ -148,6 +153,7 @@ rules:
     requires_tender: true
 
   # ---------------------------------------------------------------- 废标条款（R11–R20）
+    project_types: ["货物", "服务"]
   - id: R11
     category: 废标条款
     level: 高
@@ -387,6 +393,7 @@ rules:
     basis_status: verified
     basis: 《政府采购货物和服务招标投标管理办法》第六十条（财政部令第87号）
     basis_note: “低于平均值 20%”是项目经验阈值，不是法条数字；须同时存在影响质量或不能诚信履约的可能，且不能证明合理性才作无效投标。
+    project_types: ["货物", "服务"]
 
   - id: R33
     category: 报价异常
@@ -409,6 +416,7 @@ rules:
     basis_status: verified
     basis: 《政府采购货物和服务招标投标管理办法》第五十九条第（四）项
     basis_note: 第五十九条是报价修正规则（以单价金额计算结果为准），不直接作无效；修正后报价经投标人确认后生效，不确认的投标无效。
+    project_types: ["货物", "服务"]
 
   - id: R35
     category: 报价异常
@@ -444,6 +452,7 @@ rules:
     basis_status: verified
     basis: 《政府采购货物和服务招标投标管理办法》第五十九条第（二）项
     basis_note: 以大写金额为准；修正后报价经投标人确认后生效，不确认的投标无效。
+    project_types: ["货物", "服务"]
 
   - id: R38
     category: 报价异常
@@ -455,6 +464,7 @@ rules:
     basis_status: pending
     basis: ""
     basis_note: 未核验：单价×数量不符属行内算术错误，不是第五十九条第（四）项的直接对应情形，只能“参照”第 59 条修正顺序与第 51 条澄清补正。
+    project_types: ["货物", "服务"]
 
   - id: R39
     category: 报价异常

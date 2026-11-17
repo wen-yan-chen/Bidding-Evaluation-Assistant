@@ -143,6 +143,7 @@ def render(data: dict[str, Any], out_path: Path) -> Path:
             ["生成时间", meta["created_at"]],
             ["文档", f"{meta['file_name']}（{meta['doc_id']}）"],
             ["项目类型", {"engineering": "工程类（招标投标法体系）", "goods_services": "货物/服务类（政府采购体系）"}.get(meta.get("project_type"), "未指定（通用口径）")],
+            ["项目类型说明", meta.get("project_type_note") or "—"],
             ["页数 / 解析状态", f"{meta['pages']} 页 / {meta['parse_status']}"],
             ["页码来源", "估算（docx 无分页符）" if meta["page_source"] == "estimated" else "精确（PDF/分页符）"],
             ["说明", "；".join(meta.get("degraded") or []) or "无"],

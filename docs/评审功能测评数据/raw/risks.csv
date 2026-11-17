@@ -1,0 +1,21 @@
+﻿file,split,clean,expected_rules,expected_qual,detected_rules,detected_qual,tp,fn,fp,review_id,total,hits_detail
+risk/risk-001.docx,dev,False,R12,,R12,,1,,,rv-20261116-144224-200204,28.0,"[{""rule_id"": ""R12"", ""page"": 1, ""quote"": ""投标报价：人民币 2,300,000.00 元""}]"
+risk/risk-002.docx,dev,False,R13,,R13,,1,,,rv-20261116-144225-3f42e2,62.0,"[{""rule_id"": ""R13"", ""page"": 1, ""quote"": ""投标报价：人民币 900,000.00 元""}]"
+risk/risk-003.docx,holdout,False,R17,,R17,,1,,,rv-20261116-144225-9ee7a1,62.0,"[{""rule_id"": ""R17"", ""page"": 2, ""quote"": ""投标有效期为自投标截止之日起 60 个日历日""}]"
+risk/risk-004.docx,dev,False,R37,,R37,,1,,,rv-20261116-144225-37fe4a,68.0,"[{""rule_id"": ""R37"", ""page"": 1, ""quote"": ""大写：壹佰贰拾万元整""}]"
+risk/risk-005.docx,dev,False,,R01,,R01,1,,,rv-20261116-144225-3a0593,62.0,[]
+risk/risk-006.docx,dev,False,R21,,R21,,1,,,rv-20261116-144225-9b607e,68.0,"[{""rule_id"": ""R21"", ""page"": 2, ""quote"": ""同一编制人""}]"
+risk/risk-007.docx,holdout,False,R27,,R27,,1,,,rv-20261116-144225-540b3d,62.0,"[{""rule_id"": ""R27"", ""page"": 2, ""quote"": ""同一账户转出""}]"
+risk/risk-008.docx,dev,False,R20,,R20,,1,,,rv-20261116-144225-c9672b,70.0,"[{""rule_id"": ""R20"", ""page"": 2, ""quote"": ""虚假材料""}]"
+risk/risk-009.docx,dev,False,R31,,R31,,1,,,rv-20261116-144225-c2c4b4,56.0,"[{""rule_id"": ""R31"", ""page"": 1, ""quote"": ""投标报价：人民币 1,990,000.00 元""}]"
+risk/risk-011.docx,dev,False,R14,,R14,,1,,,rv-20261116-144225-a5776b,62.0,"[{""rule_id"": ""R14"", ""page"": 2, ""quote"": ""未加盖公章""}]"
+risk/risk-012.docx,holdout,False,R15,,R15,,1,,,rv-20261116-144225-7ea93e,62.0,"[{""rule_id"": ""R15"", ""page"": 2, ""quote"": ""不接受招标文件""}]"
+risk/risk-013.docx,dev,False,R16,,R16,,1,,,rv-20261116-144225-be8d57,62.0,"[{""rule_id"": ""R16"", ""page"": 2, ""quote"": ""两个报价""}]"
+risk/risk-014.docx,dev,False,R19,,R19,,1,,,rv-20261116-144226-840cb6,62.0,"[{""rule_id"": ""R19"", ""page"": 2, ""quote"": ""逾期送达""}]"
+risk/risk-015.docx,holdout,False,R35,,R35;R35,,1,,,rv-20261116-144226-43b59d,22.0,"[{""rule_id"": ""R35"", ""page"": 1, ""quote"": ""美元""}, {""rule_id"": ""R35"", ""page"": 2, ""quote"": ""美元""}]"
+risk/risk-010.docx,holdout,False,,R09,,R09,1,,,rv-20261116-144226-708364,58.0,[]
+bid-001.docx,dev,True,,,,,0,,,rv-20261116-144226-e54e98,68.0,[]
+bid-002.docx,holdout,True,,,,,0,,,rv-20261116-144226-524587,22.0,[]
+bid-003.docx,dev,True,,,,,0,,,rv-20261116-144226-388cd5,22.0,[]
+bid-004.pdf,dev,True,,,,,0,,,rv-20261116-144226-02c328,62.0,[]
+bid-005.pdf,holdout,True,,,,,0,,,rv-20261116-144226-aab660,58.0,[]

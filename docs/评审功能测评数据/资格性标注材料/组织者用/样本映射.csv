@@ -1,0 +1,26 @@
+﻿sample_id,original_file,format,pages,organizer_note
+S01,bid-001.docx,docx,2,正常样本
+S02,bid-002.docx,docx,2,正常样本
+S03,bid-003.docx,docx,2,正常样本
+S04,bid-004.pdf,pdf,3,PDF 文本层
+S05,bid-005.pdf,pdf,3,PDF 文本层
+S06,bid-006.txt,txt,1,GB18030 文本
+S07,bid-007.txt,txt,2,长文本
+S08,bid-008.docx,docx,2,缺报价/工期
+S09,bid-009.txt,txt,1,￥金额无单位
+S10,bid-010.docx,docx,2,长文档
+S11,bid-011.pdf,pdf,3,万元报价
+S12,bid-012.txt,txt,1,GB18030 文本
+S13,bid-013.docx,docx,2,长文档/表格
+S14,bid-014.txt,txt,1,缺工期
+S15,bid-015.docx,docx,2,合规写法对照
+S16,bid-016.docx,docx,2,30 天工期
+S17,bid-017.pdf,pdf,3,大金额
+S18,bid-018.txt,txt,1,缺报价
+S19,bid-019.docx,docx,2,长文档/表格
+S20,bid-020.txt,txt,1,24 个月工期
+S21,scan-001.pdf,pdf,3,扫描件/OCR
+S22,scan-002.pdf,pdf,3,扫描件/OCR
+S23,scan-003.pdf,pdf,3,扫描件/OCR
+S24,scan-004.pdf,pdf,3,扫描件/OCR
+S25,scan-005.pdf,pdf,3,扫描件/OCR

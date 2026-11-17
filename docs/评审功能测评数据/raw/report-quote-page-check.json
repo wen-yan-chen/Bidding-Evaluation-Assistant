@@ -1,0 +1,388 @@
+{
+  "items": [
+    {
+      "label": "bid-001-A",
+      "review_id": "rv-20261116-143942-111e11",
+      "formats": {
+        "docx": {
+          "field_quotes": [
+            {
+              "name": "项目名称",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "项目编号",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "采购人",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "投标人",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "报价",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "工期",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "qual_quotes": [
+            {
+              "rule_id": "R01",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R04",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R05",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R10",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "risk_quotes": [],
+          "pages": [],
+          "has_disclaimer": true,
+          "has_total": true,
+          "qual_counts_in_report": true,
+          "risk_count_in_report": true,
+          "chapter_markers": [
+            "招投标评审报告",
+            "评审依据",
+            "项目与投标人信息",
+            "资格性核验",
+            "分项评分",
+            "风险清单",
+            "合同摘要",
+            "结论与建议",
+            "免责声明"
+          ]
+        },
+        "pdf": {
+          "field_quotes": [
+            {
+              "name": "项目名称",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "项目编号",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "采购人",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "投标人",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "报价",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "工期",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "qual_quotes": [
+            {
+              "rule_id": "R01",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R04",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R05",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R10",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "risk_quotes": [],
+          "pages": [],
+          "has_disclaimer": true,
+          "has_total": true,
+          "qual_counts_in_report": true,
+          "risk_count_in_report": true,
+          "chapter_markers": [
+            "招投标评审报告",
+            "评审依据",
+            "项目与投标人信息",
+            "资格性核验",
+            "分项评分",
+            "风险清单",
+            "合同摘要",
+            "结论与建议",
+            "免责声明"
+          ]
+        }
+      }
+    },
+    {
+      "label": "risk-001-A",
+      "review_id": "rv-20261116-144224-200204",
+      "formats": {
+        "docx": {
+          "field_quotes": [
+            {
+              "name": "项目名称",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "项目编号",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "采购人",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "投标人",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "报价",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "工期",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "qual_quotes": [
+            {
+              "rule_id": "R01",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R04",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R05",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R10",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "risk_quotes": [
+            {
+              "rule_id": "R12",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "pages": [],
+          "has_disclaimer": true,
+          "has_total": true,
+          "qual_counts_in_report": true,
+          "risk_count_in_report": true,
+          "chapter_markers": [
+            "招投标评审报告",
+            "评审依据",
+            "项目与投标人信息",
+            "资格性核验",
+            "分项评分",
+            "风险清单",
+            "合同摘要",
+            "结论与建议",
+            "免责声明"
+          ]
+        },
+        "pdf": {
+          "field_quotes": [
+            {
+              "name": "项目名称",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "项目编号",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "采购人",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "投标人",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "报价",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "name": "工期",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "qual_quotes": [
+            {
+              "rule_id": "R01",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R04",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R05",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            },
+            {
+              "rule_id": "R10",
+              "quote_in_report": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "risk_quotes": [
+            {
+              "rule_id": "R12",
+              "quote_in_report": true,
+              "quote_in_source": true,
+              "page": 1,
+              "page_in_report": true
+            }
+          ],
+          "pages": [],
+          "has_disclaimer": true,
+          "has_total": true,
+          "qual_counts_in_report": true,
+          "risk_count_in_report": true,
+          "chapter_markers": [
+            "招投标评审报告",
+            "评审依据",
+            "项目与投标人信息",
+            "资格性核验",
+            "分项评分",
+            "风险清单",
+            "合同摘要",
+            "结论与建议",
+            "免责声明"
+          ]
+        }
+      }
+    }
+  ]
+}

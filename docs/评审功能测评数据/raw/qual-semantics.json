@@ -1,0 +1,126 @@
+{
+  "合规否定式_无重大违法记录": {
+    "states": {
+      "R01": "missing",
+      "R02": "missing",
+      "R03": "missing",
+      "R04": "missing",
+      "R05": "missing",
+      "R06": "missing",
+      "R07": "insufficient",
+      "R08": "missing",
+      "R09": "missing",
+      "R10": "missing"
+    },
+    "counts": {
+      "provided": 0,
+      "insufficient": 1,
+      "missing": 9
+    },
+    "quotes": {
+      "R01": "",
+      "R02": "",
+      "R03": "",
+      "R04": "",
+      "R05": "",
+      "R06": "",
+      "R07": "重大违法记录",
+      "R08": "",
+      "R09": "",
+      "R10": ""
+    }
+  },
+  "明说未提供_营业执照": {
+    "states": {
+      "R01": "insufficient",
+      "R02": "missing",
+      "R03": "missing",
+      "R04": "missing",
+      "R05": "missing",
+      "R06": "missing",
+      "R07": "missing",
+      "R08": "missing",
+      "R09": "missing",
+      "R10": "missing"
+    },
+    "counts": {
+      "provided": 0,
+      "insufficient": 1,
+      "missing": 9
+    },
+    "quotes": {
+      "R01": "营业执照",
+      "R02": "",
+      "R03": "",
+      "R04": "",
+      "R05": "",
+      "R06": "",
+      "R07": "",
+      "R08": "",
+      "R09": "",
+      "R10": ""
+    }
+  },
+  "先肯定后否定_营业执照": {
+    "states": {
+      "R01": "insufficient",
+      "R02": "missing",
+      "R03": "missing",
+      "R04": "missing",
+      "R05": "missing",
+      "R06": "missing",
+      "R07": "missing",
+      "R08": "missing",
+      "R09": "missing",
+      "R10": "missing"
+    },
+    "counts": {
+      "provided": 0,
+      "insufficient": 1,
+      "missing": 9
+    },
+    "quotes": {
+      "R01": "营业执照",
+      "R02": "",
+      "R03": "",
+      "R04": "",
+      "R05": "",
+      "R06": "",
+      "R07": "",
+      "R08": "",
+      "R09": "",
+      "R10": ""
+    }
+  },
+  "相邻行无字干扰": {
+    "states": {
+      "R01": "insufficient",
+      "R02": "missing",
+      "R03": "missing",
+      "R04": "missing",
+      "R05": "missing",
+      "R06": "insufficient",
+      "R07": "insufficient",
+      "R08": "insufficient",
+      "R09": "missing",
+      "R10": "insufficient"
+    },
+    "counts": {
+      "provided": 0,
+      "insufficient": 5,
+      "missing": 5
+    },
+    "quotes": {
+      "R01": "营业执照",
+      "R02": "",
+      "R03": "",
+      "R04": "",
+      "R05": "",
+      "R06": "社会保险",
+      "R07": "重大违法记录",
+      "R08": "中小企业声明函",
+      "R09": "",
+      "R10": "项目负责人"
+    }
+  }
+}

@@ -41,7 +41,7 @@
       "rule_id": "R07",
       "title": "无重大违法记录声明缺失",
       "file": "rules/R07.md",
-      "chars": 315
+      "chars": 350
     },
     {
       "rule_id": "R08",
@@ -59,7 +59,7 @@
       "rule_id": "R10",
       "title": "项目负责人资格不满足",
       "file": "rules/R10.md",
-      "chars": 344
+      "chars": 378
     },
     {
       "rule_id": "R11",

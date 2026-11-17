@@ -1,0 +1,1043 @@
+{
+  "started_at": "2026-11-16T14:45:55",
+  "base": "http://127.0.0.1:18080",
+  "text": [
+    {
+      "rep": 0,
+      "file": "bid-001.docx",
+      "ms": 87.25769999728072,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-7826f4c8"
+    },
+    {
+      "rep": 0,
+      "file": "bid-002.docx",
+      "ms": 53.78240000572987,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-588dc69b"
+    },
+    {
+      "rep": 0,
+      "file": "bid-003.docx",
+      "ms": 43.36239999975078,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-4f3d6047"
+    },
+    {
+      "rep": 0,
+      "file": "bid-004.pdf",
+      "ms": 87.23710000049323,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-81e19adc"
+    },
+    {
+      "rep": 0,
+      "file": "bid-005.pdf",
+      "ms": 65.13850000919774,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-47255fd6"
+    },
+    {
+      "rep": 0,
+      "file": "bid-006.txt",
+      "ms": 31.120400002691895,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-525761b3"
+    },
+    {
+      "rep": 0,
+      "file": "bid-007.txt",
+      "ms": 26.81829998618923,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-17f2a124"
+    },
+    {
+      "rep": 0,
+      "file": "bid-008.docx",
+      "ms": 53.81830000260379,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-a349fa3b"
+    },
+    {
+      "rep": 0,
+      "file": "bid-009.txt",
+      "ms": 28.484300011768937,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-8e2497f3"
+    },
+    {
+      "rep": 0,
+      "file": "bid-010.docx",
+      "ms": 51.22579999442678,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-3c7af8c6"
+    },
+    {
+      "rep": 0,
+      "file": "bid-011.pdf",
+      "ms": 69.41529999312479,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-c3e4a6b9"
+    },
+    {
+      "rep": 0,
+      "file": "bid-012.txt",
+      "ms": 29.494400005205534,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-bbb9a2d5"
+    },
+    {
+      "rep": 0,
+      "file": "bid-013.docx",
+      "ms": 52.20329998701345,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-34cccd30"
+    },
+    {
+      "rep": 0,
+      "file": "bid-014.txt",
+      "ms": 26.70360000047367,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-2e474f9e"
+    },
+    {
+      "rep": 0,
+      "file": "bid-015.docx",
+      "ms": 47.95999999623746,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-631cfb7f"
+    },
+    {
+      "rep": 0,
+      "file": "bid-016.docx",
+      "ms": 38.48989999096375,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-7f17fe8c"
+    },
+    {
+      "rep": 0,
+      "file": "bid-017.pdf",
+      "ms": 76.90260000526905,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-f0260abb"
+    },
+    {
+      "rep": 0,
+      "file": "bid-018.txt",
+      "ms": 25.007800009916537,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-99ad3711"
+    },
+    {
+      "rep": 0,
+      "file": "bid-019.docx",
+      "ms": 43.42100000940263,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-86778af1"
+    },
+    {
+      "rep": 0,
+      "file": "bid-020.txt",
+      "ms": 25.616799990530126,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-70490fa2"
+    },
+    {
+      "rep": 1,
+      "file": "bid-001.docx",
+      "ms": 47.16629999165889,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-43255dab"
+    },
+    {
+      "rep": 1,
+      "file": "bid-002.docx",
+      "ms": 39.722599991364405,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-ae6f762a"
+    },
+    {
+      "rep": 1,
+      "file": "bid-003.docx",
+      "ms": 45.39980000117794,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-d621ebcd"
+    },
+    {
+      "rep": 1,
+      "file": "bid-004.pdf",
+      "ms": 93.26249999867287,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-d9bf3157"
+    },
+    {
+      "rep": 1,
+      "file": "bid-005.pdf",
+      "ms": 70.07799998973496,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-47679708"
+    },
+    {
+      "rep": 1,
+      "file": "bid-006.txt",
+      "ms": 26.91630000481382,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-f1387f56"
+    },
+    {
+      "rep": 1,
+      "file": "bid-007.txt",
+      "ms": 25.504599994746968,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-b8f77378"
+    },
+    {
+      "rep": 1,
+      "file": "bid-008.docx",
+      "ms": 42.486300008022226,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-ee043479"
+    },
+    {
+      "rep": 1,
+      "file": "bid-009.txt",
+      "ms": 26.890900000580586,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-f4e9f8e3"
+    },
+    {
+      "rep": 1,
+      "file": "bid-010.docx",
+      "ms": 46.328900003572926,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-0b05dbf2"
+    },
+    {
+      "rep": 1,
+      "file": "bid-011.pdf",
+      "ms": 82.58899999782443,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-3e49d80a"
+    },
+    {
+      "rep": 1,
+      "file": "bid-012.txt",
+      "ms": 27.661999993142672,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-3930b0f6"
+    },
+    {
+      "rep": 1,
+      "file": "bid-013.docx",
+      "ms": 46.01060001004953,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-be3e9211"
+    },
+    {
+      "rep": 1,
+      "file": "bid-014.txt",
+      "ms": 26.03320000343956,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-6c1b16dc"
+    },
+    {
+      "rep": 1,
+      "file": "bid-015.docx",
+      "ms": 48.52039999968838,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-42924313"
+    },
+    {
+      "rep": 1,
+      "file": "bid-016.docx",
+      "ms": 45.48110000905581,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-18cc58a0"
+    },
+    {
+      "rep": 1,
+      "file": "bid-017.pdf",
+      "ms": 134.1314000019338,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-401f6e3f"
+    },
+    {
+      "rep": 1,
+      "file": "bid-018.txt",
+      "ms": 22.971300000790507,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-fbfe9fe0"
+    },
+    {
+      "rep": 1,
+      "file": "bid-019.docx",
+      "ms": 42.70009999163449,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-01d94e17"
+    },
+    {
+      "rep": 1,
+      "file": "bid-020.txt",
+      "ms": 24.687600001925603,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-7eebc4f9"
+    },
+    {
+      "rep": 2,
+      "file": "bid-001.docx",
+      "ms": 47.70060000009835,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-1d89cfef"
+    },
+    {
+      "rep": 2,
+      "file": "bid-002.docx",
+      "ms": 38.701899989973754,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-6325d391"
+    },
+    {
+      "rep": 2,
+      "file": "bid-003.docx",
+      "ms": 45.50920000474434,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-a2727778"
+    },
+    {
+      "rep": 2,
+      "file": "bid-004.pdf",
+      "ms": 82.032899998012,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-692825f4"
+    },
+    {
+      "rep": 2,
+      "file": "bid-005.pdf",
+      "ms": 67.05729999521282,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-1d11bd49"
+    },
+    {
+      "rep": 2,
+      "file": "bid-006.txt",
+      "ms": 27.368499999283813,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-b8a2c043"
+    },
+    {
+      "rep": 2,
+      "file": "bid-007.txt",
+      "ms": 27.725100007955916,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-52f62e1c"
+    },
+    {
+      "rep": 2,
+      "file": "bid-008.docx",
+      "ms": 40.74900000705384,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-42ab1842"
+    },
+    {
+      "rep": 2,
+      "file": "bid-009.txt",
+      "ms": 26.18050000455696,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-5a211961"
+    },
+    {
+      "rep": 2,
+      "file": "bid-010.docx",
+      "ms": 48.422699997900054,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-694eaeeb"
+    },
+    {
+      "rep": 2,
+      "file": "bid-011.pdf",
+      "ms": 74.09630001347978,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-1a988e15"
+    },
+    {
+      "rep": 2,
+      "file": "bid-012.txt",
+      "ms": 26.57060000638012,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-47a1ccf5"
+    },
+    {
+      "rep": 2,
+      "file": "bid-013.docx",
+      "ms": 49.91780000273138,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-18269d8c"
+    },
+    {
+      "rep": 2,
+      "file": "bid-014.txt",
+      "ms": 25.46950000396464,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-43a8d19c"
+    },
+    {
+      "rep": 2,
+      "file": "bid-015.docx",
+      "ms": 43.745899994974025,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-33817b15"
+    },
+    {
+      "rep": 2,
+      "file": "bid-016.docx",
+      "ms": 39.146399998571724,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-07966621"
+    },
+    {
+      "rep": 2,
+      "file": "bid-017.pdf",
+      "ms": 79.78849999199156,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-be36dff7"
+    },
+    {
+      "rep": 2,
+      "file": "bid-018.txt",
+      "ms": 24.060199997620657,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-f67b652f"
+    },
+    {
+      "rep": 2,
+      "file": "bid-019.docx",
+      "ms": 43.352500011678785,
+      "status": 200,
+      "parse_status": "degraded",
+      "doc_id": "20261116-39716e29"
+    },
+    {
+      "rep": 2,
+      "file": "bid-020.txt",
+      "ms": 27.484499994898215,
+      "status": 200,
+      "parse_status": "ok",
+      "doc_id": "20261116-5f8cafa2"
+    }
+  ],
+  "ocr_cold": {
+    "file": "scan-001.pdf",
+    "ms": 45643.843899990316,
+    "status": 200,
+    "parse_status": "degraded",
+    "ocr_pages": 3,
+    "doc_id": "20261116-30862ac1"
+  },
+  "ocr_warm": [
+    {
+      "rep": 0,
+      "file": "scan-001.pdf",
+      "ms": 18798.089599993546,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-a98e2775"
+    },
+    {
+      "rep": 0,
+      "file": "scan-002.pdf",
+      "ms": 20798.495099996217,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-898ddea6"
+    },
+    {
+      "rep": 0,
+      "file": "scan-003.pdf",
+      "ms": 16996.905599997262,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-1a7749b7"
+    },
+    {
+      "rep": 0,
+      "file": "scan-004.pdf",
+      "ms": 20318.537099999958,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-1de6ff20"
+    },
+    {
+      "rep": 0,
+      "file": "scan-005.pdf",
+      "ms": 17283.123500004876,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-e058b778"
+    },
+    {
+      "rep": 1,
+      "file": "scan-001.pdf",
+      "ms": 36207.03340000182,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-4f629a1a"
+    },
+    {
+      "rep": 1,
+      "file": "scan-002.pdf",
+      "ms": 18946.311800013063,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-f2b11852"
+    },
+    {
+      "rep": 1,
+      "file": "scan-003.pdf",
+      "ms": 19406.375099992147,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-4d22a9b0"
+    },
+    {
+      "rep": 1,
+      "file": "scan-004.pdf",
+      "ms": 18146.003599991673,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-84df98c7"
+    },
+    {
+      "rep": 1,
+      "file": "scan-005.pdf",
+      "ms": 16846.02349999477,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-cffd2baa"
+    },
+    {
+      "rep": 2,
+      "file": "scan-001.pdf",
+      "ms": 18923.534999994445,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-b118c7d0"
+    },
+    {
+      "rep": 2,
+      "file": "scan-002.pdf",
+      "ms": 22052.02809999173,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-b2a57ffd"
+    },
+    {
+      "rep": 2,
+      "file": "scan-003.pdf",
+      "ms": 16622.024199998123,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-32dbc851"
+    },
+    {
+      "rep": 2,
+      "file": "scan-004.pdf",
+      "ms": 18594.825799998944,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-b27f049d"
+    },
+    {
+      "rep": 2,
+      "file": "scan-005.pdf",
+      "ms": 17811.60760000057,
+      "status": 200,
+      "parse_status": "degraded",
+      "ocr_pages": 3,
+      "doc_id": "20261116-527e74a8"
+    }
+  ],
+  "review_seq": [
+    {
+      "i": 0,
+      "ms": 139.17439999931958,
+      "status": 200,
+      "review_id": "rv-20261116-145141-76acc6"
+    },
+    {
+      "i": 1,
+      "ms": 21.691899994038977,
+      "status": 200,
+      "review_id": "rv-20261116-145141-66b285"
+    },
+    {
+      "i": 2,
+      "ms": 23.651200011954643,
+      "status": 200,
+      "review_id": "rv-20261116-145141-8ddaa2"
+    },
+    {
+      "i": 3,
+      "ms": 22.169299991219305,
+      "status": 200,
+      "review_id": "rv-20261116-145141-ea69b0"
+    },
+    {
+      "i": 4,
+      "ms": 24.789599992800504,
+      "status": 200,
+      "review_id": "rv-20261116-145141-4114ef"
+    },
+    {
+      "i": 5,
+      "ms": 21.762899996247143,
+      "status": 200,
+      "review_id": "rv-20261116-145141-910117"
+    },
+    {
+      "i": 6,
+      "ms": 21.0981999989599,
+      "status": 200,
+      "review_id": "rv-20261116-145141-fffd75"
+    },
+    {
+      "i": 7,
+      "ms": 21.144800004549325,
+      "status": 200,
+      "review_id": "rv-20261116-145141-791a76"
+    },
+    {
+      "i": 8,
+      "ms": 21.641100000124425,
+      "status": 200,
+      "review_id": "rv-20261116-145141-e99c94"
+    },
+    {
+      "i": 9,
+      "ms": 23.42480000515934,
+      "status": 200,
+      "review_id": "rv-20261116-145142-9f7ddb"
+    },
+    {
+      "i": 10,
+      "ms": 21.568199998000637,
+      "status": 200,
+      "review_id": "rv-20261116-145142-dbb53b"
+    },
+    {
+      "i": 11,
+      "ms": 22.625500001595356,
+      "status": 200,
+      "review_id": "rv-20261116-145142-21b6af"
+    },
+    {
+      "i": 12,
+      "ms": 22.473699995316565,
+      "status": 200,
+      "review_id": "rv-20261116-145142-1d347f"
+    },
+    {
+      "i": 13,
+      "ms": 23.1424999947194,
+      "status": 200,
+      "review_id": "rv-20261116-145142-53fa81"
+    },
+    {
+      "i": 14,
+      "ms": 22.87060000526253,
+      "status": 200,
+      "review_id": "rv-20261116-145142-c0944a"
+    },
+    {
+      "i": 15,
+      "ms": 23.208800004795194,
+      "status": 200,
+      "review_id": "rv-20261116-145142-69a795"
+    },
+    {
+      "i": 16,
+      "ms": 21.858399995835498,
+      "status": 200,
+      "review_id": "rv-20261116-145142-713ccc"
+    },
+    {
+      "i": 17,
+      "ms": 22.71620000828989,
+      "status": 200,
+      "review_id": "rv-20261116-145142-243a75"
+    },
+    {
+      "i": 18,
+      "ms": 22.404500006814487,
+      "status": 200,
+      "review_id": "rv-20261116-145142-9809eb"
+    },
+    {
+      "i": 19,
+      "ms": 25.00039999722503,
+      "status": 200,
+      "review_id": "rv-20261116-145142-a6113d"
+    },
+    {
+      "i": 20,
+      "ms": 24.508699993020855,
+      "status": 200,
+      "review_id": "rv-20261116-145142-7ddc81"
+    },
+    {
+      "i": 21,
+      "ms": 24.15379999729339,
+      "status": 200,
+      "review_id": "rv-20261116-145142-c3ae9d"
+    },
+    {
+      "i": 22,
+      "ms": 21.945700005744584,
+      "status": 200,
+      "review_id": "rv-20261116-145142-add5f9"
+    },
+    {
+      "i": 23,
+      "ms": 23.24660000158474,
+      "status": 200,
+      "review_id": "rv-20261116-145142-389507"
+    },
+    {
+      "i": 24,
+      "ms": 22.454599995398894,
+      "status": 200,
+      "review_id": "rv-20261116-145142-74d367"
+    },
+    {
+      "i": 25,
+      "ms": 22.519799997098744,
+      "status": 200,
+      "review_id": "rv-20261116-145142-4d4f61"
+    },
+    {
+      "i": 26,
+      "ms": 21.880799991777167,
+      "status": 200,
+      "review_id": "rv-20261116-145142-e3773a"
+    },
+    {
+      "i": 27,
+      "ms": 28.01559999352321,
+      "status": 200,
+      "review_id": "rv-20261116-145142-a28018"
+    },
+    {
+      "i": 28,
+      "ms": 24.227499990956858,
+      "status": 200,
+      "review_id": "rv-20261116-145142-8685b6"
+    },
+    {
+      "i": 29,
+      "ms": 24.470900010783225,
+      "status": 200,
+      "review_id": "rv-20261116-145142-88c39f"
+    }
+  ],
+  "concurrency": {
+    "1": {
+      "requests": 20,
+      "workers": 1,
+      "wall_ms": 468.4,
+      "throughput_rps": 42.7,
+      "error_rate": 0.0,
+      "summary": {
+        "n": 20,
+        "min": 21.0,
+        "p50": 22.7,
+        "p95": 25.3,
+        "max": 25.5,
+        "mean": 23.1
+      }
+    },
+    "5": {
+      "requests": 50,
+      "workers": 5,
+      "wall_ms": 389.8,
+      "throughput_rps": 128.28,
+      "error_rate": 0.0,
+      "summary": {
+        "n": 50,
+        "min": 27.7,
+        "p50": 37.7,
+        "p95": 45.1,
+        "max": 48.1,
+        "mean": 38.2
+      }
+    },
+    "10": {
+      "requests": 100,
+      "workers": 10,
+      "wall_ms": 848.5,
+      "throughput_rps": 117.85,
+      "error_rate": 0.0,
+      "summary": {
+        "n": 100,
+        "min": 53.5,
+        "p50": 80.9,
+        "p95": 109.0,
+        "max": 120.4,
+        "mean": 82.5
+      }
+    }
+  },
+  "report": [
+    {
+      "review_id": "rv-20261116-145141-76acc6",
+      "fmt": "docx",
+      "first_ms": 494.7,
+      "second_ms": 24.9,
+      "status": 200,
+      "size": 42488,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-76acc6",
+      "fmt": "pdf",
+      "first_ms": 98.7,
+      "second_ms": 22.6,
+      "status": 200,
+      "size": 10961,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-66b285",
+      "fmt": "docx",
+      "first_ms": 335.1,
+      "second_ms": 26.9,
+      "status": 200,
+      "size": 42489,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-66b285",
+      "fmt": "pdf",
+      "first_ms": 97.3,
+      "second_ms": 25.8,
+      "status": 200,
+      "size": 10952,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-8ddaa2",
+      "fmt": "docx",
+      "first_ms": 372.0,
+      "second_ms": 27.2,
+      "status": 200,
+      "size": 42486,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-8ddaa2",
+      "fmt": "pdf",
+      "first_ms": 112.8,
+      "second_ms": 24.9,
+      "status": 200,
+      "size": 10962,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-ea69b0",
+      "fmt": "docx",
+      "first_ms": 363.4,
+      "second_ms": 25.7,
+      "status": 200,
+      "size": 42485,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-ea69b0",
+      "fmt": "pdf",
+      "first_ms": 106.6,
+      "second_ms": 26.4,
+      "status": 200,
+      "size": 10964,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-4114ef",
+      "fmt": "docx",
+      "first_ms": 332.0,
+      "second_ms": 25.5,
+      "status": 200,
+      "size": 42485,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-4114ef",
+      "fmt": "pdf",
+      "first_ms": 111.9,
+      "second_ms": 23.1,
+      "status": 200,
+      "size": 10963,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-910117",
+      "fmt": "docx",
+      "first_ms": 299.8,
+      "second_ms": 25.0,
+      "status": 200,
+      "size": 42488,
+      "same": true
+    },
+    {
+      "review_id": "rv-20261116-145141-910117",
+      "fmt": "pdf",
+      "first_ms": 103.5,
+      "second_ms": 23.9,
+      "status": 200,
+      "size": 10954,
+      "same": true
+    }
+  ],
+  "env": {
+    "uptime_seconds": 10,
+    "started_at": "2026-11-16T14:45:44+08:00",
+    "version": "0.9.0",
+    "container": "bid-review",
+    "host": "Ryzen 7 7735H / 16GB / Win11"
+  },
+  "text_summary": {
+    "n": 60,
+    "min": 23.0,
+    "p50": 43.4,
+    "p95": 87.2,
+    "max": 134.1,
+    "mean": 46.9
+  },
+  "ocr_warm_summary": {
+    "n": 15,
+    "min": 16622.0,
+    "p50": 18798.1,
+    "p95": 26298.5,
+    "max": 36207.0,
+    "mean": 19850.1
+  },
+  "ocr_cold_summary": {
+    "n": 1,
+    "min": 45643.8,
+    "p50": 45643.8,
+    "p95": 45643.8,
+    "max": 45643.8,
+    "mean": 45643.8
+  },
+  "review_seq_summary": {
+    "n": 30,
+    "min": 21.1,
+    "p50": 22.7,
+    "p95": 26.7,
+    "max": 139.2,
+    "mean": 26.9
+  },
+  "review_error_rate": 0.0,
+  "report_docx_summary": {
+    "n": 6,
+    "min": 299.8,
+    "p50": 349.2,
+    "p95": 464.0,
+    "max": 494.7,
+    "mean": 366.2
+  },
+  "report_docx_cached_summary": {
+    "n": 6,
+    "min": 24.9,
+    "p50": 25.6,
+    "p95": 27.1,
+    "max": 27.2,
+    "mean": 25.9
+  },
+  "report_pdf_summary": {
+    "n": 6,
+    "min": 97.3,
+    "p50": 105.0,
+    "p95": 112.6,
+    "max": 112.8,
+    "mean": 105.1
+  },
+  "report_pdf_cached_summary": {
+    "n": 6,
+    "min": 22.6,
+    "p50": 24.4,
+    "p95": 26.2,
+    "max": 26.4,
+    "mean": 24.4
+  },
+  "finished_at": "2026-11-16T14:51:47"
+}

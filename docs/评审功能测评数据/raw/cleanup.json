@@ -1,0 +1,212 @@
+{
+  "before": {
+    "docs": 48,
+    "reviews": 14,
+    "reports": 6,
+    "report_bytes": 98778,
+    "uploads": 48
+  },
+  "targets": 2,
+  "results": [
+    {
+      "chunk": 0,
+      "requested": 2,
+      "status": 200,
+      "body": "{\"selected_docs\":2,\"selected_reviews\":0,\"deleted_docs\":2,\"deleted_reviews\":0,\"deleted_reports\":0,\"missing_docs\":0,\"missing_reviews\":0}"
+    }
+  ],
+  "after": {
+    "docs": 46,
+    "reviews": 14,
+    "reports": 6,
+    "report_bytes": 98778,
+    "uploads": 46
+  },
+  "remaining_docs": [
+    {
+      "doc_id": "20261116-38ad2a5d",
+      "file_name": "risk-015.docx"
+    },
+    {
+      "doc_id": "20261116-0ebf0aa1",
+      "file_name": "risk-014.docx"
+    },
+    {
+      "doc_id": "20261116-24110ab1",
+      "file_name": "risk-013.docx"
+    },
+    {
+      "doc_id": "20261116-d5687fce",
+      "file_name": "risk-012.docx"
+    },
+    {
+      "doc_id": "20261116-b705aab1",
+      "file_name": "risk-011.docx"
+    },
+    {
+      "doc_id": "20261116-f1c384f1",
+      "file_name": "risk-010.docx"
+    },
+    {
+      "doc_id": "20261116-3db27751",
+      "file_name": "risk-009.docx"
+    },
+    {
+      "doc_id": "20261116-8d999b1b",
+      "file_name": "risk-008.docx"
+    },
+    {
+      "doc_id": "20261116-23d9d066",
+      "file_name": "risk-007.docx"
+    },
+    {
+      "doc_id": "20261116-6d32774b",
+      "file_name": "risk-006.docx"
+    },
+    {
+      "doc_id": "20261116-cd30ab70",
+      "file_name": "risk-005.docx"
+    },
+    {
+      "doc_id": "20261116-21dfa80e",
+      "file_name": "risk-004.docx"
+    },
+    {
+      "doc_id": "20261116-eb10c03f",
+      "file_name": "risk-003.docx"
+    },
+    {
+      "doc_id": "20261116-d93f390f",
+      "file_name": "risk-002.docx"
+    },
+    {
+      "doc_id": "20261116-c4ba1dc3",
+      "file_name": "risk-001.docx"
+    },
+    {
+      "doc_id": "20261116-3aced1a7",
+      "file_name": "bid-001.docx"
+    },
+    {
+      "doc_id": "20261116-3f045b6e",
+      "file_name": "bid-002.docx"
+    },
+    {
+      "doc_id": "20261116-7a72f7cd",
+      "file_name": "bid-002.docx"
+    },
+    {
+      "doc_id": "20261116-747083dc",
+      "file_name": "bid-002.docx"
+    },
+    {
+      "doc_id": "20261116-db3648d8",
+      "file_name": "scan-005.pdf"
+    },
+    {
+      "doc_id": "20261116-824281e3",
+      "file_name": "scan-004.pdf"
+    },
+    {
+      "doc_id": "20261116-23238d00",
+      "file_name": "scan-003.pdf"
+    },
+    {
+      "doc_id": "20261116-7ed4771a",
+      "file_name": "scan-002.pdf"
+    },
+    {
+      "doc_id": "20261116-61cfdbbb",
+      "file_name": "scan-001.pdf"
+    },
+    {
+      "doc_id": "20261116-6302e0c4",
+      "file_name": "bid-020.txt"
+    },
+    {
+      "doc_id": "20261116-be60daf5",
+      "file_name": "bid-019.docx"
+    },
+    {
+      "doc_id": "20261116-823ee024",
+      "file_name": "bid-018.txt"
+    },
+    {
+      "doc_id": "20261116-8bda7f4d",
+      "file_name": "bid-017.pdf"
+    },
+    {
+      "doc_id": "20261116-cd786513",
+      "file_name": "bid-016.docx"
+    },
+    {
+      "doc_id": "20261116-6c069f18",
+      "file_name": "bid-015.docx"
+    },
+    {
+      "doc_id": "20261116-380e0a47",
+      "file_name": "bid-014.txt"
+    },
+    {
+      "doc_id": "20261116-f507e734",
+      "file_name": "bid-013.docx"
+    },
+    {
+      "doc_id": "20261116-7ba2f4b3",
+      "file_name": "bid-012.txt"
+    },
+    {
+      "doc_id": "20261116-235ac1c0",
+      "file_name": "bid-011.pdf"
+    },
+    {
+      "doc_id": "20261116-03657213",
+      "file_name": "bid-010.docx"
+    },
+    {
+      "doc_id": "20261116-c06472c1",
+      "file_name": "bid-009.txt"
+    },
+    {
+      "doc_id": "20261116-290d339c",
+      "file_name": "bid-008.docx"
+    },
+    {
+      "doc_id": "20261116-78eb0ea6",
+      "file_name": "bid-007.txt"
+    },
+    {
+      "doc_id": "20261116-3a1e656d",
+      "file_name": "bid-006.txt"
+    },
+    {
+      "doc_id": "20261116-0c2c6cd1",
+      "file_name": "bid-005.pdf"
+    },
+    {
+      "doc_id": "20261116-a09eb6c2",
+      "file_name": "bid-004.pdf"
+    },
+    {
+      "doc_id": "20261116-16d8c9ab",
+      "file_name": "bid-003.docx"
+    },
+    {
+      "doc_id": "20261116-7232ac71",
+      "file_name": "bid-002.docx"
+    },
+    {
+      "doc_id": "20261116-9b04bfff",
+      "file_name": "bid-001.docx"
+    },
+    {
+      "doc_id": "20261116-2e3d1761",
+      "file_name": "bid-004.pdf"
+    },
+    {
+      "doc_id": "eval",
+      "file_name": "bid-001.docx"
+    }
+  ],
+  "remaining_targets": []
+}

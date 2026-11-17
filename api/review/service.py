@@ -64,6 +64,11 @@ def run(doc, profile_id: str = "profile-a-calibrated", project_type: str = "unkn
         },
         "disclaimer": config.DISCLAIMER,
     }
+    if project_type == "unknown":
+        review["summary"]["project_type_note"] = (
+            "项目类型未指定：R03/R08/R36 等门控规则按通用口径展示；"
+            "建议选择工程类或货物/服务类后重新评审。"
+        )
     save(review)
     return review
 

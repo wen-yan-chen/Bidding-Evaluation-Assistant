@@ -1,0 +1,8 @@
+{
+  "samples": 114,
+  "cpu_avg": 1147.01,
+  "cpu_max": 1626.55,
+  "mem_avg": 4.74,
+  "mem_max": 11.22,
+  "mem_peak_usage": "847.7MiB / 7.381GiB"
+}

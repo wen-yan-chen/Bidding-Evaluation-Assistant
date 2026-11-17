@@ -1,0 +1,70 @@
+{
+  "started_at": "2026-11-16T14:58:19",
+  "checks": {
+    "report_pdf": {
+      "src": "/api/report/rv-20261116-145518-3c1d94?format=pdf&inline=1",
+      "status": 200,
+      "content_type": "application/pdf",
+      "magic": "%PDF-1.4",
+      "size": 10917,
+      "has_disclaimer": null
+    },
+    "original_pdf": {
+      "src": "/api/doc/20261116-391e2330/raw?inline=1",
+      "status": 200,
+      "content_type": "application/pdf",
+      "magic": "%PDF-1.7",
+      "size": 141238,
+      "has_disclaimer": null
+    },
+    "docx_html": {
+      "src": "/api/doc/20261116-ad447ee9/html",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "magic": "<!doctyp",
+      "size": 7691,
+      "has_disclaimer": false
+    },
+    "reports": {
+      "rows": 20,
+      "hint": "共 50 份 · 可生成 50 份 · 显示最近 20 份 · 最近 2026-11-16 14:56:57",
+      "first_total": "62.0 / 100.0",
+      "first_numbers": "资格 提供 4 / 缺失 6 · 风险 0"
+    },
+    "download_docx": {
+      "filename": "rv-20261116-145657-d4d0bd.docx",
+      "size": 42475,
+      "sha256": "e141345dd5b1a4697dd74159d18694349ab0d4466086a48fcf0fdc22d3bab32e"
+    },
+    "download_pdf": {
+      "filename": "rv-20261116-145657-d4d0bd.pdf",
+      "size": 10906,
+      "sha256": "cf9ad87f68bcaf65810733c4c6aa037231447684512701cf4ada0ff39641251f"
+    },
+    "admin_data": {
+      "doc_rows": 205,
+      "review_rows": 300,
+      "summary": "文档 205 · 评审 300 · 报告 18 个 / 439.9 KB · 上传文件 204",
+      "doc_count": "共 205 份",
+      "review_count": "共 300 份"
+    },
+    "eval_rows": 1,
+    "eval_preview": {
+      "text": "bid-001.docx\n\n这条文档只有解析结果，没有可用的上传原件（常见于历史/测试数据）。",
+      "has_404": false,
+      "has_json": false
+    },
+    "eval_api": {
+      "status": 400,
+      "body": "{\"detail\":\"文档 ID 格式不合法\"}"
+    },
+    "console_error_count": 0
+  },
+  "shots": [
+    "docs/screenshots/20261116-08-报告中心.png",
+    "docs/screenshots/20261116-15-数据管理.png",
+    "docs/screenshots/20261116-14-数据管理-无原件文档提示.png"
+  ],
+  "console": [],
+  "page_errors": []
+}

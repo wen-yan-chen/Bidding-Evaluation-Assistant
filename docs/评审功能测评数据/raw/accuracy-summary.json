@@ -1,0 +1,112 @@
+{
+  "generated_at": "2026-11-16T14:45:07",
+  "samples": 25,
+  "parse_ok": {
+    "text": 20,
+    "text_total": 20,
+    "scan": 5,
+    "scan_total": 5
+  },
+  "fields": {
+    "all": {
+      "n": 146,
+      "hit": 146,
+      "rate": 1.0
+    },
+    "text": {
+      "n": 116,
+      "hit": 116,
+      "rate": 1.0
+    },
+    "scan": {
+      "n": 30,
+      "hit": 30,
+      "rate": 1.0
+    },
+    "extras": 0,
+    "slice_bad": 0,
+    "page_bad": 0,
+    "quote_missing_value": 1
+  },
+  "scoring": {
+    "reviews": 50,
+    "problem_files_a": [],
+    "problem_files_b": [],
+    "bid001": {
+      "a_total": 68.0,
+      "b_total": 62.0,
+      "a_items": {
+        "P1": 40.0,
+        "T1": 0.0,
+        "T2": 10.0,
+        "T3": 0.0,
+        "T4": 0.0,
+        "T5": 6.0,
+        "B1": 0.0,
+        "B2": 6.0,
+        "B3": 6.0
+      },
+      "b_items": {
+        "P1": 30.0,
+        "T1": 0.0,
+        "T2": 12.0,
+        "T3": 0.0,
+        "T4": 0.0,
+        "T5": 8.0,
+        "B1": 0.0,
+        "B2": 6.0,
+        "B3": 6.0
+      },
+      "diff": {
+        "P1": -10.0,
+        "T1": 0.0,
+        "T2": 2.0,
+        "T3": 0.0,
+        "T4": 0.0,
+        "T5": 2.0,
+        "B1": 0.0,
+        "B2": 0.0,
+        "B3": 0.0
+      }
+    }
+  },
+  "qualification": {
+    "docs": 25,
+    "bad_counts": [],
+    "states": {
+      "provided": 86,
+      "insufficient": 0,
+      "missing": 164
+    }
+  },
+  "risk": {
+    "dev": {
+      "tp": 10,
+      "fn": 0,
+      "fp": 0,
+      "recall": 1.0,
+      "fp_rate": 0.0
+    },
+    "holdout": {
+      "tp": 5,
+      "fn": 0,
+      "fp": 0,
+      "recall": 1.0,
+      "fp_rate": 0.0
+    },
+    "all": {
+      "tp": 15,
+      "fn": 0,
+      "fp": 0,
+      "recall": 1.0,
+      "fp_rate": 0.0
+    }
+  },
+  "duplicate_hits": [
+    {
+      "file": "risk/risk-015.docx",
+      "rule_id": "R35",
+      "count": 2
+    }
+  ]
+}

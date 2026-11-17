@@ -104,6 +104,7 @@ def build(review: dict[str, Any], doc) -> dict[str, Any]:  # noqa: ANN001
             "doc_id": review.get("doc_id"),
             "file_name": review.get("file_name"),
             "project_type": review.get("project_type", "unknown"),
+            "project_type_note": (review.get("summary") or {}).get("project_type_note", ""),
             "pages": len(doc.pages),
             "page_source": doc.page_source,
             "parse_status": doc.parse_status,

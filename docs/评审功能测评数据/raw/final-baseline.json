@@ -1,0 +1,17 @@
+{
+  "docs": 46,
+  "reviews": 14,
+  "reports_files": 6,
+  "bid001": {
+    "review_id": "rv-20261116-141905-60a203",
+    "total": 68.0,
+    "counts": {
+      "provided": 4,
+      "insufficient": 0,
+      "missing": 6
+    },
+    "risks": 0
+  },
+  "git_head": "86684b2d328c74c0596c119d7eb50359c6a70909",
+  "git_tracked_diff": ""
+}

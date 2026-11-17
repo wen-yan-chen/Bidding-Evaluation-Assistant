@@ -1,0 +1,303 @@
+{
+  "samples": [
+    {
+      "file": "bid-001.docx",
+      "review_id": "rv-20261116-143942-111e11",
+      "docx": 42473,
+      "pdf": 10936,
+      "docx_ms": 36.4,
+      "pdf_ms": 26.3,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-002.docx",
+      "review_id": "rv-20261116-143942-56ebd4",
+      "docx": 42522,
+      "pdf": 12181,
+      "docx_ms": 315.6,
+      "pdf_ms": 97.2,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-003.docx",
+      "review_id": "rv-20261116-143942-9fa4ca",
+      "docx": 42522,
+      "pdf": 11047,
+      "docx_ms": 341.6,
+      "pdf_ms": 81.5,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-004.pdf",
+      "review_id": "rv-20261116-143943-af3599",
+      "docx": 42476,
+      "pdf": 10907,
+      "docx_ms": 281.5,
+      "pdf_ms": 91.2,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-005.pdf",
+      "review_id": "rv-20261116-143943-83c965",
+      "docx": 42486,
+      "pdf": 10922,
+      "docx_ms": 302.4,
+      "pdf_ms": 90.7,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-006.txt",
+      "review_id": "rv-20261116-143943-683b75",
+      "docx": 42529,
+      "pdf": 11028,
+      "docx_ms": 309.0,
+      "pdf_ms": 97.4,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-007.txt",
+      "review_id": "rv-20261116-143943-4e28ae",
+      "docx": 42531,
+      "pdf": 11050,
+      "docx_ms": 311.7,
+      "pdf_ms": 98.2,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-008.docx",
+      "review_id": "rv-20261116-143943-3971bb",
+      "docx": 42332,
+      "pdf": 10695,
+      "docx_ms": 277.9,
+      "pdf_ms": 84.0,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-009.txt",
+      "review_id": "rv-20261116-143943-43963e",
+      "docx": 42507,
+      "pdf": 10962,
+      "docx_ms": 325.0,
+      "pdf_ms": 105.0,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-010.docx",
+      "review_id": "rv-20261116-143943-ccce91",
+      "docx": 42533,
+      "pdf": 12168,
+      "docx_ms": 293.3,
+      "pdf_ms": 92.6,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-011.pdf",
+      "review_id": "rv-20261116-143944-b66835",
+      "docx": 42463,
+      "pdf": 10862,
+      "docx_ms": 302.7,
+      "pdf_ms": 91.6,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-012.txt",
+      "review_id": "rv-20261116-143944-6e3f8c",
+      "docx": 42518,
+      "pdf": 11794,
+      "docx_ms": 304.7,
+      "pdf_ms": 102.7,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-013.docx",
+      "review_id": "rv-20261116-143944-119882",
+      "docx": 42460,
+      "pdf": 10949,
+      "docx_ms": 298.7,
+      "pdf_ms": 99.0,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-014.txt",
+      "review_id": "rv-20261116-143944-e100b4",
+      "docx": 42448,
+      "pdf": 10925,
+      "docx_ms": 302.5,
+      "pdf_ms": 99.0,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-015.docx",
+      "review_id": "rv-20261116-143944-a56542",
+      "docx": 42493,
+      "pdf": 10978,
+      "docx_ms": 333.3,
+      "pdf_ms": 93.0,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-016.docx",
+      "review_id": "rv-20261116-143944-a847a9",
+      "docx": 42467,
+      "pdf": 10924,
+      "docx_ms": 274.6,
+      "pdf_ms": 88.6,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-017.pdf",
+      "review_id": "rv-20261116-143944-a1fd7d",
+      "docx": 42468,
+      "pdf": 10961,
+      "docx_ms": 290.3,
+      "pdf_ms": 97.5,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-018.txt",
+      "review_id": "rv-20261116-143945-77f5ef",
+      "docx": 42466,
+      "pdf": 11694,
+      "docx_ms": 306.7,
+      "pdf_ms": 93.5,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-019.docx",
+      "review_id": "rv-20261116-143945-373e1b",
+      "docx": 42497,
+      "pdf": 10958,
+      "docx_ms": 290.3,
+      "pdf_ms": 109.0,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "bid-020.txt",
+      "review_id": "rv-20261116-143945-691271",
+      "docx": 42525,
+      "pdf": 10970,
+      "docx_ms": 305.1,
+      "pdf_ms": 93.0,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "scan-001.pdf",
+      "review_id": "rv-20261116-144003-00a135",
+      "docx": 42526,
+      "pdf": 10973,
+      "docx_ms": 300.3,
+      "pdf_ms": 102.6,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "scan-002.pdf",
+      "review_id": "rv-20261116-144132-92179d",
+      "docx": 42569,
+      "pdf": 12205,
+      "docx_ms": 312.1,
+      "pdf_ms": 89.9,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "scan-003.pdf",
+      "review_id": "rv-20261116-144151-1fe398",
+      "docx": 42567,
+      "pdf": 11054,
+      "docx_ms": 286.8,
+      "pdf_ms": 97.5,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "scan-004.pdf",
+      "review_id": "rv-20261116-144208-fd2de4",
+      "docx": 42557,
+      "pdf": 11005,
+      "docx_ms": 299.4,
+      "pdf_ms": 97.5,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    },
+    {
+      "file": "scan-005.pdf",
+      "review_id": "rv-20261116-144224-920ce9",
+      "docx": 42559,
+      "pdf": 11027,
+      "docx_ms": 281.7,
+      "pdf_ms": 102.2,
+      "docx_magic": "PK\u0003\u0004",
+      "pdf_magic": "%PDF",
+      "status": "ok"
+    }
+  ],
+  "md": {
+    "file": "QA20261116-test.md",
+    "upload_status": 200,
+    "parse_status": "ok",
+    "fields": {
+      "项目名称": "测评 Markdown 项目",
+      "项目编号": "QA-2026-MD-001",
+      "采购人": "测评采购人",
+      "投标人": "测评投标人",
+      "报价": "1,286,000.00 元",
+      "工期": "90 日历天"
+    },
+    "review_status": 200,
+    "total": 100.0,
+    "review_id": "rv-20261116-150455-1ab3b4",
+    "docx": 42188,
+    "pdf": 10536
+  },
+  "summary": {
+    "samples": 25,
+    "docx_ok": 25,
+    "pdf_ok": 25,
+    "all_ok": 25
+  }
+}

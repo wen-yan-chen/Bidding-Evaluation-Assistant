@@ -1,0 +1,63 @@
+{
+  "documents": {
+    "count": 48,
+    "contains_invalid_eval": false
+  },
+  "eval_api": {
+    "status": 400,
+    "body": "{\"detail\":\"文档 ID 格式不合法\"}"
+  },
+  "qualification": {
+    "counts": {
+      "provided": 5,
+      "insufficient": 0,
+      "missing": 5
+    },
+    "R06": "provided",
+    "R07": "provided",
+    "R08": "provided",
+    "R10": "provided",
+    "R09": "missing",
+    "R09_applicable": false,
+    "R09_note": "文档声明无需提供（不适用），建议按招标文件确认是否应提供；文本核验不替代原件核验"
+  },
+  "report": {
+    "docx": {
+      "status": 200,
+      "size": 42295,
+      "has_chapter_1": true,
+      "has_chapter_9": true
+    },
+    "pdf": {
+      "status": 200,
+      "size": 10966,
+      "has_chapter_1": true,
+      "has_chapter_9": true
+    }
+  },
+  "temp_doc_deleted": "20261116-7fc24b06",
+  "risk_015": {
+    "levels": {
+      "total_score": 22.0,
+      "total_full": 100.0,
+      "qualification_missing": 6,
+      "qualification_insufficient": 0,
+      "risk_high": 0,
+      "risk_total": 1,
+      "conclusion": "资格性材料缺失 6 项；当前细则得分 22.0/100.0。以上为辅助评审建议，最终以评标委员会结论为准。"
+    },
+    "rule_ids": [
+      "R35"
+    ],
+    "r35_count": 1
+  },
+  "bid_001": {
+    "total": 68.0,
+    "counts": {
+      "provided": 4,
+      "insufficient": 0,
+      "missing": 6
+    },
+    "risks": 0
+  }
+}

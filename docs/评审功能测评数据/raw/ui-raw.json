@@ -1,0 +1,116 @@
+{
+  "started_at": "2026-11-16T14:56:50",
+  "shots": [
+    "docs\\screenshots\\20261116-01-评审看板.png",
+    "docs\\screenshots\\20261116-02-评审结果-风险.png",
+    "docs\\screenshots\\20261116-03-双栏定位.png",
+    "docs\\screenshots\\20261116-04-源文件-docx-WordHTML.png",
+    "docs\\screenshots\\20261116-05-源文件-PDF.png",
+    "docs\\screenshots\\20261116-06-多选已选.png",
+    "docs\\screenshots\\20261116-07-多选上传完成.png",
+    "docs\\screenshots\\20261116-08-报告中心.png",
+    "docs\\screenshots\\20261116-09-报告预览.png",
+    "docs\\screenshots\\20261116-10-报告预览-原件并排.png",
+    "docs\\screenshots\\20261116-11-无原件报告-友好提示.png",
+    "docs\\screenshots\\20261116-12-系统状态-未登录.png",
+    "docs\\screenshots\\20261116-13-系统状态-管理员.png"
+  ],
+  "timings": {
+    "goto_domcontentloaded_ms": 207.2,
+    "app_ready_ms": 3261.3,
+    "navigation": {
+      "domContentLoaded": 192.90000000596046,
+      "load": 193,
+      "responseStart": 13.700000002980232,
+      "firstPaint": 232,
+      "firstContentfulPaint": 232
+    },
+    "review_click_to_render_ms": 304.1,
+    "multi_upload_ms": 3023.1,
+    "reports_list_ms": 113.1
+  },
+  "checks": {
+    "disclaimer": "AI 辅助评审结果，最终以评标委员会评审结论为准",
+    "doc_options": 200,
+    "profile_cards": 2,
+    "risk_review": {
+      "score": "28.0",
+      "full": "100.0",
+      "qual_rows": 10,
+      "score_rows": 9,
+      "risk_rows": 1,
+      "review_id": "rv-20261116-145655-16c878",
+      "metric_qual": "4/6",
+      "metric_risk": "1"
+    },
+    "locate": {
+      "marks": 1,
+      "active": "第 1 页 · R01 营业执照"
+    },
+    "docx_source": {
+      "src": "/api/doc/20261116-ad447ee9/html",
+      "visible": true
+    },
+    "pdf_source": {
+      "src": "/api/doc/20261116-391e2330/raw?inline=1",
+      "visible": true
+    },
+    "multi_select": {
+      "filename": "已选 2 个：bid-001.docx、bid-006.txt",
+      "button": "上传并解析 (2)"
+    },
+    "multi_upload_status": "批量解析完成：2 个文件全部成功。",
+    "drag_select": "QA20261116-drag.txt · 181 B",
+    "drag_upload_status": "批量解析完成：1 个文件全部成功。",
+    "reports_rows": 20,
+    "reports_hint": "正在读取最近评审…",
+    "report_preview": {
+      "summary": "总分 62.0 / 100\n资格性 已提供 4 / 缺失 6 / 效力不足 0\n风险 高 0 / 中 0 / 低 0\nP1 40.0/40.0\nT1 0.0/10.0\nT2 10.0/10.0\nT3 0.0/8.0\nT4 0.0/6.0\nT5 0.0/6.0\nB1 0.0/8.0\nB2 6.0/6.0\nB3 6.0/6.0\n查看完整评审",
+      "iframe": "/api/report/rv-20261116-145518-3c1d94?format=pdf&inline=1"
+    },
+    "report_compare": {
+      "btn": "收起原件",
+      "original_iframe": "/api/doc/20261116-391e2330/raw?inline=1",
+      "compare_class": "preview-panel is-compare"
+    },
+    "no_raw_report": {
+      "text": "原件\nQA20261116-noraw.txt\n\n这条文档只有解析结果，没有可用的上传原件（常见于历史/测试数据）。",
+      "has_404": false,
+      "has_json": false
+    },
+    "admin": {
+      "selfcheck_rows": 6,
+      "mcp": "8",
+      "mcp_label": "个已接入",
+      "skill": "4",
+      "skill_label": "个已挂载",
+      "badge_mcp": "已接入 8 个工具",
+      "badge_skill": "已挂载 4 个"
+    },
+    "admin_data": {
+      "doc_rows": 1,
+      "review_rows": 1
+    },
+    "console_error_count": 0
+  },
+  "console": [],
+  "page_errors": [],
+  "request_failed": [
+    {
+      "url": "http://127.0.0.1:18080/api/doc/20261116-391e2330/raw?inline=1",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:18080/api/report/rv-20261116-145518-3c1d94?format=pdf&inline=1",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:18080/api/doc/20261116-391e2330/raw?inline=1",
+      "error": "net::ERR_ABORTED"
+    },
+    {
+      "url": "http://127.0.0.1:18080/api/report/rv-20261116-145302-3b16d6?format=pdf&inline=1",
+      "error": "net::ERR_ABORTED"
+    }
+  ]
+}
