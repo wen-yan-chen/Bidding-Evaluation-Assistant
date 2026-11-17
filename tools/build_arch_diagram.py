@@ -1,4 +1,4 @@
-"""生成架构图 PPT，并渲染为 PNG，供主 deck 作为图片插入。"""
+﻿"""生成架构图 PPT，并渲染为 PNG，供主 deck 作为图片插入。"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -12,16 +12,17 @@ from pptx.util import Inches, Pt
 ROOT = Path(__file__).resolve().parent.parent
 OUT_PPTX = ROOT / "docs" / "_arch_diagram.pptx"
 
-BLUE = RGBColor(0x00, 0x63, 0xFF)
-DEEP = RGBColor(0x00, 0x43, 0xA8)
+PAPER = RGBColor(0xF7, 0xF3, 0xEA)
+BLUE = RGBColor(0xA6, 0x4B, 0x2A)
+DEEP = RGBColor(0x1E, 0x2E, 0x2C)
 NAVY = RGBColor(0x00, 0x2B, 0x6B)
-INK = RGBColor(0x1A, 0x22, 0x2E)
-BODY = RGBColor(0x5A, 0x67, 0x78)
-LIGHT = RGBColor(0xE9, 0xF1, 0xFF)
-PALE = RGBColor(0xF5, 0xF9, 0xFF)
-LINE = RGBColor(0xB8, 0xCA, 0xE6)
-WHITE = RGBColor(0xFF, 0xFF, 0xFF)
-FONT = "Microsoft YaHei"
+INK = RGBColor(0x17, 0x1A, 0x19)
+BODY = RGBColor(0x5C, 0x5A, 0x55)
+LIGHT = RGBColor(0xEF, 0xE7, 0xD9)
+PALE = RGBColor(0xF7, 0xF3, 0xEA)
+LINE = RGBColor(0xD4, 0xC9, 0xB7)
+WHITE = RGBColor(0xFB, 0xF8, 0xF1)
+FONT = "Noto Sans SC"
 
 
 def _font(run, size=11, bold=False, color=INK, font=FONT):
@@ -90,7 +91,7 @@ def arrow(s, x, y, w, h, direction="right"):
 def group(s, x, y, w, h, label):
     shape = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y), Inches(w), Inches(h))
     shape.fill.background()
-    shape.line.color.rgb = RGBColor(0x8F, 0xA8, 0xC8)
+    shape.line.color.rgb = LINE
     shape.line.width = Pt(1.1)
     shape.line.dash_style = 4  # dash
     shape.shadow.inherit = False
@@ -102,6 +103,8 @@ def main():
     prs.slide_width = Inches(13.333)
     prs.slide_height = Inches(7.5)
     s = prs.slides.add_slide(prs.slide_layouts[6])
+    paper = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, 0, 0, prs.slide_width, prs.slide_height)
+    paper.fill.solid(); paper.fill.fore_color.rgb = PAPER; paper.line.fill.background(); paper.shadow.inherit = False
     # 标题
     txt(s, "SYSTEM ARCHITECTURE", 0.55, 0.25, 5.0, 0.22, 9.5, True, BLUE)
     txt(s, "四层分工 + 一条可追溯链路", 0.55, 0.52, 8.5, 0.42, 22, True, INK)

@@ -13,24 +13,26 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "docs" / "演示视频-招投标评审助手-v4.pptx"
+OUT = ROOT / "docs" / "演示视频-招投标评审助手-v7.pptx"
 SHOTS = ROOT / "docs" / "screenshots"
 
-# 参照课题 32 deck 的配色
-BLUE = RGBColor(0x00, 0x63, 0xFF)
-NAVY = RGBColor(0x00, 0x2B, 0x6B)
-DEEP = RGBColor(0x00, 0x43, 0xA8)
-INK = RGBColor(0x1A, 0x22, 0x2E)
-BODY = RGBColor(0x5A, 0x67, 0x78)
-LIGHT = RGBColor(0xE9, 0xF1, 0xFF)
-LIGHT2 = RGBColor(0xF3, 0xF8, 0xFF)
-LINE = RGBColor(0xC9, 0xD6, 0xEA)
-WHITE = RGBColor(0xFF, 0xFF, 0xFF)
-GREEN = RGBColor(0x0F, 0x9F, 0x6E)
-ORANGE = RGBColor(0xD9, 0x77, 0x06)
-FONT = "Microsoft YaHei"
-SERIF = "SimSun"
-NUM = "Arial"
+# 编辑风格：纸白 / 墨黑 / 陶土红 / 深青
+PAPER = RGBColor(0xF7, 0xF3, 0xEA)
+BLUE = RGBColor(0xA6, 0x4B, 0x2A)
+NAVY = RGBColor(0x1E, 0x2E, 0x2C)
+DEEP = RGBColor(0x1E, 0x2E, 0x2C)
+INK = RGBColor(0x17, 0x1A, 0x19)
+BODY = RGBColor(0x5C, 0x5A, 0x55)
+LIGHT = RGBColor(0xEF, 0xE7, 0xD9)
+LIGHT2 = RGBColor(0xF2, 0xEC, 0xDF)
+LINE = RGBColor(0xD4, 0xC9, 0xB7)
+WHITE = RGBColor(0xFB, 0xF8, 0xF1)
+GOLD = RGBColor(0xB8, 0x8A, 0x4E)
+GREEN = RGBColor(0x5E, 0x6E, 0x5A)
+ORANGE = RGBColor(0x8C, 0x3B, 0x2E)
+FONT = "Noto Sans SC"
+SERIF = "Noto Serif SC"
+NUM = "Georgia"
 PAGE = [0]
 
 prs = Presentation()
@@ -76,7 +78,7 @@ def txt(slide, text, x, y, w, h, size=12, bold=False, color=INK,
 
 def rect(slide, x, y, w, h, fill=WHITE, line=None, radius=False, line_w=0.75):
     shape = slide.shapes.add_shape(
-        MSO_SHAPE.ROUNDED_RECTANGLE if radius else MSO_SHAPE.RECTANGLE,
+        MSO_SHAPE.RECTANGLE,
         Inches(x), Inches(y), Inches(w), Inches(h),
     )
     shape.fill.solid()
@@ -96,36 +98,29 @@ def pill(slide, text="课题 #08"):
 
 
 def bg(slide, idx):
-    # 装饰圆
-    o = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(11.15), Inches(-1.35), Inches(3.6), Inches(3.6))
-    o.fill.solid(); o.fill.fore_color.rgb = LIGHT2; o.line.fill.background(); o.shadow.inherit = False
-    o2 = slide.shapes.add_shape(MSO_SHAPE.OVAL, Inches(-1.55), Inches(5.95), Inches(3.1), Inches(3.1))
-    o2.fill.solid(); o2.fill.fore_color.rgb = LIGHT2; o2.line.fill.background(); o2.shadow.inherit = False
+    # 纸白底 + 左侧细线，不用装饰圆
+    rect(slide, 0, 0, 13.333, 7.5, PAPER)
+    rect(slide, 0.38, 0.38, 0.035, 6.74, BLUE)
 
 
 def head(slide, eyebrow, title, sub=None, idx=1):
     PAGE[0] += 1
     idx = PAGE[0]
     bg(slide, idx)
-    txt(slide, eyebrow.upper(), 0.55, 0.26, 8.0, 0.25, 10.5, True, BLUE)
-    txt(slide, title, 0.55, 0.50, 10.7, 0.62, 27, True, INK)
+    txt(slide, eyebrow.upper(), 0.72, 0.32, 8.0, 0.22, 8.8, True, BLUE)
+    txt(slide, title, 0.72, 0.56, 10.8, 0.66, 29, True, INK, font=SERIF)
     if sub:
-        txt(slide, sub, 0.55, 1.18, 10.7, 0.30, 11.5, False, BODY)
-    pill(slide)
+        txt(slide, sub, 0.72, 1.25, 10.7, 0.30, 10.8, False, BODY)
+    txt(slide, f"{idx:02d} / 12", 11.95, 0.32, 0.75, 0.22, 8.5, False, BODY, PP_ALIGN.RIGHT, font=NUM)
 
 
 def footer(slide, idx, source=""):
     idx = PAGE[0]
     if source:
-        txt(slide, "来源：" + source, 0.55, 7.08, 9.5, 0.18, 7, False, BODY)
-    txt(slide, "魔擎开发者激励 1 期 · 课题 #08 ｜ 招投标评审助手", 0.55, 7.28, 9.8, 0.16, 6.5, False, RGBColor(0x7B, 0x88, 0x98))
-    txt(slide, f"{idx:02d}", 12.55, 7.08, 0.45, 0.20, 8, False, BODY, PP_ALIGN.RIGHT)
-    # 进度条 12 段
-    active = min(11, int((idx - 1) * 12 / 16))
-    x = 0.55
-    for i in range(12):
-        rect(slide, x, 7.42, 0.88, 0.045, BLUE if i == active else RGBColor(0xE2, 0xE8, 0xF2))
-        x += 0.985
+        txt(slide, "来源：" + source, 0.72, 7.12, 9.5, 0.18, 6.8, False, BODY)
+    rect(slide, 0.72, 7.33, 11.9, 0.006, LINE)
+    txt(slide, "招投标评审助手 · 课题 08", 0.72, 7.40, 5.0, 0.12, 6.2, False, BODY)
+    txt(slide, f"{idx:02d}", 12.35, 7.36, 0.30, 0.16, 7.2, False, BODY, PP_ALIGN.RIGHT, font=NUM)
 
 
 def table(slide, rows, x, y, w, col_widths, row_h=0.34, font_size=9, header=True):
@@ -143,13 +138,13 @@ def table(slide, rows, x, y, w, col_widths, row_h=0.34, font_size=9, header=True
             cell.margin_bottom = Inches(0.02)
             cell.vertical_anchor = MSO_ANCHOR.MIDDLE
             cell.fill.solid()
-            cell.fill.fore_color.rgb = LIGHT if (header and r == 0) else (WHITE if r % 2 else RGBColor(0xF8, 0xFB, 0xFF))
+            cell.fill.fore_color.rgb = LIGHT if (header and r == 0) else (PAPER if r % 2 else WHITE)
             tf = cell.text_frame
             tf.word_wrap = True
             tf.paragraphs[0].alignment = PP_ALIGN.LEFT if c == 0 else PP_ALIGN.CENTER
             run = tf.paragraphs[0].add_run()
             run.text = str(value)
-            _set_font(run, font_size, header and r == 0, DEEP if (header and r == 0) else INK)
+            _set_font(run, font_size, header and r == 0, INK if (header and r == 0) else INK)
     return t
 
 
@@ -178,10 +173,10 @@ def slide1():
     s = prs.slides.add_slide(BLANK)
     # 右侧蓝色块
     panel = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(9.15), 0, Inches(4.18), Inches(7.5))
-    panel.fill.solid(); panel.fill.fore_color.rgb = DEEP; panel.line.fill.background(); panel.shadow.inherit = False
-    txt(s, "08", 9.42, 0.45, 3.3, 2.0, 118, True, RGBColor(0x4D, 0x94, 0xFF), font=NUM)
+    panel.fill.solid(); panel.fill.fore_color.rgb = INK; panel.line.fill.background(); panel.shadow.inherit = False
+    txt(s, "08", 9.42, 0.45, 3.3, 2.0, 118, True, GOLD, font=NUM)
     txt(s, "魔擎开发者激励 1 期 ｜ 课题 #08", 0.70, 0.42, 7.8, 0.30, 12, True, BLUE)
-    txt(s, "招投标评审助手", 0.68, 0.82, 8.2, 0.95, 40, True, INK)
+    txt(s, "招投标评审助手", 0.68, 0.82, 8.2, 0.95, 40, True, INK, font=SERIF)
     txt(s, "上传投标文件 · 8 字段 · 资格性三态 · 40 条规则", 0.72, 1.86, 8.0, 0.40, 17, False, INK)
     txt(s, "原文定位与可追溯的评分 / 风险清单", 0.72, 2.30, 8.0, 0.40, 17, False, INK)
     rect(s, 0.72, 2.88, 4.7, 0.035, BLUE)
@@ -201,28 +196,23 @@ def slide1():
 
 def slide2():
     s = prs.slides.add_slide(BLANK)
-    head(s, "CONTENTS", "目录", "八个部分，从问题到演示闭环", 2)
+    head(s, "CONTENTS", "五个部分", "架构说明 · 数据说明 · Nexent 智能体配置 · 操作说明 · 评审", 2)
     items = [
-        ("01", "选题背景", "人工评审慢，且容易漏掉「没写」的部分"),
-        ("02", "架构说明", "四层分工与一条评审链路"),
-        ("03", "数据说明", "25 份基线 + N01–N10 与 8 字段"),
-        ("04", "Nexent 配置", "模型 · 知识库 · 4 Skill · MCP 8 工具"),
-        ("05", "操作闭环", "上传 → 评审 → 定位 → 报告"),
-        ("06", "评审结果", "N01–N10：10/10 在 ±5 内"),
-        ("07", "工程质量", "规则覆盖、测试与部署"),
-        ("08", "边界与交付", "已知限制、证据与下一步"),
+        ("01", "架构说明", "四层分工与一条评审链路"),
+        ("02", "数据说明", "25 份基线 + N01–N10 + 8 字段"),
+        ("03", "Nexent 智能体配置", "模型 · 知识库 · 4 Skill · 8 MCP 工具"),
+        ("04", "操作说明", "上传 → 评审 → 定位 → 报告"),
+        ("05", "评审", "N01–N10：10/10，偏差 0.00"),
     ]
-    for i, (num, title, desc) in enumerate(items):
-        col = 0 if i < 4 else 1
-        row = i % 4
-        x = 0.72 + col * 6.15
-        y = 1.72 + row * 1.25
-        txt(s, num, x, y - 0.02, 0.55, 0.45, 21, True, BLUE, font=NUM)
-        txt(s, title, x + 0.72, y - 0.03, 2.2, 0.34, 14, True, INK)
-        txt(s, desc, x + 0.72, y + 0.33, 4.7, 0.25, 9.5, False, BODY)
-        rect(s, x + 0.72, y + 0.82, 4.9, 0.008, RGBColor(0xDD, 0xE6, 0xF3))
+    y = 1.62
+    for num, title, desc in items:
+        txt(s, num, 0.72, y - 0.02, 0.55, 0.45, 21, True, BLUE, font=NUM)
+        txt(s, title, 1.45, y - 0.04, 4.2, 0.34, 15, True, INK)
+        txt(s, desc, 1.47, y + 0.35, 8.8, 0.26, 9.5, False, BODY)
+        rect(s, 1.45, y + 0.82, 11.15, 0.008, RGBColor(0xDD, 0xE6, 0xF3))
+        y += 1.06
     footer(s, 2)
-    notes(s, "全片分八段：先讲为什么做，再讲架构、数据、Nexent 配置，然后用真实界面走一遍完整操作闭环，最后看结果和边界。")
+    notes(s, "只有五个部分：架构说明、数据说明、Nexent 智能体配置、操作说明、评审。")
 
 
 def slide3():
@@ -387,7 +377,7 @@ def slide8():
 
 def slide9():
     s = prs.slides.add_slide(BLANK)
-    head(s, "NEXENT 1 / 3", "Nexent 配置：一个智能体，四类挂载", "模型、知识库、Skill、MCP 都在 agent.json 里", 9)
+    head(s, "NEXENT 1 / 2", "Nexent 配置：一个智能体，四类挂载", "模型、知识库、Skill、MCP 都在 agent.json 里", 9)
     rows = [
         ["配置项", "值"],
         ["display_name", "招投标评审助手"],
@@ -413,7 +403,7 @@ def slide9():
 
 def slide10():
     s = prs.slides.add_slide(BLANK)
-    head(s, "NEXENT 2 / 3", "四个 Skill 与八个 MCP 工具", "Skill 管流程，MCP 管取数；分工不重叠", 10)
+    head(s, "NEXENT 2 / 2", "四个 Skill 与八个 MCP 工具", "Skill 管流程，MCP 管取数；分工不重叠", 10)
     skills = [
         ("bid-rule-cards", "规则卡", "按 rule_id 返回判定条件与依据"),
         ("missing-qualification", "缺失审计", "资格性三态：已提供/缺失/效力不足"),
@@ -672,8 +662,8 @@ def slide20():
 
 
 def build():
-    slide1(); slide2(); slide3(); slide5(); slide6(); slide7(); slide9(); slide10()
-    slide12(); slide13(); slide14(); slide15(); slide16(); slide18(); slide19(); slide20()
+    slide1(); slide2(); slide5(); slide6(); slide7(); slide9(); slide10()
+    slide12(); slide13(); slide14(); slide15(); slide16()
     prs.core_properties.title = "招投标评审助手 · 演示视频 PPT"
     prs.core_properties.author = "gcw_N79tXvDq"
     prs.core_properties.subject = "魔擎开发者激励 1 期 · 课题 8"

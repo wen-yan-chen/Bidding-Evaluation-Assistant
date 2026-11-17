@@ -135,8 +135,8 @@ R07 的“无重大违法记录”按合规声明处理；R10 要求注册建造
 └─────────────────────────────┘
 ```
 
-- app 端口：`18080`
-- MCP 端口：`8765`
+- app 端口：默认 `8080`（`HOST_PORT` 可覆盖；本项目演示环境用 `18080`）
+- MCP 端口：`8765`（`MCP_PORT` 可覆盖）
 - 数据目录：`data/`（运行时数据被 `.gitignore` 排除）
 
 ---
@@ -155,11 +155,11 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-打开：
+打开（默认 8080；若 `.env` 里 `HOST_PORT=18080` 则替换端口）：
 
-- 评审页面：<http://127.0.0.1:18080>
-- API 文档：<http://127.0.0.1:18080/docs>
-- 健康检查：<http://127.0.0.1:18080/api/health>
+- 评审页面：<http://127.0.0.1:8080>
+- API 文档：<http://127.0.0.1:8080/docs>
+- 健康检查：<http://127.0.0.1:8080/api/health>
 
 停止：
 
@@ -218,7 +218,9 @@ python -m pytest -q
 | 最大偏差 | **0** |
 
 - `eval_scoring --strict`：10 条、10/10、平均偏差 0.00，**脚本通过**；
+- 3 次一致性：`python tools/check_repeatable.py` → 字段 / 资格性 / 评分 / 风险 **3/3 完全一致**；
 - 10 份为唯一样本；n=10 仍属小样本，95% 置信区间约 72%–100%，不能外推；
+- 校准与验证使用同一批 N01–N10，10/10 属**拟合内**结果，不能当作泛化准确率；
 - N01–N08 的 T1/T3/T4 文本相同，样本对这三项区分力有限；N09/N10 已加入“有/无”对照；
 - 扫描件的 T2/B2/B3 依赖 OCR，需人工复核。
 
@@ -243,44 +245,43 @@ python -m pytest -q
 ├── mcps/                   # MCP 服务（8 个工具）
 ├── skills/                 # 4 个 Nexent Skill
 ├── web/                    # 前端页面
-├── tools/                  # 评测/校验脚本
+├── tools/                  # 评测/校验脚本（含 check_repeatable / sync_to_agentshub）
 ├── tests/                  # pytest
-├── docs/                   # 开发/数据/评审/使用四份文档、截图、样例报告
+├── docs/                   # 开发/数据/评审/测试/使用五份文档、截图、样例报告、评测数据
+├── .github/workflows/ci.yml
 ├── agent.json              # Nexent 智能体定义
 ├── prompt.md               # 系统提示词
 ├── docker-compose.yml
 ├── DEPLOY.md
+├── CHANGELOG.md
+├── VERSION
 └── LICENSE
 ```
 
 ---
 
-## 7. AgentsHub 智能体
+## 7. AgentsHub 提交目录
 
-AgentsHub 目录（只放智能体包，不含完整后端）：
-
-```text
-行业智能体/政务/招投标评审助手/
-├── agent.json
-├── README.md
-├── DEPLOY.md
-├── knowledge/
-│   ├── rules-full.md
-│   └── manifest.json
-├── skills/
-├── mcps/
-└── screenshots/
-```
+提交目录 `行业智能体/政务/招投标评审助手/` **就是本工程的全量副本**（`web/`、`api/`、`data/`、`tools/`、`tests/`、`docs/`、Docker 文件都在里面），评审 clone AgentsHub 后即可按 `DEPLOY.md` 复现，不依赖外部仓库。
 
 PR：
 
-- <https://gitcode.com/ModelEngine/AgentsHub/merge_requests/170>
+- <https://gitcode.com/ModelEngine/AgentsHub/pull/170>
+
+导入 Nexent 的顺序：
+
+1. 上传 4 个 Skill zip（`skills/*.zip`）；
+2. 上传 `agent.json`；
+3. 建知识库并上传 `knowledge/rules-full.md`（按 `## Rxx` 切分）；
+4. 把 `agent.json` 的 `index_names` 换成新索引 ID；
+5. 起 app + MCP（见 `DEPLOY.md`），填写 `mcp_url`；
+6. 选择模型、保存/发布。
 
 注意：
 
-- `mcps/bid_review_mcp.py` 依赖完整后端；需先按 `DEPLOY.md` 启动 app + MCP；
-- `agent.json` 的知识库索引 `4-5897...` 需按目标环境替换为实际索引 ID；
-- 导入顺序：先导入 Skill/MCP/知识库，再导入 `agent.json`。
+- `mcps/bid_review_mcp.py` 依赖完整后端（`api/`、`data/`、`knowledge/`），不能单独运行；
+- 知识库索引 `4-5897...` 是导出方租户的索引名，必须替换；
+- 详细步骤见 `DEPLOY.md` 第 6 节。
 
 ---
 
@@ -316,9 +317,10 @@ MIT License。提交到 AgentsHub 即表示同意以仓库现有 MIT License 发
 - [开发说明](docs/开发说明.md)
 - [数据说明](docs/数据说明.md)
 - [评审说明](docs/评审说明.md)
+- [测试报告](docs/测试报告.md)
 - [使用说明](docs/使用说明.md)
 - [四份文档 PDF 合集](docs/pdf/20261117/招投标评审助手-文档合集.pdf)
 - [演示视频脚本](docs/演示视频脚本.md)
-- [演示视频 PPT](docs/演示视频-招投标评审助手-v4.pptx)
+- [演示视频 PPT](docs/演示视频-招投标评审助手-v7.pptx)
 - [部署说明](DEPLOY.md)
 - [评测数据索引](docs/评审功能测评数据/README.md)
