@@ -207,7 +207,7 @@ python -m pytest -q
 | 风险 | TP 15 / FN 0 / FP 0 |
 | 规则覆盖 | 40 = 27 自动 + 10 人工 + 3 未实现 |
 | 报告一致性 | 14/14 |
-| 本地 pytest | 66 passed, 1 skipped（MCP 用例因本机缺依赖跳过） |
+| 本地 / 容器 pytest | 本地 66 passed, 1 skipped；容器 67 passed |
 
 ### 5.2 评分校准
 
@@ -312,7 +312,7 @@ PR：
 - R25/R32/R33 需多家投标人比价，单份不可判定；
 - OCR 质量会影响扫描件的字段与评分，扫描件结论需人工核对；
 - 专家样本 10 份，n=10 仍属小样本，不能外推；
-- Docker 全量回归需在干净环境复跑；本地 pytest 为 66 passed / 1 skipped；
+- 容器全量 pytest 已通过：67 passed；本地 66 passed / 1 skipped；
 - 演示视频尚未录制。
 
 ---
