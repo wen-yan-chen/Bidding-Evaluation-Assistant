@@ -29,5 +29,7 @@ jobs:
         run: python tools/eval_qualification.py --strict --require-full
       - name: Risk regression (15 planted + 5 clean)
         run: python tools/eval_risks.py --strict
+      - name: Out-of-sample scoring regression (8 files, calibrated profile)
+        run: python tools/eval_calibrated.py --strict
       - name: Unit and API tests
         run: python -m pytest -q

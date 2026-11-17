@@ -6,7 +6,7 @@
 支持三种评分项：
 - `price_ratio`：报价 / 最高限价 的比值分档（超过 100% 直接 0 分并触发 R12）
 - `duration`   ：工期天数与招标要求比较
-- `presence`   ：关键章节/承诺是否提供（字面量命中即视为提供）
+- `presence`   ：关键章节/承诺是否提供（默认字面量命中；配置 `content_patterns` 时必须有实质内容，仅标题/套话不算）
 
 每项结果都带 `evidence`（page / quote），与字段、风险使用同一套溯源口径。
 """
@@ -30,6 +30,11 @@ NO_BASIS = "未检索到权威依据"
 
 PRICE_RE = re.compile(r"([0-9][0-9,，]*(?:\.[0-9]{1,2})?)\s*(万元|万|元)?")
 DURATION_RE = re.compile(r"([0-9]{1,4})\s*(个?日历天|个?日历日|天|日|个月|月|周|年)")
+TIME_NUMBER_RE = re.compile(
+    r"[0-9]+\s*(?:个?工作日|日历天|天|日|周|个月|月|年|小时|分钟)"
+    r"|[0-9]{4}\s*年\s*[0-9]{1,2}\s*月"
+)
+NEGATIVE_CONTENT = ("未提供", "未附", "未提交", "未明确", "未展开", "仅列标题", "没有", "不含", "缺少")
 
 
 @dataclass
@@ -189,6 +194,22 @@ def _find(pattern: str, doc) -> dict[str, Any] | None:  # noqa: ANN001
     }
 
 
+def _sentence_text(doc, start: int, end: int) -> str:  # noqa: ANN001
+    """取命中所在句/行，避免把相邻句的“未提供”误伤到本句。"""
+    text = doc.full_text
+    left = 0
+    for char in "。；;\n":
+        pos = text.rfind(char, 0, start)
+        if pos >= left:
+            left = pos + 1
+    right = len(text)
+    for char in "。；;\n":
+        pos = text.find(char, end)
+        if pos != -1 and pos < right:
+            right = pos
+    return text[left:right].strip()
+
+
 def _score_price(item: dict[str, Any], doc, requirements: dict[str, Any]) -> ItemResult:
     weight = float(item["weight"])
     basis = str(item.get("basis") or "")
@@ -265,17 +286,32 @@ def _score_presence(item: dict[str, Any], doc, _requirements: dict[str, Any]) ->
     basis = str(item.get("basis") or "")
     basis_status = str(item.get("basis_status", "pending"))
 
-    for pattern in item.get("patterns") or []:
-        evidence = _find(str(pattern), doc)
-        if evidence is not None:
-            tiers = {str(t.get("state")): t for t in item.get("tiers") or []}
-            tier = tiers.get("provided") or {}
-            score = min(float(tier.get("score", weight)), weight)
-            return ItemResult(
-                item["id"], item["category"], item["name"], weight, score, weight,
-                str(tier.get("reason") or ""), basis, basis_status, tier="provided",
-                evidence={**evidence, "pattern": pattern},
-            )
+    # 校准版判据：content_patterns 表示“必须有实质内容”；
+    # 只出现章节标题/投标函套话不算响应。未配置时保持原来的 presence 行为。
+    content_patterns = [str(p) for p in item.get("content_patterns") or []]
+    content_number_patterns = {str(p) for p in item.get("content_number_patterns") or []}
+    patterns = content_patterns or [str(p) for p in item.get("patterns") or []]
+
+    for pattern in patterns:
+        evidence = _find(pattern, doc)
+        if evidence is None:
+            continue
+        # 收紧：进度安排/工期安排/节点/响应时限等泛词，必须邻近“数字+时间单位”，
+        # 避免“我方将按工期安排组织施工”这种套话通过。
+        sentence = _sentence_text(doc, evidence["char_start"], evidence["char_end"])
+        if pattern in content_number_patterns and not TIME_NUMBER_RE.search(sentence):
+            continue
+        # 负向句里的“未提供项目管理机构/仅列标题”不能算已提供。
+        if content_patterns and any(word in sentence for word in NEGATIVE_CONTENT):
+            continue
+        tiers = {str(t.get("state")): t for t in item.get("tiers") or []}
+        tier = tiers.get("provided") or {}
+        score = min(float(tier.get("score", weight)), weight)
+        return ItemResult(
+            item["id"], item["category"], item["name"], weight, score, weight,
+            str(tier.get("reason") or ""), basis, basis_status, tier="provided",
+            evidence={**evidence, "pattern": pattern, "content_pattern": bool(content_patterns)},
+        )
 
     tiers = {str(t.get("state")): t for t in item.get("tiers") or []}
     tier = tiers.get("missing") or {}

@@ -24,7 +24,7 @@ def _review_id() -> str:
     return f"rv-{datetime.now(config.CST):%Y%m%d-%H%M%S}-{uuid4().hex[:6]}"
 
 
-def run(doc, profile_id: str = "profile-a", project_type: str = "unknown") -> dict[str, Any]:  # noqa: ANN001
+def run(doc, profile_id: str = "profile-a-calibrated", project_type: str = "unknown") -> dict[str, Any]:  # noqa: ANN001
     from api.review import qualification
 
     qualification_result = qualification.check(doc, project_type=project_type)

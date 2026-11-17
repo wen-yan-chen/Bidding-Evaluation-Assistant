@@ -1,0 +1,66 @@
+{
+  "version": "v1",
+  "generated_at": "2026-11-16",
+  "note": "S11–S18 out-of-sample 盲评集：专家评分来自 1 名评审人先在评分表上独立打分（未看引擎结果），再由工具与两版 profile 对比。用于锁定 profile-a-calibrated 的行为，不写入 data/samples/expert_scores.json（那是留给真实评标专家的）。",
+  "source_sheet": "新样本_S11-S18/新样本评分表.xlsx",
+  "baseline_profile": "profile-a",
+  "score_profile": "profile-a-calibrated",
+  "items": [
+    {
+      "sample_id": "N01",
+      "file": "新样本_S11-S18/N01.docx",
+      "intent": "全实质：进度表 + 团队表 + SLA",
+      "expert_total": 100,
+      "expert_scores": {"P1": 40, "T1": 10, "T2": 10, "T3": 8, "T4": 6, "T5": 6, "B1": 8, "B2": 6, "B3": 6}
+    },
+    {
+      "sample_id": "N02",
+      "file": "新样本_S11-S18/N02.docx",
+      "intent": "只有标题：T2/B2/B3 都无实质",
+      "expert_total": 72,
+      "expert_scores": {"P1": 40, "T1": 10, "T2": 0, "T3": 8, "T4": 6, "T5": 0, "B1": 8, "B2": 0, "B3": 0}
+    },
+    {
+      "sample_id": "N03",
+      "file": "新样本_S11-S18/N03.docx",
+      "intent": "套话陷阱：工期安排无数字、响应时限无数字、项目经理持证无人员表",
+      "expert_total": 78,
+      "expert_scores": {"P1": 40, "T1": 10, "T2": 0, "T3": 8, "T4": 6, "T5": 6, "B1": 8, "B2": 0, "B3": 0}
+    },
+    {
+      "sample_id": "N04",
+      "file": "新样本_S11-S18/N04.docx",
+      "intent": "数字进度 + 人员表 + 具体时限",
+      "expert_total": 100,
+      "expert_scores": {"P1": 40, "T1": 10, "T2": 10, "T3": 8, "T4": 6, "T5": 6, "B1": 8, "B2": 6, "B3": 6}
+    },
+    {
+      "sample_id": "N05",
+      "file": "新样本_S11-S18/N05.docx",
+      "intent": "横道图 + 证书 + SLA",
+      "expert_total": 100,
+      "expert_scores": {"P1": 40, "T1": 10, "T2": 10, "T3": 8, "T4": 6, "T5": 6, "B1": 8, "B2": 6, "B3": 6}
+    },
+    {
+      "sample_id": "N06",
+      "file": "新样本_S11-S18/N06.docx",
+      "intent": "只有 7×24，无具体时限",
+      "expert_total": 78,
+      "expert_scores": {"P1": 40, "T1": 10, "T2": 0, "T3": 8, "T4": 6, "T5": 6, "B1": 8, "B2": 0, "B3": 0}
+    },
+    {
+      "sample_id": "N07",
+      "file": "新样本_S11-S18/N07.docx",
+      "intent": "有进度/团队，无售后承诺",
+      "expert_total": 94,
+      "expert_scores": {"P1": 40, "T1": 10, "T2": 10, "T3": 8, "T4": 6, "T5": 6, "B1": 8, "B2": 6, "B3": 0}
+    },
+    {
+      "sample_id": "N08",
+      "file": "新样本_S11-S18/N08.docx",
+      "intent": "报价超限价，资格/技术/商务均弱",
+      "expert_total": 32,
+      "expert_scores": {"P1": 0, "T1": 10, "T2": 0, "T3": 8, "T4": 6, "T5": 0, "B1": 8, "B2": 0, "B3": 0}
+    }
+  ]
+}

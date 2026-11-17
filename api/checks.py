@@ -10,7 +10,6 @@
 - R37 报价大写与小写不一致（中文数字解析后比对）
 - R38 单价 × 数量 ≠ 该项合价（参照 59/51）
 - R39 报价缺漏项（必报分项对比）
-- R40 报价为整万元（经验判据）
 
 每个检查返回**命中列表**（可为空）；无法判断时返回空列表并在 `reason` 中说明，
 由上层决定是否展示"该规则本次不可判定"，绝不靠猜。
@@ -200,22 +199,6 @@ def check_amount_case(doc, _context: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
-def check_round_price(doc, _context: dict[str, Any]) -> list[dict[str, Any]]:
-    price, field = _price_of(doc)
-    if price is None or price < 10000:
-        return []
-    if price % 10000 == 0:
-        return [
-            _money_hit(
-                "R40", doc, doc.page_of(field.char_start),
-                field.char_start, field.char_end,
-                reason=f"报价 {price:,.0f} 元为整万元，存在协同定价的弱信号（经验判据）",
-                values={"price": price},
-            )
-        ]
-    return []
-
-
 def _iter_table_rows(doc):
     """按行扫描简单表格；返回 (line_start, quote, cells)。不依赖 docx 表格对象。"""
     offset = 0
@@ -377,5 +360,4 @@ CHECKS = {
     "R37": check_amount_case,
     "R38": check_unit_product,
     "R39": check_missing_items,
-    "R40": check_round_price,
 }

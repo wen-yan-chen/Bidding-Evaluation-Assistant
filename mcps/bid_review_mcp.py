@@ -205,7 +205,7 @@ def check_qualification(doc_id: str) -> dict[str, Any]:
 
 
 @mcp.tool()
-def score_item(doc_id: str, profile_id: str = "profile-a") -> dict[str, Any]:
+def score_item(doc_id: str, profile_id: str = "profile-a-calibrated") -> dict[str, Any]:
     """按评分细则逐项算分：返回分项得分、满分、扣分理由、依据与溯源。
 
     `profile_id` 对应 `data/scoring/{profile_id}.yaml`；换一套细则再算一次，

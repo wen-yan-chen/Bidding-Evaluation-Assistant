@@ -22,7 +22,7 @@ router = APIRouter(prefix="/api", tags=["review"])
 
 class ReviewRequest(BaseModel):
     doc_id: str = Field(..., description="已解析文档 ID")
-    profile_id: str = Field("profile-a", description="评分细则 ID")
+    profile_id: str = Field("profile-a-calibrated", description="评分细则 ID（默认校准版；profile-a 为旧基线）")
     project_type: Literal["engineering", "goods_services", "unknown"] = Field(
         "unknown", description="项目类型：engineering / goods_services / unknown"
     )

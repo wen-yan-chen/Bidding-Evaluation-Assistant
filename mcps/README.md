@@ -2,6 +2,11 @@
 
 FastMCP 单文件服务 `bid_review_mcp.py`，`transport=sse`，容器内端口 8765；已实现 8 个工具。
 
+> **运行前置（重要）：**本文件不是独立服务。`bid_review_mcp.py` 依赖完整后端的
+> `api/`、`data/`、`knowledge/`，必须先按过程仓库的 [`DEPLOY.md`](../DEPLOY.md) 启动
+> app + MCP（`docker compose up -d --build`），再把 `agent.json` 的 `mcp_url` 换成实际
+> MCP 地址。AgentsHub 目录里只放智能体包，不包含完整后端源码；只启动这个 py 文件会缺依赖。
+
 | 工具 | 作用 | 关键返回 |
 | --- | --- | --- |
 | `parse_tender` | 解析招标/投标文件 | 8 字段（含资质/业绩清单）+ `page` + `quote` + 条款切分 |

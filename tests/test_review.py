@@ -39,10 +39,47 @@ def parse_sample(name: str, doc_id: str = "eval"):
 
 def test_profiles_loaded_and_digest_differs():
     profiles = scoring.list_profiles()
-    assert [p.id for p in profiles] == ["profile-a", "profile-b"]
+    assert sorted(p.id for p in profiles) == ["profile-a", "profile-a-calibrated", "profile-b"]
     assert all(p.total == 100 for p in profiles)
-    assert scoring.profile_digest(profiles[0]) != scoring.profile_digest(profiles[1])
+    assert len({scoring.profile_digest(p) for p in profiles}) == 3
     assert scoring.load_profile("not-exist") is None
+
+
+def test_calibrated_profile_penalises_form_only_t2_b2():
+    doc = parse_sample("bid-001.docx")
+    old = scoring.score_doc(doc, "profile-a")
+    calibrated = scoring.score_doc(doc, "profile-a-calibrated")
+    old_items = {i["item_id"]: i["score"] for i in old["items"]}
+    new_items = {i["item_id"]: i["score"] for i in calibrated["items"]}
+    assert old["total"] == 68.0
+    assert calibrated["total"] == 52.0
+    assert old_items["T2"] == 10 and new_items["T2"] == 0
+    assert old_items["B2"] == 6 and new_items["B2"] == 0
+    assert old_items["B3"] == 6 and new_items["B3"] == 6
+
+
+def test_calibrated_t2_requires_number_and_time():
+    text = "我方将按工期安排组织施工，确保按期完成。\n"
+    result = scoring.score_doc(text_doc(text), "profile-a-calibrated")
+    items = {i["item_id"]: i["score"] for i in result["items"]}
+    assert items["T2"] == 0
+
+    text_ok = "进度安排：第 3 周完成设备到货，第 6 周完成上线。\n"
+    result_ok = scoring.score_doc(text_doc(text_ok), "profile-a-calibrated")
+    items_ok = {i["item_id"]: i["score"] for i in result_ok["items"]}
+    assert items_ok["T2"] == 10
+
+
+def test_calibrated_b3_requires_time_limit():
+    text = "我方承诺响应时限短，售后服务网络完善。\n"
+    result = scoring.score_doc(text_doc(text), "profile-a-calibrated")
+    items = {i["item_id"]: i["score"] for i in result["items"]}
+    assert items["B3"] == 0
+
+    text_ok = "售后服务：一般故障 2 小时内响应、8 小时内解决。\n"
+    result_ok = scoring.score_doc(text_doc(text_ok), "profile-a-calibrated")
+    items_ok = {i["item_id"]: i["score"] for i in result_ok["items"]}
+    assert items_ok["B3"] == 6
 
 
 def test_price_and_duration_parsing():
@@ -185,7 +222,7 @@ def test_review_api_roundtrip():
 
     profiles = client.get("/api/scoring/profiles")
     assert profiles.status_code == 200
-    assert profiles.json()["count"] == 2
+    assert profiles.json()["count"] == 3
 
     missing = client.get("/api/review/rv-not-exist")
     assert missing.status_code == 404
