@@ -1,7 +1,7 @@
 {
   "version": "v1",
   "generated_at": "2026-11-17",
-  "note": "老师对 8 份 out-of-sample 新样本独立评分（未看引擎分）；reviewer=EX-01，不含真实姓名；用于验证 profile-a-calibrated。",
+  "note": "两位老师对 8 份 out-of-sample 新样本独立评分（未看引擎分）：EX-01 严格 B3，EX-02 按旧细则（7×24 给 6，N02/N06 与严格口径差 6）；不含真实姓名。",
   "items": [
     {
       "file": "out_of_sample/新样本_S11-S18/N01.docx",
@@ -126,6 +126,142 @@
       "file": "out_of_sample/新样本_S11-S18/N08.docx",
       "profile": "profile-a-calibrated",
       "reviewer": "EX-01",
+      "total": 32,
+      "scores": {
+        "P1": 0,
+        "T1": 10,
+        "T2": 0,
+        "T3": 8,
+        "T4": 6,
+        "T5": 0,
+        "B1": 8,
+        "B2": 0,
+        "B3": 0
+      }
+    },
+    {
+      "file": "out_of_sample/新样本_S11-S18/N01.docx",
+      "profile": "profile-a-calibrated",
+      "reviewer": "EX-02",
+      "total": 100,
+      "scores": {
+        "P1": 40,
+        "T1": 10,
+        "T2": 10,
+        "T3": 8,
+        "T4": 6,
+        "T5": 6,
+        "B1": 8,
+        "B2": 6,
+        "B3": 6
+      }
+    },
+    {
+      "file": "out_of_sample/新样本_S11-S18/N02.docx",
+      "profile": "profile-a-calibrated",
+      "reviewer": "EX-02",
+      "total": 78,
+      "scores": {
+        "P1": 40,
+        "T1": 10,
+        "T2": 0,
+        "T3": 8,
+        "T4": 6,
+        "T5": 0,
+        "B1": 8,
+        "B2": 0,
+        "B3": 6
+      }
+    },
+    {
+      "file": "out_of_sample/新样本_S11-S18/N03.docx",
+      "profile": "profile-a-calibrated",
+      "reviewer": "EX-02",
+      "total": 78,
+      "scores": {
+        "P1": 40,
+        "T1": 10,
+        "T2": 0,
+        "T3": 8,
+        "T4": 6,
+        "T5": 6,
+        "B1": 8,
+        "B2": 0,
+        "B3": 0
+      }
+    },
+    {
+      "file": "out_of_sample/新样本_S11-S18/N04.docx",
+      "profile": "profile-a-calibrated",
+      "reviewer": "EX-02",
+      "total": 100,
+      "scores": {
+        "P1": 40,
+        "T1": 10,
+        "T2": 10,
+        "T3": 8,
+        "T4": 6,
+        "T5": 6,
+        "B1": 8,
+        "B2": 6,
+        "B3": 6
+      }
+    },
+    {
+      "file": "out_of_sample/新样本_S11-S18/N05.docx",
+      "profile": "profile-a-calibrated",
+      "reviewer": "EX-02",
+      "total": 100,
+      "scores": {
+        "P1": 40,
+        "T1": 10,
+        "T2": 10,
+        "T3": 8,
+        "T4": 6,
+        "T5": 6,
+        "B1": 8,
+        "B2": 6,
+        "B3": 6
+      }
+    },
+    {
+      "file": "out_of_sample/新样本_S11-S18/N06.docx",
+      "profile": "profile-a-calibrated",
+      "reviewer": "EX-02",
+      "total": 84,
+      "scores": {
+        "P1": 40,
+        "T1": 10,
+        "T2": 0,
+        "T3": 8,
+        "T4": 6,
+        "T5": 6,
+        "B1": 8,
+        "B2": 0,
+        "B3": 6
+      }
+    },
+    {
+      "file": "out_of_sample/新样本_S11-S18/N07.docx",
+      "profile": "profile-a-calibrated",
+      "reviewer": "EX-02",
+      "total": 94,
+      "scores": {
+        "P1": 40,
+        "T1": 10,
+        "T2": 10,
+        "T3": 8,
+        "T4": 6,
+        "T5": 6,
+        "B1": 8,
+        "B2": 6,
+        "B3": 0
+      }
+    },
+    {
+      "file": "out_of_sample/新样本_S11-S18/N08.docx",
+      "profile": "profile-a-calibrated",
+      "reviewer": "EX-02",
       "total": 32,
       "scores": {
         "P1": 0,
