@@ -38,7 +38,8 @@ def token_from_git() -> str:
 
 
 def main() -> int:
-    body = BODY_FILE.read_text(encoding="utf-8")
+    body_file = Path(sys.argv[1]) if len(sys.argv) > 1 else BODY_FILE
+    body = body_file.read_text(encoding="utf-8")
     token = os.getenv("GITCODE_TOKEN") or token_from_git()
 
     resp = requests.patch(
