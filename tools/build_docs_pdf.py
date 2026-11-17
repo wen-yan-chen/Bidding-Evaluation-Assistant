@@ -35,7 +35,7 @@ from reportlab.platypus import (
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
 FONT = Path("C:/Windows/Fonts/simhei.ttf")
-OUT_DIR = DOCS / "pdf"
+OUT_DIR = DOCS / "pdf" / "20261117"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 pdfmetrics.registerFont(TTFont("SimHei", str(FONT)))

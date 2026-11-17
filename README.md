@@ -217,7 +217,7 @@ python -m pytest -q
 - 校准版：**10/10** 与“老师逐项分反推总分”一致；
 - 这是 **in-sample 规则对齐**，不是独立验证，不能外推。
 
-### 5.3 新样本 out-of-sample（N01–N10，重评版）
+### 5.3 新样本 out-of-sample（N01–N10，盲评定稿）
 
 10 份新样本一次盲评，B3 按“具体时限/SLA/质保期”严格口径：
 
@@ -329,6 +329,6 @@ MIT License。提交到 AgentsHub 即表示同意以仓库现有 MIT License 发
 - [数据说明](docs/数据说明.md)
 - [评审说明](docs/评审说明.md)
 - [使用说明](docs/使用说明.md)
-- [四份文档 PDF 合集](docs/pdf/招投标评审助手-文档合集.pdf)
+- [四份文档 PDF 合集](docs/pdf/20261117/招投标评审助手-文档合集.pdf)
 - [部署说明](DEPLOY.md)
 - [评测数据索引](docs/评审功能测评数据/README.md)

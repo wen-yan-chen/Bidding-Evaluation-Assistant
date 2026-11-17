@@ -22,7 +22,7 @@ for file, start, end in [
 payload = {
     "version": "v2",
     "generated_at": "2026-11-17",
-    "note": "重评版：N01-N10 一次盲评，B3 按具体时限/SLA/质保期严格口径；不区分独立性。",
+    "note": "盲评定稿：N01-N10 一次盲评，B3 按具体时限/SLA/质保期严格口径。",
     "items": items,
 }
 with open("data/samples/expert_scores.json", "w", encoding="utf-8") as fh:

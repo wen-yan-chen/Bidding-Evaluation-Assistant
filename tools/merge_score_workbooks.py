@@ -6,7 +6,7 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 
-BASE = Path(__file__).resolve().parent.parent / "docs" / "评审功能测评数据" / "01-评分重评"
+BASE = Path(__file__).resolve().parent.parent / "docs" / "评审功能测评数据" / "01-评分结果"
 SRC = BASE / "评分表_N01-N08.xlsx"
 ADD = BASE / "评分表_N09-N10.xlsx"
 OUT = BASE / "评分表_N01-N10.xlsx"

@@ -10,7 +10,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-BASE = Path(__file__).resolve().parent.parent / "docs" / "评审功能测评数据" / "01-评分重评"
+BASE = Path(__file__).resolve().parent.parent / "docs" / "评审功能测评数据" / "01-评分结果"
 OUT = BASE / "评分意见_N01-N10.docx"
 
 ITEMS = [
@@ -104,7 +104,7 @@ def main() -> int:
     doc.styles["Normal"]._element.rPr.rFonts.set(qn("w:eastAsia"), "宋体")
 
     para(doc, "招投标辅助评审 · 参考评分意见（N01–N10）", 18, True, (0x12, 0x3B, 0x5D), 6, WD_ALIGN_PARAGRAPH.CENTER)
-    para(doc, "重评版 · 2026-11-17 · B3 口径确认后｜9 项 100 分｜限价 2,000,000.00 元｜工期 90 日历天",
+    para(doc, "盲评定稿 · 2026-11-17｜9 项 100 分｜限价 2,000,000.00 元｜工期 90 日历天",
          9.5, False, (0x4A, 0x65, 0x72), 14, WD_ALIGN_PARAGRAPH.CENTER)
 
     heading(doc, "一、评分口径")
@@ -142,9 +142,8 @@ def main() -> int:
         p.paragraph_format.line_spacing = 1.2
         set_font(p.add_run(text), 9.8)
 
-    heading(doc, "五、重评与统计口径")
-    para(doc, "B3 口径统一后，N02、N06 的 B3 由 6 改 0，总分分别由 78/84 改为 72/78；其余 8 份分数不变。只采用本版 N01–N10 的分数，初评不再作为依据。")
-    para(doc, "10 份为唯一样本；若两位评审人都评，标注条数是 20 条，但样本数仍是 10 份，刚够正式要求的下限（10–15 份）。10 份均由同一套生成模板产出，段落结构、句式高度相似，真实标书的长篇叙述、附件、表格混排仍未覆盖。")
+    heading(doc, "五、统计口径")
+    para(doc, "N01–N10 按 B3 严格口径评分；10 份为唯一样本，刚够正式要求的下限（10–15 份）。10 份均由同一套生成模板产出，段落结构、句式高度相似，真实标书的长篇叙述、附件、表格混排仍未覆盖。")
 
     heading(doc, "六、结论")
     para(doc, "10 份的分数梯度比 8 份那批更开：4 份满分，N07 94，N03/N06 78，N02 72，N10 44，N08 32。差异集中在两处：一是“仅列标题/套话”与“实质内容”的区分；二是价格与工期两个硬性档位。报告里引用本版分数，并保留“10 份小样本、不能外推”的限制。")
