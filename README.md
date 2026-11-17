@@ -331,6 +331,6 @@ MIT License。提交到 AgentsHub 即表示同意以仓库现有 MIT License 发
 - [使用说明](docs/使用说明.md)
 - [四份文档 PDF 合集](docs/pdf/20261117/招投标评审助手-文档合集.pdf)
 - [演示视频脚本](docs/演示视频脚本.md)
-- [演示视频 PPT](docs/演示视频-招投标评审助手.pptx)
+- [演示视频 PPT](docs/演示视频-招投标评审助手-新版.pptx)
 - [部署说明](DEPLOY.md)
 - [评测数据索引](docs/评审功能测评数据/README.md)

@@ -6,12 +6,14 @@ from pathlib import Path
 from PIL import Image
 from pptx import Presentation
 from pptx.dml.color import RGBColor
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "docs" / "演示视频-招投标评审助手.pptx"
+OUT = ROOT / "docs" / "演示视频-招投标评审助手-新版.pptx"
 SHOTS = ROOT / "docs" / "screenshots"
 
 # 参照课题 32 deck 的配色
@@ -27,6 +29,7 @@ WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 GREEN = RGBColor(0x0F, 0x9F, 0x6E)
 ORANGE = RGBColor(0xD9, 0x77, 0x06)
 FONT = "Microsoft YaHei"
+SERIF = "SimSun"
 NUM = "Arial"
 
 prs = Presentation()
@@ -283,41 +286,11 @@ def slide4():
 
 def slide5():
     s = prs.slides.add_slide(BLANK)
-    head(s, "ARCHITECTURE 1 / 2", "架构：四层分工，一条可追溯链路", "位置由代码算，判断有边界，依据可回溯", 5)
-    layers = [
-        ("前端 web/", "评审看板 · 双栏 · 报告中心"),
-        ("FastAPI api/", "parsers · extract · review · rules · report"),
-        ("Nexent Agent + MCP", "4 Skill · 8 MCP 工具 · 知识库"),
-        ("data / knowledge", "规则 · 评分细则 · 样本 · 报告"),
-    ]
-    for i, (title, sub) in enumerate(layers):
-        y = 1.62 + i * 1.22
-        rect(s, 0.72, y, 4.35, 0.98, LIGHT if i == 2 else WHITE, BLUE if i == 2 else LINE, True)
-        txt(s, title, 0.94, y + 0.16, 3.9, 0.30, 12.5, True, DEEP if i == 2 else INK)
-        txt(s, sub, 0.94, y + 0.52, 3.9, 0.24, 8.2, False, BODY)
-        if i < 3:
-            arrow = s.shapes.add_shape(MSO_SHAPE.DOWN_ARROW, Inches(2.55), Inches(y + 1.00), Inches(0.28), Inches(0.18))
-            arrow.fill.solid(); arrow.fill.fore_color.rgb = BLUE; arrow.line.fill.background(); arrow.shadow.inherit = False
-    # 右侧链路
-    steps = ["上传", "解析", "8 字段", "资格/评分/风险", "报告"]
-    for i, step in enumerate(steps):
-        y = 1.62 + i * 1.06
-        rect(s, 6.15, y, 2.10, 0.72, WHITE, LINE, True)
-        txt(s, step, 6.28, y + 0.20, 1.85, 0.28, 10.5, True, INK, PP_ALIGN.CENTER)
-        if i < len(steps) - 1:
-            arrow = s.shapes.add_shape(MSO_SHAPE.DOWN_ARROW, Inches(7.00), Inches(y + 0.75), Inches(0.24), Inches(0.20))
-            arrow.fill.solid(); arrow.fill.fore_color.rgb = BLUE; arrow.line.fill.background(); arrow.shadow.inherit = False
-    rect(s, 8.65, 1.62, 3.95, 1.95, LIGHT, BLUE, True)
-    txt(s, "端口与部署", 8.88, 1.80, 3.5, 0.28, 11, True, DEEP)
-    txt(s, "app 18080 ｜ MCP 8765", 8.88, 2.15, 3.5, 0.25, 9.5, False, BODY)
-    txt(s, "docker compose up -d", 8.88, 2.48, 3.5, 0.25, 9.5, False, BODY)
-    txt(s, "MCP 不是独立服务", 8.88, 2.81, 3.5, 0.25, 9.5, True, ORANGE)
-    txt(s, "需先启动完整后端", 8.88, 3.12, 3.5, 0.25, 9.5, False, BODY)
-    rect(s, 8.65, 3.85, 3.95, 1.55, WHITE, LINE, True)
-    txt(s, "三个硬边界", 8.88, 4.03, 3.5, 0.28, 11, True, DEEP)
-    txt(s, "① 抽不到不猜\n② 无 page/quote 不进报告\n③ 不输出中标/废标结论", 8.88, 4.38, 3.45, 0.85, 8.8, False, BODY)
+    head(s, "ARCHITECTURE", "架构：四层分工，一条可追溯链路", "位置由代码算，判断有边界，依据可回溯", 5)
+    image(s, ROOT / "docs" / "assets" / "architecture.png", 0.55, 1.40, 12.25, 5.55)
+    txt(s, "app 18080 ｜ MCP 8765 ｜ docker compose up -d", 8.30, 7.02, 4.45, 0.22, 7.2, False, BODY, PP_ALIGN.RIGHT)
     footer(s, 5, "docs/开发说明.md ｜ DEPLOY.md")
-    notes(s, "架构分四层：前端、FastAPI、Nexent/MCP、数据与知识库。右侧是五步链路。部署上 app 在 18080，MCP 在 8765；MCP 依赖完整后端，不是单独一个 py 文件。")
+    notes(s, "架构分四层：交互层、FastAPI 服务层、Nexent 智能体层、数据层。中间箭头是上传/评审链路，MCP 负责取数和回写。app 在 18080，MCP 在 8765。")
 
 
 def slide6():
@@ -346,64 +319,60 @@ def slide6():
 
 def slide7():
     s = prs.slides.add_slide(BLANK)
-    head(s, "DATA", "数据说明：25 份基线 + N01–N10 盲评", "全部自造虚构，不含真实企业/个人信息", 7)
+    head(s, "DATA", "数据说明：25 份基线 + N01–N10", "全部自造虚构，不含真实企业/个人信息", 7)
     rows = [
-        ["类别", "路径", "规模", "说明"],
-        ["解析基线", "data/samples/", "25 份", "20 文本层 + 5 扫描件；146 个字段"],
-        ["植入风险", "data/samples/risk/", "15 份", "每份只植入一类风险；5 份干净对照"],
-        ["资格性标注", "docs/评审功能测评数据/02-资格性标注/", "250 条", "25 份 × R01–R10 三态"],
-        ["盲评样本", "data/samples/out_of_sample/", "N01–N10", "10 份，9 项评分 + 逐份依据"],
-        ["规则库", "data/rules/rules.yaml", "40 条", "27 自动 + 10 人工 + 3 未实现"],
-        ["评分细则", "data/scoring/", "3 套", "默认 profile-a-calibrated"],
-        ["知识库", "knowledge/rules-full.md", "40 条", "导入后替换 index_names"],
+        ["数据资产", "规模", "口径"],
+        ["解析基线", "25 份", "20 文本层 + 5 扫描件；146 字段"],
+        ["植入风险", "15 份", "每份一类；5 份干净对照"],
+        ["资格性标注", "250 条", "25 份 × R01–R10 三态"],
+        ["盲评样本", "N01–N10", "10 份；9 项评分 + 逐份依据"],
+        ["规则 / 细则", "40 / 3", "27 + 10 + 3；默认 calibrated"],
     ]
-    table(s, rows, 0.72, 1.62, 11.90, [1.55, 4.30, 1.35, 4.70], 0.44, 8.8)
-    rect(s, 0.72, 5.80, 5.85, 0.78, LIGHT, BLUE, True)
-    txt(s, "资格性：250/250 = 100%", 0.94, 6.00, 5.4, 0.22, 10, True, DEEP)
-    txt(s, "风险：TP 15 / FN 0 / FP 0", 0.94, 6.26, 5.4, 0.20, 8.5, False, BODY)
-    rect(s, 6.77, 5.80, 5.85, 0.78, WHITE, LINE, True)
-    txt(s, "盲评：N01–N10 校准版 10/10", 7.00, 6.00, 5.4, 0.22, 10, True, DEEP)
-    txt(s, "平均绝对偏差 0.00；旧版 4/10", 7.00, 6.26, 5.4, 0.20, 8.5, False, BODY)
+    table(s, rows, 0.72, 1.62, 6.95, [1.25, 1.25, 4.45], 0.50, 8.8)
+    rect(s, 8.05, 1.62, 4.45, 2.20, LIGHT, BLUE, True)
+    txt(s, "8 个字段", 8.28, 1.80, 3.9, 0.26, 11, True, DEEP)
+    txt(s, "每个字段都带 page + quote", 8.28, 2.10, 3.9, 0.22, 7.6, False, BODY)
+    txt(s, "项目名称　　项目编号\n采购人　　　投标人\n报价　　　　工期\n资质清单　　业绩清单", 8.28, 2.44, 3.95, 1.10, 8.8, False, INK, spacing=1.18)
+    txt(s, "3 套评分细则", 8.05, 4.05, 3.5, 0.24, 10, True, BLUE)
+    txt(s, "3 套细则：profile-a-calibrated（默认）｜ profile-a（旧基线）｜ profile-b（技术优先）", 8.05, 4.28, 4.45, 0.55, 7.2, False, BODY)
+    stats = [("25/25", "解析"), ("250/250", "资格性"), ("10/10", "盲评")]
+    for i, (num, label) in enumerate(stats):
+        x = 0.72 + i * 4.05
+        rect(s, x, 5.38, 3.75, 0.76, LIGHT, BLUE, True)
+        txt(s, num, x + 0.18, 5.48, 1.55, 0.28, 14, True, DEEP, font=NUM)
+        txt(s, label, x + 1.85, 5.53, 1.55, 0.22, 8.2, False, BODY)
+    txt(s, "风险 TP 15 / FN 0 / FP 0 ｜ 证据：docs/数据说明.md ｜ docs/评审功能测评数据/", 0.72, 6.36, 11.8, 0.24, 8.2, False, BODY)
     footer(s, 7, "docs/数据说明.md ｜ data/samples/")
-    notes(s, "数据分成三层：25 份解析基线、15 份植入风险、N01–N10 盲评样本；再加 250 条资格性标注和 40 条规则。全部是自造数据。")
+    notes(s, "数据用一张图说完：25 份解析基线、15 份植入风险、250 条资格性标注、N01–N10 盲评样本；再往上 8 字段、40 条规则、3 套细则。全部自造数据。")
 
 
 def slide8():
     s = prs.slides.add_slide(BLANK)
-    head(s, "DATA & RULES", "数据口径：8 个字段、40 条规则、3 套细则", "字段带 quote，规则带依据三态，细则可切换", 8)
-    txt(s, "8 个字段", 0.72, 1.62, 3.2, 0.28, 11, True, BLUE)
-    fields = ["项目名称", "项目编号", "采购人", "投标人", "报价", "工期", "资质清单", "业绩清单"]
-    for i, f in enumerate(fields):
+    head(s, "REPRODUCE", "复现路径：一条命令，四步验收", "从代码到页面，全部可复算", 8)
+    steps = [
+        ("01", "启动", "docker compose up -d --build", "app 18080 / MCP 8765"),
+        ("02", "规则", "python tools/validate_rules.py", "40 条 · 30/6/4"),
+        ("03", "评测", "python tools/eval_calibrated.py --strict", "N01–N10 10/10"),
+        ("04", "回归", "python -m pytest -q", "本地 66 / 容器 67"),
+    ]
+    for i, (num, title, cmd, result) in enumerate(steps):
         col, row = i % 2, i // 2
-        rect(s, 0.72 + col * 2.55, 2.00 + row * 0.72, 2.35, 0.52, LIGHT, BLUE, True)
-        txt(s, f, 0.88, 2.13 + row * 0.72, 2.05, 0.22, 9, True, DEEP)
-    txt(s, "40 条规则", 5.85, 1.62, 3.0, 0.28, 11, True, BLUE)
-    rows = [
-        ["类别", "规则", "数量"],
-        ["资质门槛", "R01–R10", "10"],
-        ["废标条款", "R11–R20", "10"],
-        ["围标串标", "R21–R30", "10"],
-        ["报价异常", "R31–R40", "10"],
-    ]
-    table(s, rows, 5.85, 2.00, 3.10, [1.10, 1.35, 0.65], 0.48, 9.2)
-    txt(s, "依据三态", 9.40, 1.62, 2.8, 0.28, 11, True, BLUE)
-    for i, (num, label) in enumerate([("30", "verified"), ("6", "pending"), ("4", "na")]):
-        rect(s, 9.40, 2.00 + i * 0.82, 2.95, 0.64, WHITE, LINE, True)
-        txt(s, num, 9.58, 2.10 + i * 0.82, 0.8, 0.34, 16, True, DEEP, font=NUM)
-        txt(s, label, 10.36, 2.19 + i * 0.82, 1.7, 0.22, 8.5, False, BODY)
-    txt(s, "3 套评分细则", 0.72, 5.18, 3.5, 0.28, 11, True, BLUE)
-    rows2 = [
-        ["ID", "权重", "用途"],
-        ["profile-a-calibrated", "40/40/20", "默认；T2/B2/B3 实质响应"],
-        ["profile-a", "40/40/20", "旧基线，对照"],
-        ["profile-b", "30/50/20", "技术优先"],
-    ]
-    table(s, rows2, 0.72, 5.52, 8.65, [2.70, 1.25, 4.70], 0.38, 8.5)
-    rect(s, 9.72, 5.18, 2.65, 1.55, LIGHT, BLUE, True)
-    txt(s, "门控", 9.94, 5.34, 2.2, 0.24, 9.5, True, DEEP)
-    txt(s, "工程 / 货物服务 / 未指定\nR03 · R08 · R36 按类型启用", 9.94, 5.66, 2.25, 0.80, 7.6, False, BODY)
-    footer(s, 8, "data/rules/rules.yaml ｜ data/scoring/")
-    notes(s, "8 字段、40 条规则、3 套细则。规则分四类，每类 10 条；依据分 verified、pending、na 三态。评分默认用校准版，工程/货物服务类型会影响门控规则。")
+        x = 0.72 + col * 3.30
+        y = 1.62 + row * 1.28
+        rect(s, x, y, 3.10, 1.08, WHITE, LINE, True)
+        txt(s, num, x + 0.15, y + 0.12, 0.35, 0.22, 9, True, BLUE, font=NUM)
+        txt(s, title, x + 0.58, y + 0.10, 0.80, 0.24, 9.5, True, INK)
+        txt(s, cmd, x + 0.15, y + 0.48, 2.80, 0.30, 7.2, True, DEEP, font="Consolas")
+        txt(s, result, x + 0.15, y + 0.82, 2.80, 0.20, 7.0, False, BODY)
+    rect(s, 7.45, 1.62, 5.15, 4.05, DEEP, DEEP, True)
+    txt(s, "一键验收", 7.70, 1.82, 4.6, 0.26, 11, True, WHITE)
+    txt(s, "docker compose up -d --build\n\npython tools/eval_calibrated.py --strict\npython tools/eval_scoring.py --strict\npython -m pytest -q", 7.70, 2.18, 4.55, 2.45, 8.6, False, WHITE, font="Consolas", spacing=1.25)
+    txt(s, "环境：Python 3.11 ｜ RapidOCR ｜ 数据全本地", 7.70, 4.10, 4.55, 0.22, 7.0, False, RGBColor(0xD8, 0xE6, 0xFF))
+    txt(s, "容器：67 passed｜本地：66 passed / 1 skipped", 7.70, 4.90, 4.55, 0.24, 7.2, False, RGBColor(0xD8, 0xE6, 0xFF))
+    rect(s, 0.72, 6.02, 11.90, 0.78, LIGHT, BLUE, True)
+    txt(s, "验收判定：规则 40 = 27+10+3 ｜ 资格性 250/250 ｜ 风险 15/15 ｜ 报告 14/14 ｜ 评分 10/10", 0.95, 6.22, 11.4, 0.26, 8.8, True, DEEP)
+    footer(s, 8, "docs/开发说明.md ｜ DEPLOY.md ｜ tools/")
+    notes(s, "复现路径四步：启动、规则、评测、回归。命令都写在这里；容器和本地测试分别 67/66。验收判定一行写清楚。")
 
 
 def slide9():
@@ -576,10 +545,34 @@ def slide16():
             ("N05", 100, 100, 100), ("N06", 78, 100, 78), ("N07", 94, 100, 94), ("N08", 32, 54, 32),
             ("N09", 100, 100, 100), ("N10", 44, 66, 44)]
     rows += [[a, str(b), str(c), str(d)] for a, b, c, d in data]
-    table(s, rows, 0.72, 3.05, 5.75, [0.95, 1.35, 1.35, 1.35], 0.30, 8.0)
-    image(s, SHOTS / "20261117-02-评审结果-总分卡.png", 6.85, 3.05, 5.75, 1.10)
-    txt(s, "评分表 / 意见：docs/评审功能测评数据/01-评分结果/", 6.85, 4.45, 5.75, 0.30, 8.2, False, BODY)
-    txt(s, "score_item 默认 profile-a-calibrated；旧 profile-a 保留作对照。", 6.85, 4.85, 5.75, 0.42, 8.2, True, ORANGE)
+    table(s, rows, 0.72, 3.05, 5.45, [0.90, 1.25, 1.25, 1.25], 0.29, 8.0)
+    chart_data = CategoryChartData()
+    chart_data.categories = [x[0] for x in data]
+    chart_data.add_series("旧版偏差", tuple(x[2] - x[1] for x in data))
+    chart_data.add_series("校准版偏差", tuple(x[3] - x[1] for x in data))
+    chart = s.shapes.add_chart(
+        XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(6.55), Inches(2.95), Inches(6.15), Inches(3.45), chart_data
+    ).chart
+    chart.has_title = False
+    chart.has_legend = True
+    chart.legend.position = XL_LEGEND_POSITION.BOTTOM
+    chart.legend.include_in_layout = False
+    chart.font.name = FONT
+    chart.font.size = Pt(8)
+    chart.font.color.rgb = BODY
+    chart.value_axis.minimum_scale = 0
+    chart.value_axis.maximum_scale = 25
+    chart.value_axis.major_unit = 5
+    chart.value_axis.has_major_gridlines = True
+    chart.value_axis.major_gridlines.format.line.color.rgb = RGBColor(0xE2, 0xE8, 0xF2)
+    chart.plots[0].gap_width = 70
+    chart.plots[0].overlap = -8
+    chart.series[0].format.fill.solid()
+    chart.series[0].format.fill.fore_color.rgb = ORANGE
+    chart.series[1].format.fill.solid()
+    chart.series[1].format.fill.fore_color.rgb = BLUE
+    txt(s, "旧版偏差集中在 N02/N03/N06/N08/N10；校准版全部为 0。", 6.55, 6.45, 6.15, 0.24, 8.0, True, ORANGE)
+    txt(s, "评分表 / 意见：docs/评审功能测评数据/01-评分结果/；默认 score_item = profile-a-calibrated。", 0.72, 6.55, 5.55, 0.40, 7.4, False, BODY)
     footer(s, 16, "docs/评审说明.md ｜ tools/eval_scoring.py")
     notes(s, "评审结果：N01–N10 十份新样本，旧版只有 4/10 在 ±5 内，校准版 10/10，平均偏差 0。注意这是 n=10 的小样本，不能外推。")
 
@@ -660,7 +653,7 @@ def slide20():
     s = prs.slides.add_slide(BLANK)
     bg(s, 20)
     txt(s, "一句话总结", 1.05, 1.60, 3.0, 0.30, 11, True, BLUE)
-    txt(s, "把一份标书，变成可追溯的评审结果。", 1.02, 2.00, 11.2, 0.85, 30, True, INK)
+    txt(s, "把一份标书，变成可追溯的评审结果。", 1.02, 2.00, 11.2, 0.85, 30, True, INK, font=SERIF)
     rect(s, 1.05, 3.00, 4.6, 0.035, BLUE)
     rows = [
         ("代码仓库", "https://github.com/wen-yan-chen/Bidding-Evaluation-Assistant"),
