@@ -329,5 +329,6 @@ MIT License。提交到 AgentsHub 即表示同意以仓库现有 MIT License 发
 - [数据说明](docs/数据说明.md)
 - [评审说明](docs/评审说明.md)
 - [使用说明](docs/使用说明.md)
+- [四份文档 PDF 合集](docs/pdf/招投标评审助手-文档合集.pdf)
 - [部署说明](DEPLOY.md)
 - [评测数据索引](docs/评审功能测评数据/README.md)
