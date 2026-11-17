@@ -1,4 +1,4 @@
-"""生成课题 8 演示视频 PPT（参照课题 32 deck 的版式）。"""
+﻿"""生成课题 8 演示视频 PPT（参照课题 32 deck 的版式）。"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -13,7 +13,7 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Inches, Pt
 
 ROOT = Path(__file__).resolve().parent.parent
-OUT = ROOT / "docs" / "演示视频-招投标评审助手-新版.pptx"
+OUT = ROOT / "docs" / "演示视频-招投标评审助手-v4.pptx"
 SHOTS = ROOT / "docs" / "screenshots"
 
 # 参照课题 32 deck 的配色
@@ -31,6 +31,7 @@ ORANGE = RGBColor(0xD9, 0x77, 0x06)
 FONT = "Microsoft YaHei"
 SERIF = "SimSun"
 NUM = "Arial"
+PAGE = [0]
 
 prs = Presentation()
 prs.slide_width = Inches(13.333)
@@ -103,6 +104,8 @@ def bg(slide, idx):
 
 
 def head(slide, eyebrow, title, sub=None, idx=1):
+    PAGE[0] += 1
+    idx = PAGE[0]
     bg(slide, idx)
     txt(slide, eyebrow.upper(), 0.55, 0.26, 8.0, 0.25, 10.5, True, BLUE)
     txt(slide, title, 0.55, 0.50, 10.7, 0.62, 27, True, INK)
@@ -112,12 +115,13 @@ def head(slide, eyebrow, title, sub=None, idx=1):
 
 
 def footer(slide, idx, source=""):
+    idx = PAGE[0]
     if source:
         txt(slide, "来源：" + source, 0.55, 7.08, 9.5, 0.18, 7, False, BODY)
     txt(slide, "魔擎开发者激励 1 期 · 课题 #08 ｜ 招投标评审助手", 0.55, 7.28, 9.8, 0.16, 6.5, False, RGBColor(0x7B, 0x88, 0x98))
     txt(slide, f"{idx:02d}", 12.55, 7.08, 0.45, 0.20, 8, False, BODY, PP_ALIGN.RIGHT)
     # 进度条 12 段
-    active = min(11, int((idx - 1) * 12 / 20))
+    active = min(11, int((idx - 1) * 12 / 16))
     x = 0.55
     for i in range(12):
         rect(slide, x, 7.42, 0.88, 0.045, BLUE if i == active else RGBColor(0xE2, 0xE8, 0xF2))
@@ -170,6 +174,7 @@ def notes(slide, text):
 
 
 def slide1():
+    PAGE[0] = 1
     s = prs.slides.add_slide(BLANK)
     # 右侧蓝色块
     panel = s.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(9.15), 0, Inches(4.18), Inches(7.5))
@@ -222,37 +227,43 @@ def slide2():
 
 def slide3():
     s = prs.slides.add_slide(BLANK)
-    head(s, "BACKGROUND", "选题背景：人工评审慢，且容易漏「没写」的部分", "一份标书几十页，资格、评分、风险要来回翻", 3)
+    head(s, "BACKGROUND + OVERVIEW", "从人工评审，到一个可追溯的系统", "三个痛点一条链路：上传 → 解析 → 资格/评分/风险 → 报告", 3)
     left = [
-        ("逐页翻找", "项目名称、报价、工期散落在不同章节"),
-        ("资格靠人记", "营业执照、授权书、社保等逐项核对"),
-        ("评分口径不一", "同一份标书，不同评审人给分不同"),
+        ("逐页翻找", "字段散在不同章节，翻页慢"),
+        ("资格靠人记", "营业执照、授权书、社保逐项核"),
+        ("评分口径不一", "同一份标书，不同人给分不同"),
     ]
     right = [
-        ("8 字段 + 页码", "字段、清单、quote 全部可回原文"),
-        ("资格性三态", "已提供 / 缺失 / 效力不足，逐项带页"),
-        ("9 项确定性评分", "T2/B2/B3 要求实质内容，套话不给分"),
+        ("8 字段 + 页码", "字段、清单、quote 可回原文"),
+        ("资格性三态", "已提供 / 缺失 / 效力不足"),
+        ("9 项确定性评分", "T2/B2/B3 要实质内容"),
     ]
-    txt(s, "现状", 0.72, 1.62, 2.5, 0.28, 11, True, BODY)
-    txt(s, "本方案", 7.10, 1.62, 2.5, 0.28, 11, True, BLUE)
+    txt(s, "现状", 0.72, 1.58, 2.2, 0.24, 10, True, BODY)
+    txt(s, "本方案", 7.05, 1.58, 2.2, 0.24, 10, True, BLUE)
     for i, (a, b) in enumerate(left):
-        y = 1.98 + i * 1.08
-        rect(s, 0.70, y, 5.30, 0.90, RGBColor(0xF5, 0xF7, 0xFA), RGBColor(0xDF, 0xE6, 0xEF), True)
-        txt(s, a, 0.92, y + 0.15, 4.8, 0.25, 12, True, INK)
-        txt(s, b, 0.92, y + 0.47, 4.8, 0.28, 9.5, False, BODY)
+        y = 1.90 + i * 0.98
+        rect(s, 0.70, y, 5.25, 0.80, RGBColor(0xF5, 0xF7, 0xFA), RGBColor(0xDF, 0xE6, 0xEF), True)
+        txt(s, a, 0.92, y + 0.12, 4.7, 0.22, 10.5, True, INK)
+        txt(s, b, 0.92, y + 0.40, 4.7, 0.22, 8.2, False, BODY)
     for i, (a, b) in enumerate(right):
-        y = 1.98 + i * 1.08
-        rect(s, 8.05, y, 4.55, 0.90, LIGHT, BLUE, True)
-        txt(s, a, 8.27, y + 0.15, 4.0, 0.25, 12, True, DEEP)
-        txt(s, b, 8.27, y + 0.47, 4.0, 0.28, 9.2, False, BODY)
-        # 箭头
-        arrow = s.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(6.60), Inches(y + 0.31), Inches(0.75), Inches(0.28))
+        y = 1.90 + i * 0.98
+        rect(s, 8.00, y, 4.55, 0.80, LIGHT, BLUE, True)
+        txt(s, a, 8.22, y + 0.12, 4.0, 0.22, 10.5, True, DEEP)
+        txt(s, b, 8.22, y + 0.40, 4.0, 0.22, 8.2, False, BODY)
+        arrow = s.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(6.55), Inches(y + 0.25), Inches(0.62), Inches(0.24))
         arrow.fill.solid(); arrow.fill.fore_color.rgb = BLUE; arrow.line.fill.background(); arrow.shadow.inherit = False
-    rect(s, 0.70, 5.45, 11.90, 0.95, LIGHT, BLUE, True)
-    txt(s, "目标：一份标书 → 可追溯的资格、评分、风险结论；每条结论都能落到原文某一句", 0.95, 5.68, 11.40, 0.25, 12.5, True, DEEP)
-    txt(s, "评测口径：25 份基线 + 15 份植入风险 + N01–N10 盲评", 0.95, 6.02, 11.40, 0.22, 9.5, False, BODY)
-    footer(s, 3, "docs/评审说明.md ｜ docs/数据说明.md")
-    notes(s, "痛点有三类：逐页翻找、资格靠人记、评分口径不一致。我们的做法是把字段、资格、评分、风险都结构化，并且每条都带 page 和 quote。")
+    txt(s, "系统全景：六步链路", 0.72, 5.18, 4.0, 0.24, 10, True, BLUE)
+    steps = ["上传", "解析", "8 字段", "资格性", "评分/风险", "报告"]
+    for i, step in enumerate(steps):
+        x = 0.72 + i * 1.95
+        rect(s, x, 5.50, 1.70, 0.56, WHITE, LINE, True)
+        txt(s, step, x + 0.08, 5.64, 1.54, 0.24, 8.5, True, INK, PP_ALIGN.CENTER)
+        if i < 5:
+            arrow = s.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(x + 1.71), Inches(5.64), Inches(0.20), Inches(0.28))
+            arrow.fill.solid(); arrow.fill.fore_color.rgb = BLUE; arrow.line.fill.background(); arrow.shadow.inherit = False
+    txt(s, "确定性代码算分，模型只负责组织语言；每条结论带 page + quote。", 0.72, 6.40, 11.4, 0.24, 8.2, True, ORANGE)
+    footer(s, 3, "docs/使用说明.md ｜ docs/开发说明.md")
+    notes(s, "一页说清背景和全景：三个痛点，对应三个方案，再落到六步链路。核心原则是最下面这行：算分是确定性代码，模型只组织语言。")
 
 
 def slide4():
@@ -333,8 +344,7 @@ def slide7():
     txt(s, "8 个字段", 8.28, 1.80, 3.9, 0.26, 11, True, DEEP)
     txt(s, "每个字段都带 page + quote", 8.28, 2.10, 3.9, 0.22, 7.6, False, BODY)
     txt(s, "项目名称　　项目编号\n采购人　　　投标人\n报价　　　　工期\n资质清单　　业绩清单", 8.28, 2.44, 3.95, 1.10, 8.8, False, INK, spacing=1.18)
-    txt(s, "3 套评分细则", 8.05, 4.05, 3.5, 0.24, 10, True, BLUE)
-    txt(s, "3 套细则：profile-a-calibrated（默认）｜ profile-a（旧基线）｜ profile-b（技术优先）", 8.05, 4.28, 4.45, 0.55, 7.2, False, BODY)
+    txt(s, "3 套细则：profile-a-calibrated（默认）｜ profile-a（旧基线）｜ profile-b（技术优先）", 8.05, 4.05, 4.45, 0.62, 7.2, False, BODY)
     stats = [("25/25", "解析"), ("250/250", "资格性"), ("10/10", "盲评")]
     for i, (num, label) in enumerate(stats):
         x = 0.72 + i * 4.05
@@ -533,48 +543,40 @@ def slide15():
 
 def slide16():
     s = prs.slides.add_slide(BLANK)
-    head(s, "EVALUATION", "评审结果：N01–N10，校准版 10/10", "与参考评分逐份一致；旧版 4/10", 16)
-    metrics = [("10/10", "校准版 ±5 内", DEEP), ("0.00", "平均绝对偏差", DEEP), ("4/10", "旧版 ±5 内", ORANGE), ("11.60", "旧版平均偏差", ORANGE)]
+    head(s, "EVALUATION", "评审结果：N01–N10，10/10", "参考评分与校准版逐份一致；平均偏差 0.00", 16)
+    metrics = [("10/10", "在 ±5 内", DEEP), ("0.00", "平均绝对偏差", DEEP), ("10 份", "唯一样本", DEEP), ("n=10", "小样本", ORANGE)]
     for i, (num, label, color) in enumerate(metrics):
         x = 0.72 + i * 3.05
         rect(s, x, 1.68, 2.75, 1.12, WHITE, LINE, True)
         txt(s, num, x + 0.18, 1.82, 2.4, 0.42, 22, True, color, font=NUM)
         txt(s, label, x + 0.18, 2.34, 2.4, 0.24, 7.8, False, BODY)
-    rows = [["样本", "参考", "旧版", "校准"]]
-    data = [("N01", 100, 100, 100), ("N02", 72, 94, 72), ("N03", 78, 100, 78), ("N04", 100, 100, 100),
-            ("N05", 100, 100, 100), ("N06", 78, 100, 78), ("N07", 94, 100, 94), ("N08", 32, 54, 32),
-            ("N09", 100, 100, 100), ("N10", 44, 66, 44)]
-    rows += [[a, str(b), str(c), str(d)] for a, b, c, d in data]
-    table(s, rows, 0.72, 3.05, 5.45, [0.90, 1.25, 1.25, 1.25], 0.29, 8.0)
+    rows = [["样本", "参考", "校准"]]
+    data = [("N01", 100), ("N02", 72), ("N03", 78), ("N04", 100), ("N05", 100),
+            ("N06", 78), ("N07", 94), ("N08", 32), ("N09", 100), ("N10", 44)]
+    rows += [[a, str(v), str(v)] for a, v in data]
+    table(s, rows, 0.72, 3.05, 4.75, [1.05, 1.55, 1.55], 0.30, 8.2)
     chart_data = CategoryChartData()
     chart_data.categories = [x[0] for x in data]
-    chart_data.add_series("旧版偏差", tuple(x[2] - x[1] for x in data))
-    chart_data.add_series("校准版偏差", tuple(x[3] - x[1] for x in data))
+    chart_data.add_series("参考分 = 校准分", tuple(x[1] for x in data))
     chart = s.shapes.add_chart(
-        XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(6.55), Inches(2.95), Inches(6.15), Inches(3.45), chart_data
+        XL_CHART_TYPE.COLUMN_CLUSTERED, Inches(5.85), Inches(3.00), Inches(6.55), Inches(3.25), chart_data
     ).chart
     chart.has_title = False
-    chart.has_legend = True
-    chart.legend.position = XL_LEGEND_POSITION.BOTTOM
-    chart.legend.include_in_layout = False
+    chart.has_legend = False
     chart.font.name = FONT
     chart.font.size = Pt(8)
     chart.font.color.rgb = BODY
     chart.value_axis.minimum_scale = 0
-    chart.value_axis.maximum_scale = 25
-    chart.value_axis.major_unit = 5
+    chart.value_axis.maximum_scale = 110
+    chart.value_axis.major_unit = 20
     chart.value_axis.has_major_gridlines = True
     chart.value_axis.major_gridlines.format.line.color.rgb = RGBColor(0xE2, 0xE8, 0xF2)
-    chart.plots[0].gap_width = 70
-    chart.plots[0].overlap = -8
+    chart.plots[0].gap_width = 55
     chart.series[0].format.fill.solid()
-    chart.series[0].format.fill.fore_color.rgb = ORANGE
-    chart.series[1].format.fill.solid()
-    chart.series[1].format.fill.fore_color.rgb = BLUE
-    txt(s, "旧版偏差集中在 N02/N03/N06/N08/N10；校准版全部为 0。", 6.55, 6.45, 6.15, 0.24, 8.0, True, ORANGE)
-    txt(s, "评分表 / 意见：docs/评审功能测评数据/01-评分结果/；默认 score_item = profile-a-calibrated。", 0.72, 6.55, 5.55, 0.40, 7.4, False, BODY)
+    chart.series[0].format.fill.fore_color.rgb = BLUE
+    txt(s, "N01–N08 的 T1/T3/T4 文本相同，样本对这三项区分力有限；这是 n=10 的小样本，不能外推。", 0.72, 6.55, 11.80, 0.30, 8.0, True, ORANGE)
     footer(s, 16, "docs/评审说明.md ｜ tools/eval_scoring.py")
-    notes(s, "评审结果：N01–N10 十份新样本，旧版只有 4/10 在 ±5 内，校准版 10/10，平均偏差 0。注意这是 n=10 的小样本，不能外推。")
+    notes(s, "评审结果只看现在：N01–N10，参考分和校准版逐份一致，10/10 在 ±5 内，平均偏差 0。不要再讲旧版对比；只说明 n=10 的边界。")
 
 
 def slide17():
@@ -670,8 +672,8 @@ def slide20():
 
 
 def build():
-    slide1(); slide2(); slide3(); slide4(); slide5(); slide6(); slide7(); slide8(); slide9(); slide10()
-    slide11(); slide12(); slide13(); slide14(); slide15(); slide16(); slide17(); slide18(); slide19(); slide20()
+    slide1(); slide2(); slide3(); slide5(); slide6(); slide7(); slide9(); slide10()
+    slide12(); slide13(); slide14(); slide15(); slide16(); slide18(); slide19(); slide20()
     prs.core_properties.title = "招投标评审助手 · 演示视频 PPT"
     prs.core_properties.author = "gcw_N79tXvDq"
     prs.core_properties.subject = "魔擎开发者激励 1 期 · 课题 8"
